@@ -26,8 +26,8 @@ tasks:
       - task: all
 
   all:
-    desc: Everything - video, sprite, compressed Plymouth frames and logo
-    deps: [encode, sprite, plymouth, logo]
+    desc: Everything - video, sprite, compressed Plymouth frames, logo, palette and wallpapers
+    deps: [encode, sprite, plymouth, logo, palette, wallpaper]
 
   image:
     desc: Build the {{.IMAGE}} image every generator runs in (Docker)
@@ -100,13 +100,41 @@ tasks:
     deps: [image]
     vars:
       LOGO_DIR: '{{.LOGO_DIR | default "logos"}}'
-    sources: [logo.py, fonts/*.ttf]
+    sources: [logo.py, palette.py, palette.toml, fonts/*.ttf]
     generates: ['{{.LOGO_DIR}}/preview.png']
     cmds:
       - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
 
+  palette:
+    desc: Check the palette's contrast and write it for the theme forks (JSON, CSS, SCSS, Bibata) into palette/
+    label: palette-{{.PALETTE_DIR}}
+    deps: [image]
+    vars:
+      PALETTE_DIR: '{{.PALETTE_DIR | default "palette"}}'
+    sources: [palette.py, palette.toml]
+    generates: ['{{.PALETTE_DIR}}/*']
+    cmds:
+      - '{{.RUN}} python palette.py {{.PALETTE_DIR}}'
+
+  wallpaper:
+    desc: The desktop backgrounds, dark and light, at 4K into wallpapers/
+    label: wallpaper-{{.WALLPAPER_DIR}}
+    deps: [image]
+    vars:
+      WALLPAPER_DIR: '{{.WALLPAPER_DIR | default "wallpapers"}}'
+    sources: [wallpaper.py, palette.py, palette.toml]
+    generates: ['{{.WALLPAPER_DIR}}/*.png']
+    cmds:
+      - '{{.RUN}} python wallpaper.py {{.WALLPAPER_DIR}}'
+
+  preview:
+    desc: Open preview.html - the desktop with the palette, in dark and light - in this machine's browser
+    deps: [palette, wallpaper, logo]
+    cmds:
+      - if command -v xdg-open >/dev/null; then xdg-open preview.html; else open preview.html; fi
+
   check:
-    desc: Fail if the committed plymouth/ and logos/ are not what the sources make
+    desc: Fail if the committed plymouth/, logos/, wallpapers/ and palette/ are not what the sources make
     deps: [image]
     cmds:
       - rm -rf .check
@@ -114,13 +142,19 @@ tasks:
         vars: {PLY_DIR: .check/plymouth}
       - task: logo
         vars: {LOGO_DIR: .check/logos}
+      - task: wallpaper
+        vars: {WALLPAPER_DIR: .check/wallpapers}
+      - task: palette
+        vars: {PALETTE_DIR: .check/palette}
       - '{{.RUN}} python check.py plymouth .check/plymouth'
       - '{{.RUN}} python check.py logos .check/logos'
-      # The SVGs are text, written the same everywhere.
+      - '{{.RUN}} python check.py wallpapers .check/wallpapers'
+      # The SVGs and the palette are text, written the same everywhere.
       - for f in .check/logos/*.svg; do cmp "logos/$(basename "$f")" "$f" || exit 1; done
+      - diff -r palette .check/palette
       - rm -rf .check
 
   clean:
-    desc: Remove the generated frames, video and sprite (plymouth/ and logos/ are committed)
+    desc: Remove the generated frames, video and sprite (plymouth/, logos/, wallpapers/ and palette/ are committed)
     cmds:
       - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} .check .frames-*

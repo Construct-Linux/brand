@@ -1,0 +1,71 @@
+# The colors of CONSTRUCT: the one place they are written. logo.py and wallpaper.py read them,
+# and palette.py checks their contrast and writes them out (palette/) for the theme forks:
+# Orchis (GTK and GNOME Shell), Tela (folders) and Bibata (cursor). THEMING.md says where each
+# one goes.
+#
+# Two modes. Dark is the default and the boot's: the cyan of the logo on ink. Light keeps the
+# same hue, darkened until text in it reads on white.
+# The neutrals carry the ink's blue (hue ~207), so the desktop, the boot and the logo are one
+# surface, not cyan on a stock grey.
+
+[brand]
+cyan = "#00E5FF"        # the mark, the animation, the accent in dark mode
+ink = "#0B1116"         # behind the mark: boot, previews, the darkest surface
+paper = "#F4F6F8"       # behind the mono mark: the lightest surface but white
+boot = "#000000"        # Plymouth draws the frames on black
+
+# Surfaces, Orchis' scale: a-d light (a is the brightest), e-h dark (e is the darkest).
+# Orchis uses c and e as the window background, a and g for views (lists, text),
+# b and f for alternating rows, d and h for raised surfaces (popovers, headers).
+[neutral]
+a = "#FFFFFF"
+b = "#F9FAFB"
+c = "#F4F6F8"
+d = "#C9D1D8"
+e = "#0B1116"
+f = "#11181E"
+g = "#172028"
+h = "#1F2A33"
+
+[dark]
+accent = "#00E5FF"      # links, selection, focus, the suggested button
+on_accent = "#0B1116"   # text on the accent
+text = "#E6EDF2"
+muted = "#9FB3C0"
+border = "#2A3843"
+success = "#3DDC97"
+warning = "#FFC857"
+error = "#FF6B85"
+
+[light]
+accent = "#007A85"
+on_accent = "#FFFFFF"
+text = "#11181E"
+muted = "#5F7380"
+border = "#C9D1D8"
+success = "#1B7F4E"
+warning = "#8F5B00"
+error = "#C62840"
+
+# Tela: the folder body; its glyph is drawn in folder_glyph. Folders sit on both modes, so the
+# color is between the two accents.
+[icons]
+folder = "#0097A7"
+folder_glyph = "#FFFFFF"
+
+# Bibata: the three colors its SVGs are drawn with (render.json's #00FF00, #0000FF, #FF0000).
+[cursor]
+fill = "#0B1116"
+outline = "#FFFFFF"
+watch = "#00E5FF"
+
+# libadwaita apps on GNOME 47+ take the accent from a fixed list; this is the nearest to cyan,
+# used where the theme cannot reach.
+[gnome]
+accent = "teal"
+
+# Type. Audiowide is only the wordmark: it is a display face, not one to read menus in.
+[type]
+wordmark = "Audiowide"
+ui = "Cantarell"        # GNOME's own; nothing to add to the image
+mono = "JetBrains Mono" # terminals and editors: a developer desktop

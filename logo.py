@@ -2,6 +2,7 @@ import os, sys
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
+import palette
 
 # usage: logo.py [out_dir]
 # The Construct mark: the animation's last frame without the grid - the room in outline,
@@ -10,9 +11,11 @@ from PIL import Image, ImageDraw, ImageFont
 OUT = sys.argv[1] if len(sys.argv) > 1 else "logos"
 os.makedirs(OUT, exist_ok=True)
 
-CYAN = "#00E5FF"
-INK = "#0B1116"     # dark background for previews
-PAPER = "#F4F6F8"   # light background for mono previews
+PAL = palette.load()
+CYAN = PAL["brand"]["cyan"]
+INK = PAL["brand"]["ink"]       # dark background for previews
+PAPER = PAL["brand"]["paper"]   # light background for mono previews
+DEEP = PAL["neutral"]["f"]      # the mono mark and word on paper
 FONT = os.environ.get("FONT") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "Audiowide-Regular.ttf")  # OFL, same as video.py
 
 # ---------- camera from video.py: room = cube 3x3x3, looking straight down +z ----------
@@ -117,10 +120,20 @@ def symbolic(lines):
             f'<path d="{d}" fill="none" stroke="#2e3436" stroke-width="1.5" '
             f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
 
+def activities(lines):
+    """The Activities button of Orchis' GNOME Shell theme (its -i option): 48 px, white, as the
+    theme's own icons are; the shell tints nothing, so the stroke is drawn at panel weight."""
+    d = " ".join("M" + " L".join(f"{6 + (p[0] + 6) * 36 / 112:.2f} {6 + (p[1] + 6) * 36 / 112:.2f}" for p in pts) + (" Z" if closed else "")
+                 for pts, closed in chain(lines))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">\n'
+            f'<path d="{d}" fill="none" stroke="#fff" stroke-width="3" '
+            f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
+
 SIZES = [512, 128, 64, 48, 32, 24, 16]
 for variant, color in (("", CYAN), ("-mono", "currentColor")):
     open(f"{OUT}/{NAME}{variant}.svg", "w").write(svg(LINES, color))
 open(f"{OUT}/{NAME}-symbolic.svg", "w").write(symbolic(LINES))
+open(f"{OUT}/{NAME}-activities.svg", "w").write(activities(LINES))
 for s in SIZES:
     cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN, INK))
 cv2.imwrite(f"{OUT}/{NAME}-neon-512.png", render(LINES, 512, CYAN, INK, neon=True))
@@ -147,19 +160,19 @@ sheet = Image.new("RGB", (W, 560), INK)
 d = ImageDraw.Draw(sheet)
 note_font = ImageFont.truetype(FONT, 12)
 d.text((30, 22), NAME.upper(), font=ImageFont.truetype(FONT, 20), fill=CYAN)
-d.text((30, 54), "The animation's last frame without the grid: the room in outline, open on the left.", font=note_font, fill="#9FB3C0")
+d.text((30, 54), "The animation's last frame without the grid: the room in outline, open on the left.", font=note_font, fill=PAL["dark"]["muted"])
 x = 30
 for s in [256, 128, 64, 48, 32, 24, 16]:  # actual pixels, on dark
     sheet.paste(to_pil(render(LINES, s, CYAN, INK, neon=s == 256)), (x, 100 + 256 - s))
-    d.text((x, 370), f"{s}px", font=note_font, fill="#5F7380")
+    d.text((x, 370), f"{s}px", font=note_font, fill=PAL["light"]["muted"])
     x += s + 30
 big = cv2.resize(render(LINES, 16, CYAN, INK), (128, 128), interpolation=cv2.INTER_NEAREST)  # 16 px x8
 sheet.paste(to_pil(big), (x + 10, 228))
-d.text((x + 10, 370), "16px x8", font=note_font, fill="#5F7380")
-sheet.paste(to_pil(render(LINES, 128, "#11181E", PAPER)), (W - 30 - 128, 228))
-d.text((W - 30 - 128, 370), "mono", font=note_font, fill="#5F7380")
+d.text((x + 10, 370), "16px x8", font=note_font, fill=PAL["light"]["muted"])
+sheet.paste(to_pil(render(LINES, 128, DEEP, PAPER)), (W - 30 - 128, 228))
+d.text((W - 30 - 128, 370), "mono", font=note_font, fill=PAL["light"]["muted"])
 sheet.paste(lockup(120, CYAN, INK, "#FFFFFF", neon=True), (30, 410))
-lk = lockup(120, "#11181E", PAPER, "#11181E")
+lk = lockup(120, DEEP, PAPER, DEEP)
 sheet.paste(lk, (W - 30 - lk.width, 410))
 sheet.save(f"{OUT}/preview.png")
-print(f"{OUT}/: {NAME} -> svg, mono and symbolic svg, png {SIZES}, neon, preview.png")
+print(f"{OUT}/: {NAME} -> svg, mono, symbolic and activities svg, png {SIZES}, neon, preview.png")

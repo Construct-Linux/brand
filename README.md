@@ -44,22 +44,26 @@ same images on any machine. `task image` builds it; every task that needs it bui
 
 | Command | What it does |
 |---|---|
-| `task` / `task all` | **Everything**: frames, video, sprite, compressed Plymouth frames and logo |
+| `task` / `task all` | **Everything**: frames, video, sprite, compressed Plymouth frames, logo, palette and wallpapers |
 | `task generate` | Renders `frames/construct_01.png` … `construct_48.png` |
 | `task encode` | Builds `construct.mp4` (5 s) from the frames |
 | `task play` | Opens `construct.mp4` in this machine's video player |
 | `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
 | `task plymouth` | Transparent PNGs per frame for Plymouth in `plymouth/`, compressed with pngquant |
-| `task logo` | The logo in `logos/`: SVG in color, mono and GNOME symbolic, PNG from 16 to 512 px, and `preview.png` |
+| `task logo` | The logo in `logos/`: SVG in color, mono, GNOME symbolic and Orchis' Activities button, PNG from 16 to 512 px, and `preview.png` |
+| `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
+| `task wallpaper` | The desktop backgrounds, dark and light, at 4K into `wallpapers/` |
+| `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
-| `task check` | Fails if the committed `plymouth/` and `logos/` are not what the sources make |
+| `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
 | `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
 
-`plymouth/` and `logos/` are committed - they are what the distribution takes - and `task check`
-holds them to the sources: it regenerates them and compares each image over black, within a
-small tolerance (OpenCV picks its vector code by processor, and pngquant's palette follows the
-pixels), and the SVGs byte for byte. After changing `video.py`, `plymouth.py`, `logo.py` or the
-font, run `task plymouth logo` and commit the result. The video and the sprite are previews,
+`plymouth/`, `logos/`, `wallpapers/` and `palette/` are committed - they are what the
+distribution takes - and `task check` holds them to the sources: it regenerates them and compares
+each image over black, within a small tolerance (OpenCV picks its vector code by processor, and
+pngquant's palette follows the pixels), and the SVGs and the palette byte for byte. After
+changing `video.py`, `plymouth.py`, `logo.py`, `wallpaper.py`, `palette.toml` or the font, run
+`task plymouth logo palette wallpaper` and commit the result. The video and the sprite are previews,
 not committed.
 
 Each task runs the ones it needs first (`play` → `encode` → `generate` → `image`) and skips the
@@ -85,6 +89,9 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
 - `logo.py [out_dir]`: the logo files and the preview sheet.
+- `palette.py [out_dir]`: checks the palette's contrast and writes it out; `palette.load()` is what
+  the other generators read the colors from.
+- `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds.
 - `check.py <committed_dir> <regenerated_dir>`: compares two sets of images over black.
 
 ## Plymouth
@@ -133,8 +140,8 @@ The path must be inside the repository: the generators run in a container that o
 ## License
 
 - The artwork - the logo (`logos/`), the animation's frames (`plymouth/` and what `task`
-  generates) and the tagline - is under the Creative Commons Attribution-ShareAlike 4.0
+  generates), the wallpapers (`wallpapers/`), the palette and the tagline - is under the Creative Commons Attribution-ShareAlike 4.0
   International license (`LICENSES/CC-BY-SA-4.0.txt`).
-- The scripts, the `Taskfile.yml` and the `Dockerfile` are under the MIT license
+- The scripts, `preview.html`, the `Taskfile.yml` and the `Dockerfile` are under the MIT license
   (`LICENSES/MIT.txt`).
 - The Audiowide font is under the SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`).

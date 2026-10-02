@@ -1,0 +1,38 @@
+{
+  "Bibata-Modern-Construct": {
+    "dir": "svg/modern",
+    "out": "bitmaps/Bibata-Modern-Construct",
+    "colors": [
+      {
+        "match": "#00FF00",
+        "replace": "#0B1116"
+      },
+      {
+        "match": "#0000FF",
+        "replace": "#FFFFFF"
+      },
+      {
+        "match": "#FF0000",
+        "replace": "#00E5FF"
+      }
+    ]
+  },
+  "Bibata-Modern-Construct-Right": {
+    "dir": "svg/modern-right",
+    "out": "bitmaps/Bibata-Modern-Construct-Right",
+    "colors": [
+      {
+        "match": "#00FF00",
+        "replace": "#0B1116"
+      },
+      {
+        "match": "#0000FF",
+        "replace": "#FFFFFF"
+      },
+      {
+        "match": "#FF0000",
+        "replace": "#00E5FF"
+      }
+    ]
+  }
+}

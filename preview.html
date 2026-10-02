@@ -1,0 +1,238 @@
+<!doctype html>
+<!-- How the desktop looks with the palette: open after task palette wallpaper logo (task preview).
+     Every color comes from palette/construct.css; nothing here is a value of its own. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONSTRUCT desktop</title>
+<link rel="stylesheet" href="palette/construct.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  @font-face { font-family: "Audiowide"; src: url("fonts/Audiowide-Regular.ttf"); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font-ui); }
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
+  header.page { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; margin-bottom: 20px; }
+  .word { font-family: var(--font-wordmark); letter-spacing: .35em; font-size: 22px; color: var(--accent); display: flex; align-items: center; gap: 14px; }
+  .word img { width: 40px; height: 40px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 3px; background: var(--view); }
+  .seg button { font: inherit; border: 0; background: none; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 40px 0 12px; font-weight: 700; }
+  p.note { color: var(--muted); margin: 0 0 12px; max-width: 70ch; }
+
+  /* ---------- the desktop ---------- */
+  .desktop { position: relative; aspect-ratio: 16 / 9; width: 100%; border-radius: 12px; overflow: hidden;
+             background: var(--brand-ink) url("wallpapers/construct-dark.png") center / cover; border: 1px solid var(--border);
+             container-type: inline-size; font-size: clamp(9px, 1.15cqi, 15px); }
+  @media (prefers-color-scheme: light) { :root:not([data-mode="dark"]) .desktop { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); } }
+  :root[data-mode="light"] .desktop { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); }
+  /* the shell is dark in both modes (Orchis' dark top bar) */
+  .topbar { position: absolute; inset: 0 0 auto 0; height: 2.2em; background: rgba(11, 17, 22, .82); color: #E6EDF2;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 .8em; font-size: .95em; }
+  .topbar .left, .topbar .right { display: flex; align-items: center; gap: 1em; }
+  .topbar img { height: 1.5em; }
+  .topbar .vitals { font-family: var(--font-mono); font-size: .85em; color: #9FB3C0; display: flex; gap: .9em; }
+  .topbar .vitals b { color: var(--brand-cyan); font-weight: 600; }
+  .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--brand-cyan); display: inline-block; }
+  .panel { position: absolute; inset: auto 0 0 0; height: 3.4em; background: rgba(11, 17, 22, .82);
+           display: flex; align-items: center; gap: .6em; padding: 0 .8em; }
+  .panel .app { width: 2.3em; height: 2.3em; border-radius: .5em; background: var(--neutral-h); position: relative;
+                display: grid; place-items: center; color: #E6EDF2; font-size: .8em; }
+  .panel .app.on::after { content: ""; position: absolute; bottom: -.45em; left: 35%; right: 35%; height: .2em; border-radius: 1em; background: var(--brand-cyan); }
+  .panel .start { background: none; }
+  .panel .start img { width: 1.8em; }
+
+  .win { position: absolute; background: var(--view); color: var(--text); border-radius: .8em; overflow: hidden;
+         box-shadow: 0 1.2em 3em rgba(0, 0, 0, .45), 0 0 0 1px var(--border); display: flex; flex-direction: column; }
+  .titlebar { height: 2.6em; display: flex; align-items: center; gap: .6em; padding: 0 .7em; background: var(--raised); border-bottom: 1px solid var(--border); }
+  .titlebar .t { flex: 1; text-align: center; font-weight: 700; }
+  .wbtn { width: 1.1em; height: 1.1em; border-radius: 50%; background: var(--alt); border: 1px solid var(--border); }
+  .files { left: 4%; top: 9%; width: 54%; height: 70%; }
+  .files .body { display: flex; flex: 1; min-height: 0; }
+  .side { width: 30%; background: var(--bg); padding: .6em; display: flex; flex-direction: column; gap: .15em; border-right: 1px solid var(--border); }
+  .side div { padding: .35em .6em; border-radius: .4em; color: var(--text); }
+  .side .sel { background: var(--accent); color: var(--on-accent); }
+  .content { flex: 1; padding: .9em; display: flex; flex-direction: column; gap: .8em; overflow: hidden; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6em; }
+  .fi { display: flex; flex-direction: column; align-items: center; gap: .25em; padding: .4em; border-radius: .5em; font-size: .85em; }
+  .fi.sel { background: color-mix(in srgb, var(--accent) 22%, transparent); outline: 2px solid var(--accent); }
+  .fi svg { width: 3.4em; height: 3.4em; }
+  .row { display: flex; gap: .6em; align-items: center; flex-wrap: wrap; }
+  .btn { padding: .45em 1em; border-radius: .45em; background: var(--alt); border: 1px solid var(--border); color: var(--text); font-weight: 700; font-size: .9em; }
+  .btn.sug { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+  .btn.des { color: var(--error); }
+  .entry { flex: 1; min-width: 8em; padding: .45em .7em; border-radius: .45em; background: var(--bg); border: 2px solid var(--accent); color: var(--text); font-size: .9em; }
+  .switch { width: 2.6em; height: 1.4em; border-radius: 1em; background: var(--accent); position: relative; }
+  .switch::after { content: ""; position: absolute; right: .15em; top: .15em; width: 1.1em; height: 1.1em; border-radius: 50%; background: var(--on-accent); }
+  .switch.off { background: var(--border); }
+  .switch.off::after { left: .15em; right: auto; background: var(--view); }
+  .check { width: 1.2em; height: 1.2em; border-radius: .3em; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: .8em; font-weight: 700; }
+  .link { color: var(--accent); text-decoration: underline; }
+  .tags { display: flex; gap: .6em; font-size: .85em; flex-wrap: wrap; }
+  .tags span { padding: .15em .6em; border-radius: 1em; border: 1px solid currentColor; }
+  .bar { height: .4em; border-radius: 1em; background: var(--border); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
+
+  /* the terminal is dark in both modes */
+  .term { right: 2%; top: 40%; width: 38%; height: 48%; background: var(--brand-ink); color: #E6EDF2; }
+  .term .titlebar { background: #11181E; border-color: #2A3843; color: #E6EDF2; }
+  .term .titlebar .wbtn { background: #172028; border-color: #2A3843; }
+  .term pre { margin: 0; padding: .8em; font: .88em/1.5 var(--font-mono); white-space: pre-wrap; }
+  .term .p { color: var(--brand-cyan); } .term .ok { color: #3DDC97; } .term .w { color: #FFC857; } .term .m { color: #9FB3C0; }
+
+  .toast { position: absolute; right: 2%; top: 3.2em; width: 30%; background: var(--raised); color: var(--text); border-radius: .7em;
+           padding: .7em .9em; box-shadow: 0 .8em 2em rgba(0, 0, 0, .35), 0 0 0 1px var(--border); display: flex; gap: .7em; align-items: flex-start; font-size: .9em; }
+  .toast img { width: 2em; }
+  .toast b { display: block; }
+  .toast span { color: var(--muted); }
+  .cursor { position: absolute; left: 47%; top: 58%; width: 1.6em; filter: drop-shadow(0 .1em .15em rgba(0, 0, 0, .4)); }
+
+  /* ---------- swatches ---------- */
+  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .s { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--view); }
+  .s i { display: block; height: 56px; }
+  .s div { padding: 8px 10px; font-size: 13px; }
+  .s code { font: 12px var(--font-mono); color: var(--muted); display: block; }
+  .ident { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--view); }
+  .card .img { aspect-ratio: 16 / 10; display: grid; place-items: center; }
+  .card .img img { max-width: 70%; max-height: 80%; }
+  .card div.c { padding: 10px 12px; font-size: 13px; color: var(--muted); }
+  .card div.c b { color: var(--text); display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  td code { font: 13px var(--font-mono); color: var(--accent); }
+  .scroll { overflow-x: auto; }
+  @media (max-width: 640px) { .term, .toast { display: none; } .files { width: 88%; } }
+</style>
+</head>
+<body>
+<main>
+  <header class="page">
+    <div class="word"><img src="logos/construct.svg" alt="">CONSTRUCT</div>
+    <div class="seg" role="group" aria-label="Mode">
+      <button data-set="">System</button><button data-set="dark">Dark</button><button data-set="light">Light</button>
+    </div>
+  </header>
+
+  <div class="desktop" aria-label="The desktop with the palette">
+    <div class="topbar">
+      <div class="left"><img src="logos/construct-activities.svg" alt="Activities"><span>Files</span></div>
+      <div>Fri 2 Oct  19:42</div>
+      <div class="right">
+        <span class="vitals"><span>CPU <b>12%</b></span><span>MEM <b>4.1G</b></span><span>58°C</span></span>
+        <span class="dot" title="caffeine"></span><span>⏻</span>
+      </div>
+    </div>
+
+    <div class="win files">
+      <div class="titlebar"><span class="wbtn"></span><span class="t">Projects</span><span class="wbtn"></span><span class="wbtn"></span></div>
+      <div class="body">
+        <div class="side"><div>Home</div><div class="sel">Projects</div><div>Downloads</div><div>Pictures</div><div>Trash</div></div>
+        <div class="content">
+          <div class="grid">
+            <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>os</div>
+            <div class="fi sel"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>brand</div>
+            <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>Orchis-theme</div>
+            <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>tilingshell</div>
+          </div>
+          <div class="row"><input class="entry" value="palette.toml" aria-label="Search"><span class="btn">Cancel</span><span class="btn sug">Open</span><span class="btn des">Delete</span></div>
+          <div class="row"><span class="switch"></span> Show hidden files <span class="switch off"></span> Thumbnails <span class="check">✓</span> Sort folders first</div>
+          <div class="bar"><i></i></div>
+          <div class="row" style="font-size:.9em">Copying 12 of 19 files · <span class="link">Show details</span></div>
+          <div class="tags"><span style="color:var(--success)">Verified</span><span style="color:var(--warning)">Update pending</span><span style="color:var(--error)">Rollback</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="win term">
+      <div class="titlebar"><span class="wbtn"></span><span class="t">~/construct</span><span class="wbtn"></span></div>
+<pre><span class="p">~/construct</span> $ task palette
+<span class="m">contrast:</span>
+  16.06  <span class="ok">ok</span>  dark text on background
+  12.34  <span class="ok">ok</span>  dark accent on background
+   4.70  <span class="ok">ok</span>  light accent on background
+<span class="p">~/construct</span> $ sysupdate status
+image  <span class="ok">verified</span>  slot B
+next   <span class="w">staged</span>    reboot to apply
+<span class="p">~/construct</span> $ <span style="background:#00E5FF"> </span></pre>
+    </div>
+
+    <div class="toast"><img src="logos/construct.svg" alt=""><div><b>Update ready</b><span>The new image is verified. Restart to switch to it.</span></div></div>
+
+    <svg class="cursor" viewBox="0 0 24 32" aria-hidden="true"><path d="M2 2 L2 26 L8 20 L12 30 L16 28 L12 18 L20 18 Z" fill="var(--cursor-fill)" stroke="var(--cursor-outline)" stroke-width="1.6" stroke-linejoin="round"/></svg>
+
+    <div class="panel">
+      <div class="app start"><img src="logos/construct-activities.svg" alt=""></div>
+      <div class="app on">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:10px">Files on the left and the terminal on the right; the top bar and the bottom panel are GNOME Shell with Orchis, dash-to-panel and Vitals. The shell and the terminal stay dark in both modes, as Orchis' dark top bar does. The cursor is the Bibata shape in the cursor colors; the folders are Tela's in the folder color.</p>
+
+  <h2>Accent and text, this mode</h2>
+  <div class="sw" id="mode-sw"></div>
+
+  <h2>Surfaces (Orchis' scale)</h2>
+  <div class="sw" id="neutral-sw"></div>
+
+  <h2>Identity</h2>
+  <div class="ident">
+    <div class="card"><div class="img" style="background:#000"><img src="plymouth/outro-0010.png" alt="The last boot frame"></div><div class="c"><b>Boot</b>Plymouth's last frame, on black</div></div>
+    <div class="card"><div class="img" style="background:var(--brand-ink)"><img src="wallpapers/construct-dark.png" alt="Dark wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, dark</b>wallpapers/construct-dark.png</div></div>
+    <div class="card"><div class="img" style="background:var(--brand-paper)"><img src="wallpapers/construct-light.png" alt="Light wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, light</b>wallpapers/construct-light.png</div></div>
+    <div class="card"><div class="img" style="background:#1F2A33"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg</div></div>
+  </div>
+
+  <h2>Where each piece goes</h2>
+  <div class="scroll"><table>
+    <tr><th>Repository</th><th>Takes</th><th>From</th></tr>
+    <tr><td>Orchis-theme</td><td>accent per variant, background scale, semantic colors, Activities icon, wallpaper</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code>, <code>wallpapers/</code></td></tr>
+    <tr><td>Tela-icon-theme</td><td>folder and glyph color, a <i>construct</i> variant</td><td><code>palette/construct.json</code> (<code>icons-folder</code>, <code>icons-folder-glyph</code>)</td></tr>
+    <tr><td>Bibata_Cursor</td><td>Bibata-Modern-Construct and -Right</td><td><code>palette/bibata-render.json</code></td></tr>
+    <tr><td>tilingshell, dash-to-panel</td><td>highlight color</td><td><code>dark-accent</code> (gsettings override in os)</td></tr>
+    <tr><td>Vitals, caffeine, clipboard-indicator, appindicator, gsconnect</td><td>nothing of their own: the shell theme draws them</td><td>-</td></tr>
+    <tr><td>libadwaita apps</td><td>the nearest fixed accent</td><td><code>gnome-accent</code> = teal</td></tr>
+  </table></div>
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="folder" viewBox="0 0 64 64">
+    <path d="M6 14 a4 4 0 0 1 4 -4 h14 l5 5 h25 a4 4 0 0 1 4 4 v31 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)"/>
+    <path d="M6 22 h52 v28 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)" style="filter:brightness(1.12)"/>
+    <path d="M27 31 l-6 6 6 6 M37 31 l6 6 -6 6" fill="none" stroke="var(--icons-folder-glyph)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll(".seg button");
+  function setMode(m) {
+    if (m) root.dataset.mode = m; else delete root.dataset.mode;
+    buttons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.set === m)));
+    try { localStorage.setItem("construct-mode", m); } catch (e) {}
+    swatches();
+  }
+  buttons.forEach(b => b.addEventListener("click", () => setMode(b.dataset.set)));
+
+  const MODE = [["accent", "Accent"], ["on-accent", "Text on accent"], ["text", "Text"], ["muted", "Muted"],
+                ["border", "Border"], ["success", "Success"], ["warning", "Warning"], ["error", "Error"]];
+  const NEUTRAL = "abcdefgh".split("").map(k => ["neutral-" + k, k + (k < "e" ? " (light)" : " (dark)")]);
+  function fill(id, rows) {
+    const css = getComputedStyle(root);
+    document.getElementById(id).innerHTML = rows.map(([v, name]) => {
+      const hex = css.getPropertyValue("--" + v).trim();
+      return `<div class="s"><i style="background:${hex}"></i><div>${name}<code>--${v} ${hex}</code></div></div>`;
+    }).join("");
+  }
+  function swatches() { fill("mode-sw", MODE); fill("neutral-sw", NEUTRAL); }
+  let saved = new URLSearchParams(location.search).get("mode");  // ?mode=light, ?mode=dark
+  if (saved === null) try { saved = localStorage.getItem("construct-mode") || ""; } catch (e) { saved = ""; }
+  setMode(saved);
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", swatches);
+</script>
+</body>
+</html>
