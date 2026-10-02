@@ -2,19 +2,21 @@
 
 Animación de 48 frames (1080×1080): una habitación en wireframe cian que se dibuja sola, una puerta que se ilumina y el texto **CONSTRUCT**. El video final dura 5 s (48 frames a 9.6 fps).
 
+La animación va de menos a más: el contenido se dibuja a lo largo de los 48 frames y, a la vez, el color pasa de un turquesa apagado a cian saturado y el brillo del neón crece hasta el último frame (`intensity()` en `video.py`).
+
 ## Requisitos
 
-- Python 3 con `numpy`, `opencv-python` y `pillow`
-- [Task](https://taskfile.dev) (`brew install go-task` o ver la web)
-- Fuente **DejaVu Sans**, la que usa Plymouth por defecto:
-  - Debian/Ubuntu: `apt install fonts-dejavu-core`
-  - Fedora/RHEL: `dnf install dejavu-sans-fonts`
-  - Arch: `pacman -S ttf-dejavu`
+- Python 3 y [Task](https://taskfile.dev) (`brew install go-task` o ver la web)
+- El resto se instala con:
 
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install numpy opencv-python pillow
+task deps
 ```
+
+`task deps` ejecuta dos tareas:
+
+- `task setup`: crea `.venv` e instala `requirements.txt` (`numpy`, `opencv-python`, `pillow`).
+- `task font`: instala **DejaVu Sans**, la fuente por defecto de Plymouth, con el gestor de paquetes del sistema (`apt`, `dnf`, `pacman`, `zypper` o `brew`). Si la fuente ya está, no hace nada. En Linux pide `sudo`.
 
 ## Uso
 
@@ -26,12 +28,12 @@ python3 -m venv .venv
 | `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
 | `task clean`    | Borra `frames/`, `construct.mp4` y `sprite.png`            |
 
-Cada tarea ejecuta antes las que necesita (`play` → `encode` → `generate`) y se salta las que ya están al día.
+Cada tarea ejecuta antes las que necesita (`play` → `encode` → `generate` → `deps`) y se salta las que ya están al día.
 
 Variables que se pueden cambiar:
 
 ```sh
-task play PYTHON=.venv/bin/python        # usar el venv
+task play PYTHON=python3                 # usar otro intérprete en vez de .venv
 task encode DURATION=8                   # mismo número de frames, más lento
 task generate FRAMES_DIR=out
 task sprite COLS=12                      # grilla de 12 columnas

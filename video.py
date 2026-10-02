@@ -19,6 +19,17 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else "frames"
 os.makedirs(OUT, exist_ok=True)
 N = 48  # total frames (encode.py turns them into a 5s video)
 CYAN = np.array([1.0, 0.90, 0.0])  # BGR -> cyan (#00E5FF)
+DIM = np.array([0.55, 0.50, 0.38])  # BGR -> desaturated teal, the starting color
+# story timeline (units used by the segment/door/text timings below) mapped onto N frames:
+# the first frame already shows the spark, the last frame is the fully lit logo
+T0, T1 = 7, 46
+
+def timeline(f):
+    return T0 + f * (T1 - T0) / (N - 1)
+
+def intensity(f):
+    """0 -> 1 over the whole clip: drives color saturation, brightness and neon glow."""
+    return (f / (N - 1)) ** 1.4  # ease-in: the neon keeps building up to the last frame
 
 # ---------- camera: room = cube 3x3x3, x right, y up, z depth (z=0 open front) ----------
 cam = np.array([0.55, 1.75, -2.6])
@@ -85,13 +96,15 @@ DOOR_A, DOOR_B = 36, 44
 TEXT_A, TEXT_B = 40, 46
 CORNER_A, CORNER_B = 4, 9
 
-def glow(img):
+def glow(img, strength=1.0):
     out = img.copy()
     for k, w in ((9, 0.9), (31, 0.7), (91, 0.55)):
-        out += cv2.GaussianBlur(img, (0, 0), k * SS / 3) * w
+        out += cv2.GaussianBlur(img, (0, 0), k * SS / 3) * w * strength
     return out
 
-def render(f):
+def render(frame):
+    g = intensity(frame)
+    f = timeline(frame)
     lines = np.zeros((H * SS, W * SS, 3), np.float32)
     fill = np.zeros_like(lines)
     lw = 3 * SS
@@ -132,21 +145,23 @@ def render(f):
         floor = np.array([P(p) for p in [(0,0,0),(3,0,0),(3,0,3),(0,0,3)]], np.int32)
         cv2.fillPoly(mask, [floor], (1,1,1))
         fill += r * mask
-    mono = glow(lines + fill)[..., 0]
-    img = mono[..., None] * CYAN[None, None, :]
+    # from less to more: brightness, glow and saturation all ramp with g
+    lines *= 0.6 + 0.4 * g
+    mono = glow(lines + fill, 0.15 + 1.15 * g)[..., 0]
+    color = DIM + (CYAN - DIM) * g
+    img = mono[..., None] * color[None, None, :]
     # white-hot core on lines
-    img += np.clip(lines[..., :1] - 0.0, 0, 1) * 0.35 + fill[..., :1] * np.array([0.6, 0.3, 0])
-    # floor reflection of floor lines (subtle)
+    img += np.clip(lines[..., :1], 0, 1) * 0.35 * g + fill[..., :1] * np.array([0.6, 0.3, 0]) * g
     img = np.clip(img, 0, 1)
     img = cv2.resize(img, (W, H), interpolation=cv2.INTER_AREA)
     out = (img * 255).astype(np.uint8)
     # text
     tt = prog(f, TEXT_A, TEXT_B)
     if tt > 0:
-        out = draw_text(out, tt)
+        out = draw_text(out, tt, g)
     return out
 
-def draw_text(bgr, a):
+def draw_text(bgr, a, g=1.0):
     txt = "CONSTRUCT"
     size = 64
     font = ImageFont.truetype(FONT, size)
@@ -161,7 +176,7 @@ def draw_text(bgr, a):
         dr.text((x, y), ch, font=font, fill=255)
         x += w + spacing
     m = np.asarray(layer, np.float32) / 255 * a
-    halo = cv2.GaussianBlur(m, (0, 0), 10) * 0.6
+    halo = cv2.GaussianBlur(m, (0, 0), 6 + 6 * g) * (0.2 + 0.6 * g)
     base = bgr.astype(np.float32) / 255
     base += halo[..., None] * np.array([1.0, 0.95, 0.7])
     base = base * (1 - m[..., None]) + m[..., None]
