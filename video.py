@@ -13,7 +13,7 @@ os.makedirs(OUT, exist_ok=True)
 N = 48  # total frames (encode.py turns them into a 5s video)
 CYAN = np.array([1.0, 0.90, 0.0])  # BGR -> cyan (#00E5FF)
 DIM = np.array([0.55, 0.50, 0.38])  # BGR -> desaturated teal, the starting color
-# story timeline (units used by the segment/door/text timings below) mapped onto N frames:
+# story timeline (units used by the segment/text timings below) mapped onto N frames:
 # the first frame already shows the spark, the last frame is the fully lit logo
 T0, T1 = 7, 46
 
@@ -35,7 +35,7 @@ cam = np.array([0.6, 1.2, -2.9])  # position (x, y=height, z=distance in front);
 FOCAL = 620                       # focal length in design px: larger = closer / bigger room
 F = FOCAL * PX
 # vanishing point on screen; VX centers the floor front edge over the word:
-VX, VY = 0.5 - FOCAL * (1.5 - cam[0]) / -cam[2] / 1080, 0.51
+VX, VY = 0.5 - FOCAL * (1.5 - cam[0]) / -cam[2] / 1080, 0.47  # room higher: word + tagline below
 CX, CY = W * SS * VX, H * SS * VY
 
 def P(p):
@@ -81,8 +81,8 @@ HI_A, HI_B = 31.1, 33.3       # y=2 horizontals, outer edge -> axis
 VERT_HI = snap(33)            # inner verticals, top edge -> y=2 line: whole in frame 33
 VERT_LO = snap(34)            # ...then y=2 line -> floor: whole in frame 34
 LO_A, LO_B = 34.6, 37         # y=1 horizontals -> room closed at 37
-DOOR_A, DOOR_B = 37.2, 40.5   # entrance lights up once the room is closed...
-TEXT_A, TEXT_B = 41.2, 45.2   # ...then the word, fully white for the last frames
+TEXT_A, TEXT_B = 38, 42       # the word, once the room is closed: fully white from frame 43
+TAG_A, TAG_B = 42.3, 45.2     # then the tagline, in the last frames (full from frame 47)
 
 def edge(p0, p1, d, start, step):
     S(p0, p1, start + d * step, start + (d + 1) * step)
@@ -93,27 +93,19 @@ for x in range(4):
         if x > 0: edge((x, 0, z), (x - 1, 0, z), d, FLOOR_A, FLOOR_STEP)
         if z > 0: edge((x, 0, z), (x, 0, z - 1), d, FLOOR_A, FLOOR_STEP)
 
-# door: an open entrance in the right wall, middle cell column (z 1..2), two rows high
-# (y 0..2); its jambs and lintel are grid lines. Same door as the logo (logo.py).
-# No fill: the frame lights up brighter than the grid.
-DZ0, DZ1 = 1, 2
-DOOR = [(3, 0, DZ0), (3, 2, DZ0), (3, 2, DZ1), (3, 0, DZ1)]
-
 S((3, 0, 3), (3, 3, 3), AXIS_A, AXIS_B)  # corner axis
 S((3, 3, 3), (3, 3, 0), TOP_A, TOP_B)    # right wall top edge
 S((3, 3, 3), (0, 3, 3), TOP_A, TOP_B)    # back wall top edge
 S((3, 0, 0), (3, 3, 0), *OUTER)  # right wall front edge
 S((0, 0, 3), (0, 3, 3), *OUTER)  # back wall left edge
-S((3, 2, 0), (3, 2, 3), HI_A, HI_B)        # right wall y=2 (door lintel line)
+S((3, 2, 0), (3, 2, 3), HI_A, HI_B)        # right wall y=2
 S((0, 2, 3), (3, 2, 3), HI_A, HI_B)        # back wall y=2
-for k in (1, 2):  # right wall z=1, z=2 are the door jambs
+for k in (1, 2):
     for (y0, y1), win in (((3, 2), VERT_HI), ((2, 0), VERT_LO)):
         S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
         S((3 - k, y0, 3), (3 - k, y1, 3), *win)  # back wall
 S((0, 1, 3), (3, 1, 3), LO_A, LO_B)        # back wall y=1
-# right wall y=1 stops at the door jambs: one piece from the front edge, one from the axis
-S((3, 1, 0), (3, 1, DZ0), LO_A, LO_B)
-S((3, 1, 3), (3, 1, DZ1), LO_A, LO_B)
+S((3, 1, 3), (3, 1, 0), LO_A, LO_B)        # right wall y=1
 # the room is open on the left and the front: those sides end on the floor/back-wall edges
 
 MIN_LEN = 14 * PX  # px a growing line needs before it is shown
@@ -144,28 +136,26 @@ def render(frame):
         # bright drawing head
         if t < 1:
             cv2.circle(lines, pt(q1), round(4 * PX * (1 << SHIFT)), (1.4,) * 3, -1, cv2.LINE_AA, SHIFT)
-    # door frame: jambs + lintel brighten over the grid
-    d = prog(f, DOOR_A, DOOR_B)
-    if d > 0:
-        jamb_pts = np.array([pt(P(p)) for p in DOOR], np.int32)
-        cv2.polylines(lines, [jamb_pts], False, (1.0 + 1.2 * d,) * 3, int(lw * (1 + 0.8 * d)), cv2.LINE_AA, SHIFT)
     # from less to more: brightness, glow and saturation all ramp with g
     lines *= 0.6 + 0.4 * g
     mono = glow(lines, 0.15 + 1.15 * g)[..., 0]
     color = DIM + (CYAN - DIM) * g
     img = mono[..., None] * color[None, None, :]
     # white-hot core on lines
-    img += np.clip(lines[..., :1], 0, 2) * 0.35 * g  # >1 only on the door frame: whiter core
+    img += np.clip(lines[..., :1], 0, 2) * 0.35 * g  # >1 only on the drawing heads: whiter core
     img = np.clip(img, 0, 1)
     img = cv2.resize(img, (W, H), interpolation=cv2.INTER_AREA)
     out = (img * 255).astype(np.uint8)
     # text
     tt = prog(f, TEXT_A, TEXT_B)
     if tt > 0:
-        out = draw_text(out, tt, g)
+        out = draw_text(out, tt, prog(f, TAG_A, TAG_B), g)
     return out
 
-def draw_text(bgr, a, g=1.0):
+TAGLINE = "Your workspace on the grid"  # splash only, not part of the logo
+
+def draw_text(bgr, a, b, g=1.0):
+    """The word (opacity a) and, under it, the tagline (opacity b)."""
     txt = "CONSTRUCT"
     # the word spans exactly the floor front edge above it (x 0..3 at z=0)
     span = (P((3, 0, 0))[0] - P((0, 0, 0))[0]) / SS
@@ -178,11 +168,21 @@ def draw_text(bgr, a, g=1.0):
     layer = Image.new("L", (W, H), 0)
     dr = ImageDraw.Draw(layer)
     x = (W - span) / 2
-    y = 940 * U  # cap middle, between the floor edge and the bottom
+    y = 897 * U  # cap middle of the word, under the floor edge
     for ch in txt:
         dr.text((x, y), ch, font=font, fill=255, anchor="lm")
         x += font.getlength(ch) + spacing
     m = np.asarray(layer, np.float32) / 255 * a
+    if b > 0:  # tagline: smaller, lighter tracking, light gray
+        tag = Image.new("L", (W, H), 0)
+        dt = ImageDraw.Draw(tag)
+        tf = ImageFont.truetype(FONT, round(size * 0.42))
+        tsp = 0.12 * tf.size
+        tx = (W - sum(tf.getlength(ch) for ch in TAGLINE) - tsp * (len(TAGLINE) - 1)) / 2
+        for ch in TAGLINE:
+            dt.text((tx, y + size * 1.25), ch, font=tf, fill=255, anchor="lm")
+            tx += tf.getlength(ch) + tsp
+        m = np.maximum(m, np.asarray(tag, np.float32) / 255 * 0.6 * b)
     halo = cv2.GaussianBlur(m, (0, 0), (4 + 3 * g) * U) * (0.1 + 0.2 * g)  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255
     base += halo[..., None] * np.array([1.0, 0.95, 0.7])
