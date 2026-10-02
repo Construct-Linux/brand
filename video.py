@@ -1,5 +1,6 @@
 import json, numpy as np, cv2, os, sys
 from PIL import Image, ImageDraw, ImageFont
+import palette
 
 # CONSTRUCT boot animation. "The image doesn't move. The workspace does."
 # Two layers with fixed roles:
@@ -20,7 +21,7 @@ PX = SS * U   # one design pixel on the supersampled canvas
 # Audiowide (SIL Open Font License, fonts/OFL.txt), shipped in the repo: same file
 # everywhere, no system font needed. The word is baked into the frames.
 FONT = os.environ.get("FONT") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "Audiowide-Regular.ttf")
-CYAN = np.array([1.0, 0.90, 0.0])  # BGR -> cyan (#00E5FF)
+CYAN = np.array(palette.rgb(palette.load()["brand"]["cyan"])[::-1]) / 255  # BGR, 0..1
 
 # ---------- segments (frame counts) ----------
 INTRO, LOOP, OUTRO = 26, 12, 10

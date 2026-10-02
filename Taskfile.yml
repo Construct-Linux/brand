@@ -38,7 +38,7 @@ tasks:
   generate:
     desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
     deps: [image]
-    sources: [video.py, fonts/*.ttf]
+    sources: [video.py, palette.py, palette.toml, fonts/*.ttf]
     generates: ['{{.FRAMES_DIR}}/construct_*.png']
     cmds:
       - '{{.RUN}} python video.py {{.FRAMES_DIR}}'
@@ -73,7 +73,7 @@ tasks:
     deps: [image]
     vars:
       TMP: .frames-{{.PLY_DIR | replace "/" "-"}}
-    sources: [video.py, plymouth.py, fonts/*.ttf, Dockerfile, requirements.txt]
+    sources: [video.py, plymouth.py, palette.py, palette.toml, fonts/*.ttf, Dockerfile, requirements.txt]
     generates: ['{{.PLY_DIR}}/*.png']
     cmds:
       - rm -rf {{.PLY_DIR}} {{.TMP}}
