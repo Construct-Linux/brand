@@ -40,8 +40,10 @@ def intensity(f):
 # Framing is done by shifting the image (like an architectural shift lens), never by
 # turning the camera.
 cam = np.array([1.3, 1.2, -2.9])  # position (x, y=height, z=distance in front)
-F = 620 * PX                      # focal length: larger = closer / bigger room
-VX, VY = 0.48, 0.51               # where the vanishing point (straight ahead) sits on screen
+FOCAL = 620                       # focal length in design px: larger = closer / bigger room
+F = FOCAL * PX
+# vanishing point on screen; VX centers the floor front edge over the word:
+VX, VY = 0.5 - FOCAL * (1.5 - cam[0]) / -cam[2] / 1080, 0.51
 CX, CY = W * SS * VX, H * SS * VY
 
 def P(p):

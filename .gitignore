@@ -3,3 +3,4 @@ frames/*
 plymouth/*
 .task/*
 .venv/
+.plymouth-frames
