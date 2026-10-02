@@ -3,7 +3,16 @@ from PIL import Image, ImageDraw, ImageFont
 
 W = H = 1080
 SS = 2  # supersampling
-FONT = "fonts/Michroma.ttf"
+# DejaVu Sans: default font for Plymouth ("Sans" -> fontconfig) on Debian/Ubuntu/Fedora/Arch
+FONT_CANDIDATES = [
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",    # Debian/Ubuntu
+    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",  # Fedora/RHEL
+    "/usr/share/fonts/TTF/DejaVuSans.ttf",                # Arch
+    "/usr/share/fonts/dejavu/DejaVuSans.ttf",             # openSUSE / older Fedora
+]
+FONT = os.environ.get("FONT") or next((p for p in FONT_CANDIDATES if os.path.exists(p)), None)
+if not FONT:
+    sys.exit("DejaVuSans.ttf not found: install fonts-dejavu-core / dejavu-sans-fonts or set FONT=/path/DejaVuSans.ttf")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "frames"
 os.makedirs(OUT, exist_ok=True)
 N = 48          # total frames
