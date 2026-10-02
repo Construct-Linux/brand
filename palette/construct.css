@@ -32,7 +32,7 @@
   --border: #2A3843;
   --success: #3DDC97;
   --warning: #FFC857;
-  --error: #FF6B85;
+  --error: #FF7A90;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-mode="dark"]) {
@@ -79,5 +79,5 @@
   --border: #2A3843;
   --success: #3DDC97;
   --warning: #FFC857;
-  --error: #FF6B85;
+  --error: #FF7A90;
 }

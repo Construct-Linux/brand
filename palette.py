@@ -38,6 +38,9 @@ def orchis_on_dark(h):
     return (r * 299 + g * 587 + b * 114) / 1000 >= 156
 
 
+# Orchis' dark text on a bright fill: black at 0.87, over white (the lightest it is drawn on).
+ORCHIS_DARK_TEXT = "#212121"
+
 # WCAG 2.2: 4.5 for text, 3 for parts of the interface that are not text; 7 for body text,
 # which is read the most.
 TEXT, UI, BODY = 4.5, 3.0, 7.0
@@ -54,6 +57,10 @@ def checks(p):
             for k in ("success", "warning", "error"):
                 yield f"{mode} {k} on {surface}", m[k], s, TEXT
         yield f"{mode} text on accent", m["on_accent"], m["accent"], TEXT
+        # Buttons filled with a semantic color (destructive, success): Orchis puts black or white
+        # on them by brightness, as on the accent.
+        for k in ("success", "warning", "error"):
+            yield f"{mode} text on {k} fill", ORCHIS_DARK_TEXT if orchis_on_dark(m[k]) else "#FFFFFF", m[k], TEXT
     yield "folder glyph on folder", p["icons"]["folder_glyph"], p["icons"]["folder"], UI
     yield "folder on dark background", p["icons"]["folder"], n["e"], UI
     yield "cursor outline on fill", p["cursor"]["outline"], p["cursor"]["fill"], UI

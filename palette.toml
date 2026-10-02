@@ -35,7 +35,7 @@ muted = "#9FB3C0"
 border = "#2A3843"
 success = "#3DDC97"
 warning = "#FFC857"
-error = "#FF6B85"
+error = "#FF7A90"
 
 [light]
 accent = "#007A85"

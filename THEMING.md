@@ -1,9 +1,13 @@
 # Theming
 
 How the desktop takes the brand. The colors are written once, in `palette.toml`; `task palette`
-checks their contrast and writes them out in `palette/`, and each fork takes them from there. The
-forks stay small patches on top of upstream: a color variant added next to upstream's own, never
-upstream's values edited in place, so that pulling upstream keeps merging.
+checks their contrast and writes them out in `palette/`, and each fork takes them from there.
+
+The forks carry CONSTRUCT and nothing else: GNOME Shell 51 and later, one color, the files the
+image installs. Upstream's other colors, desktops and toolkits are removed rather than kept beside
+ours, so a fork is small and reads as what it builds. The cost is paid when pulling upstream:
+merges conflict on the recolored lines and on files we deleted, and an icon or asset upstream adds
+arrives in upstream's color until it is recolored. Each fork's README says what it carries.
 
 `task preview` opens `preview.html`: the desktop drawn with the palette, in dark and light.
 
@@ -23,9 +27,10 @@ Dark is the default. Light keeps the cyan's hue, darkened to `#007A85` so links 
 read on white: the logo's `#00E5FF` on white is 1.5:1.
 
 `palette.py` fails when a pair the desktop draws one on the other is below WCAG 2.2 - 7:1 for
-body text, 4.5:1 for other text (links, muted, success, warning, error, text on the accent),
-3:1 for parts that are not text - and when Orchis would choose a different text color on the
-accent than the palette's: Orchis picks it itself, by brightness.
+body text, 4.5:1 for other text (links, muted, success, warning, error, text on the accent and on
+buttons filled with success, warning or error), 3:1 for parts that are not text - and when Orchis
+would choose a different text color on the accent than the palette's: Orchis picks the text on a
+fill itself, by brightness.
 
 ## What `palette/` holds
 
@@ -38,30 +43,28 @@ accent than the palette's: Orchis picks it itself, by brightness.
 
 ## Repository by repository
 
-**Orchis-theme** (GTK 2/3/4, GNOME Shell)
+All on the `gnome-51` branch (`gnome-shell-51` for Orchis) of github.com/Construct-Linux.
 
-- Add `construct` as a theme color: import `construct.scss` in `_color-palette-default.scss`, a
-  `construct` branch in `theme()` (`_colors.scss`) and in `install.sh`'s `-t`.
-- Under the `construct` theme, `background(a ... h)` returns `$construct-bg-a ... -h` instead of
-  the greys, so windows, views and popovers carry the ink's blue.
-- `logos/construct-activities.svg` as `src/gnome-shell/activities/activities-construct.svg`, for
-  `-i construct`.
-- `wallpapers/construct-*.png` in place of `wallpaper/`.
-- Installed with `-t construct -i construct -l`. `-l` links the GTK 4 theme for libadwaita apps;
-  without it they use `gnome-accent` (teal).
+**Orchis-theme** (GTK 3, GTK 4/libadwaita, GNOME Shell): Orchis-Construct-Light and
+Orchis-Construct-Dark, `./install.sh -d DIR -c light dark`. `construct.scss` is copied in as
+`src/_sass/_construct-palette.scss`: the accent per variant, `background(a ... h)` on the
+palette's surfaces, the semantic colors. The GTK 4 accent is the theme's whatever Settings picks.
+`logos/construct-activities.svg` is the Activities button. Copy the palette again when it changes.
 
-**Tela-icon-theme**: a `construct` variant in `install.sh`, next to the others:
-`theme_color` = `icons-folder`, `theme_back_color` = `icons-folder-glyph`.
+**Tela-icon-theme**: Tela, Tela-dark and Tela-light, with upstream's blue recolored in the
+sources to `icons-folder` (glyph `icons-folder-glyph`); `sh ./install.sh -d DIR`. Upstream icons
+merged later arrive blue: the recipe fails if `#5294e2` is left.
 
-**Bibata_Cursor**: the entries of `bibata-render.json` in `render.json`; the build makes
-`Bibata-Modern-Construct` and `-Right` from upstream's SVGs.
+**Bibata_Cursor**: Bibata-Modern-Construct, X cursors and GNOME Shell's `cursors_scalable/`, built
+from the SVGs by `build.py` with Python and rsvg-convert; its color table is `cursor` here.
 
 **tilingshell, dash-to-panel**: their highlight colors set to `dark-accent`, as gsettings
-overrides in `os`, not in the fork.
+overrides in the image, not in the fork.
 
-**Vitals, caffeine, clipboard-indicator, appindicator, gsconnect**: nothing. The shell theme
-draws them.
+**Vitals, caffeine, clipboard-indicator, appindicator, dash-to-panel, tilingshell**: GNOME Shell
+51 only; the shell theme draws them.
 
-**os**: the gsettings defaults that tie it together (`gtk-theme`, `icon-theme`, `cursor-theme`,
+**The image** (spin-desktop): the dconf defaults that tie it together - `gtk-theme` and the shell
+theme Orchis-Construct-Dark, `icon-theme` Tela-dark, `cursor-theme` Bibata-Modern-Construct,
 `accent-color` = `gnome-accent`, `color-scheme` = `prefer-dark`, the wallpapers, the fonts from
-`type`), and the Plymouth theme from `plymouth/`.
+`type` - and the Plymouth theme from `plymouth/`.
