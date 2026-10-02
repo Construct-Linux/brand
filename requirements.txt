@@ -1,3 +1,5 @@
-numpy
-opencv-python
-pillow
+# Pinned: the frames and logos are committed, and are checked against what these produce.
+# OpenCV without its GUI: the container has no display (task play opens the video on the host).
+numpy==2.5.3
+opencv-python-headless==5.0.0.93
+pillow==12.3.0

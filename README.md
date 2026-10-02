@@ -1,100 +1,140 @@
 # CONSTRUCT
 
-Identidad y animación de arranque de **CONSTRUCT**, un escritorio Linux para desarrolladores sobre Wolfi: una imagen base de solo lectura, verificada, con actualización A/B y vuelta atrás automática; encima, GNOME.
+The identity and boot animation of **CONSTRUCT**, a Linux desktop for developers built on Wolfi:
+a read-only, verified base image with A/B updates and automatic rollback, and GNOME on top.
 
-La idea: **la imagen no se mueve; el espacio de trabajo sí.** La habitación abierta tiene dos capas con roles fijos:
+The idea: **the image does not move; the workspace does.** The open room has two layers with
+fixed roles:
 
-- **El contorno** (el símbolo del logo) es la base estable. Se dibuja temprano, en un solo gesto desde la esquina (cada línea sale de una ya dibujada; los cantos cuelgan del borde de arriba), y desde el frame 7 queda fijo, a intensidad plena, hasta el final.
-- **La grilla interior** es el espacio de trabajo: más fina y más tenue, se construye dentro del contorno, se activa, respira mientras el sistema espera y se apaga al final. Nunca toca ni modifica el contorno.
+- **The outline** (the logo's mark) is the stable base. It is drawn early, in a single gesture
+  from the corner (each line leaves from one already drawn; the edges hang from the top one),
+  and from frame 7 it stays fixed, at full intensity, to the end.
+- **The inner grid** is the workspace: finer and dimmer, it is built inside the outline, comes
+  alive, breathes while the system waits, and goes out at the end. It never touches or changes
+  the outline.
 
-La secuencia (48 frames, 1080×1080; el video de vista previa dura 5 s a 9.6 fps) tiene tres tramos:
+The sequence (48 frames, 1080×1080; the preview video lasts 5 s at 9.6 fps) has three parts:
 
-| Tramo | Frames | Qué pasa |
+| Part | Frames | What happens |
 |---|---|---|
-| intro | 1–26 | contorno (cerrado en el 7), CONSTRUCT (completa en el 10), grilla en trazo y activación |
-| espera | 27–38 | la grilla respira, uniforme y sin dirección; se repite sin costura todo lo que haga falta |
-| cierre | 39–48 | la grilla se apaga; quedan el símbolo y la palabra: el logo |
+| intro | 1–26 | the outline (closed at 7), CONSTRUCT (complete at 10), the grid drawn and lit |
+| wait | 27–38 | the grid breathes, evenly and without direction; it repeats seamlessly for as long as needed |
+| outro | 39–48 | the grid goes out; the mark and the word remain: the logo |
 
-Nada está conectado al estado real del arranque, así que nada simula progreso ni verificación: la intro es coreografía de duración fija y la espera no avanza hacia ningún lado. Si el arranque termina durante la intro, la marca ya es reconocible desde el primer segundo. El tagline no va en el splash.
+Nothing is tied to the boot's real state, so nothing pretends to show progress or verification:
+the intro is choreography of fixed length and the wait goes nowhere. If the boot ends during the
+intro, the brand is already recognizable from the first second. The tagline is not on the splash.
 
-El tagline de identidad se presenta en minúsculas y en dos líneas:
+The tagline is set in lowercase, on two lines:
 
 > the workspace.<br>
 > the image, verified.
 
-Primero, el espacio donde trabajás; después, la base verificada que lo sostiene. Se usa en la presentación de la distribución y piezas de identidad.
+First the space you work in, then the verified base that holds it up. It is used in the
+distribution's presentation and identity pieces.
 
-## Requisitos
+## Requirements
 
-- Python 3 y [Task](https://taskfile.dev) (`brew install go-task` o ver la web)
-- El resto se instala con:
+[Task](https://taskfile.dev) and Docker. Every generator runs in the image the `Dockerfile`
+describes - Python 3.13 by digest, pinned `numpy`, `opencv-python-headless` and `pillow`
+(`requirements.txt`), and `pngquant` from a dated Debian snapshot - so the same sources make the
+same images on any machine. `task image` builds it; every task that needs it builds it first.
+
+## Usage
+
+| Command | What it does |
+|---|---|
+| `task` / `task all` | **Everything**: frames, video, sprite, compressed Plymouth frames and logo |
+| `task generate` | Renders `frames/construct_01.png` … `construct_48.png` |
+| `task encode` | Builds `construct.mp4` (5 s) from the frames |
+| `task play` | Opens `construct.mp4` in this machine's video player |
+| `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
+| `task plymouth` | Transparent PNGs per frame for Plymouth in `plymouth/`, compressed with pngquant |
+| `task logo` | The logo in `logos/`: SVG in color, mono and GNOME symbolic, PNG from 16 to 512 px, and `preview.png` |
+| `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
+| `task check` | Fails if the committed `plymouth/` and `logos/` are not what the sources make |
+| `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
+
+`plymouth/` and `logos/` are committed - they are what the distribution takes - and `task check`
+holds them to the sources: it regenerates them and compares each image over black, within a
+small tolerance (OpenCV picks its vector code by processor, and pngquant's palette follows the
+pixels), and the SVGs byte for byte. After changing `video.py`, `plymouth.py`, `logo.py` or the
+font, run `task plymouth logo` and commit the result. The video and the sprite are previews,
+not committed.
+
+Each task runs the ones it needs first (`play` → `encode` → `generate` → `image`) and skips the
+ones that are up to date.
+
+Variables that can be changed:
 
 ```sh
-task deps
-```
-
-`task deps` ejecuta dos tareas:
-
-- `task setup`: crea `.venv` e instala `requirements.txt` (`numpy`, `opencv-python`, `pillow`).
-- `task pngquant`: instala `pngquant` de la misma forma.
-
-## Uso
-
-| Comando         | Qué hace                                                   |
-|-----------------|------------------------------------------------------------|
-| `task` / `task all` | **Todo**: dependencias, frames, video, sprite, frames de Plymouth comprimidos y logo |
-| `task generate` | Renderiza `frames/construct_01.png` … `construct_48.png`   |
-| `task encode`   | Arma `construct.mp4` (5 s) a partir de los frames          |
-| `task play`     | Reproduce `construct.mp4` en bucle (`q` / `Esc` para salir) |
-| `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
-| `task plymouth` | PNG transparentes por frame para Plymouth en `plymouth/`, comprimidos con pngquant |
-| `task logo`     | Propuestas de logo en `logos/`: SVG color y mono, PNG de 16 a 512 px y `preview.png` |
-| `task compress` | Vuelve a pasar pngquant sobre `plymouth/*.png`, reemplazando los archivos |
-| `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png`, `plymouth/` y `logos/` |
-
-Cada tarea ejecuta antes las que necesita (`play` → `encode` → `generate` → `deps`) y se salta las que ya están al día.
-
-Variables que se pueden cambiar:
-
-```sh
-task play PYTHON=python3                 # usar otro intérprete en vez de .venv
-task encode DURATION=8                   # mismo número de frames, más lento
+task encode DURATION=8                   # same number of frames, slower
 task generate FRAMES_DIR=out
-task sprite COLS=12                      # grilla de 12 columnas
-task plymouth SIZE=800                   # frames de Plymouth a 800 px
-task plymouth QUALITY=65-85              # pngquant más agresivo
+task sprite COLS=12                      # a 12-column grid
+task plymouth SIZE=800                   # Plymouth frames at 800 px
+task plymouth QUALITY=65-85              # more aggressive pngquant
 ```
 
 ## Scripts
 
-- `video.py [dir] [frame ...]`: renderiza todos los frames, o solo los índices que se le pasen (desde 0), p. ej. `python3 video.py out 0 47`.
-- `encode.py [dir] [out.mp4] [segundos]`: une los PNG en un mp4 con fps = frames / segundos.
-- `play.py [video]`: reproduce el video en bucle.
-- `plymouth.py [dir] [out] [colores]`: convierte los frames a PNG transparentes con paleta (`colores=0`: RGBA completo).
-- `sprite.py [dir] [out.png] [columnas] [px]`: une todos los frames en una sola imagen (por defecto 8 columnas, miniaturas de 270 px).
+- `video.py [dir] [frame ...]`: renders every frame, or only the indexes given (from 0), e.g.
+  `python video.py out 0 47`.
+- `encode.py [dir] [out.mp4] [seconds]`: joins the PNGs into an mp4 with fps = frames / seconds.
+- `plymouth.py [dir] [out] [colors]`: turns the frames into transparent paletted PNGs
+  (`colors=0`: full RGBA).
+- `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
+  270 px thumbnails by default).
+- `logo.py [out_dir]`: the logo files and the preview sheet.
+- `check.py <committed_dir> <regenerated_dir>`: compares two sets of images over black.
 
 ## Plymouth
 
-`task plymouth` genera un PNG por frame, separado por tramo (cada uno numerado desde 1):
+`task plymouth` makes one PNG per frame, split by part (each numbered from 1):
 
-- `intro-0001.png` … `intro-0026.png`: se reproduce una vez al empezar.
-- `loop-0001.png` … `loop-0012.png`: se repite mientras el sistema arranca; el último frame empalma con el primero.
-- `outro-0001.png` … `outro-0010.png`: se reproduce una vez al terminar (después de una vuelta completa del loop); el último frame es el logo.
-- Si el arranque termina antes de que acabe la intro, lo más limpio es mostrar directamente `outro-0010.png` (el logo) en lugar de saltar al medio de la secuencia.
+- `intro-0001.png` … `intro-0026.png`: played once at the start.
+- `loop-0001.png` … `loop-0012.png`: repeated while the system boots; the last frame joins the
+  first.
+- `outro-0001.png` … `outro-0010.png`: played once at the end; its last frame is the logo.
+  Plymouth hands the screen to the login screen as soon as the boot is done, so the
+  distribution plays the outro when the disk asks for its password, with the prompt under the
+  logo.
+- If the boot ends before the intro does, the cleanest thing is to show `outro-0010.png` (the
+  logo) directly instead of jumping into the middle of the sequence.
 
-Formato:
+Format:
 
-- Un PNG por frame, sin números ni bordes, con **fondo transparente**: el negro lo pone Plymouth.
-- Se dibujan directamente al tamaño final (`SIZE`, 1080 por defecto; mínimo recomendado 800), no se escalan.
-- Se generan en RGBA sin pérdida (~4.6 MB) y `pngquant` los comprime en el mismo lugar (`--quality 80-95`, variable `QUALITY`): ~1.6 MB los 48 frames a 1080 px (~34 KiB por frame; la grilla está presente en casi todos), pensado para un UKI sin initrd.
-- Sin pngquant, `plymouth.py frames plymouth 256` hace una paleta propia (~1.1 MB, algo menos fiel).
+- One PNG per frame, with no numbers or borders, on a **transparent background**: Plymouth puts
+  the black behind it.
+- Drawn at their final size (`SIZE`, 1080 by default; 800 at least) rather than scaled.
+- Made as lossless RGBA (~4.6 MB) and compressed in place by `pngquant` (`--quality 80-95`,
+  variable `QUALITY`): ~1.7 MB for the 48 frames at 1080 px (~34 KiB a frame; the grid is in
+  almost all of them). They go into the boot's initrd, which the firmware reads from the disk
+  before anything else, so every kilobyte is in the boot time.
+- Without pngquant, `plymouth.py frames plymouth 256` makes its own palette (~1.1 MB, a little
+  less faithful).
 
-## Fuente
+## Font
 
-La palabra usa **Audiowide**, con licencia SIL Open Font License 1.1: se puede usar, incrustar en imágenes y redistribuir con la distro. El archivo va en el repo (`fonts/Audiowide-Regular.ttf`, licencia en `fonts/OFL.txt`), así que no hace falta instalar nada y sale igual en cualquier máquina. "Audiowide" es un nombre reservado de la licencia: se usa el archivo tal cual; si alguna vez se modifica la fuente, hay que cambiarle el nombre. La misma fuente y el mismo espaciado se usan en la animación y en el logo; en los dos casos la palabra mide lo mismo que el borde del piso que tiene encima.
+The word uses **Audiowide**, under the SIL Open Font License 1.1: it may be used, embedded in
+images and redistributed with the distribution. The file is in the repository
+(`fonts/Audiowide-Regular.ttf`, license in `LICENSES/OFL-1.1.txt`), so nothing needs installing
+and it comes out the same on any machine. "Audiowide" is a Reserved Font Name: the file is used
+as it is; if the font is ever modified, it must be renamed. The same font and spacing are used in
+the animation and the logo; in both the word is as wide as the edge of the floor above it.
 
-Para probar otra fuente:
+To try another font:
 
 ```sh
-FONT=/ruta/Fuente.ttf task generate
+FONT=/path/Font.ttf task generate
 ```
+
+The path must be inside the repository: the generators run in a container that only sees it.
+
+## License
+
+- The artwork - the logo (`logos/`), the animation's frames (`plymouth/` and what `task`
+  generates) and the tagline - is under the Creative Commons Attribution-ShareAlike 4.0
+  International license (`LICENSES/CC-BY-SA-4.0.txt`).
+- The scripts, the `Taskfile.yml` and the `Dockerfile` are under the MIT license
+  (`LICENSES/MIT.txt`).
+- The Audiowide font is under the SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`).

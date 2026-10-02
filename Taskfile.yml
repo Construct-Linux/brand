@@ -1,10 +1,16 @@
 version: '3'
 
-run: once  # shared deps (setup, generate, ...) run a single time per invocation
+run: once  # shared deps (image, generate, ...) run a single time per invocation
 
 vars:
-  VENV: .venv
-  PYTHON: '{{.PYTHON | default ".venv/bin/python"}}'
+  IMAGE: construct-brand
+  UID:
+    sh: id -u
+  GID:
+    sh: id -g
+  # Every generator runs in the image (Dockerfile): pinned Python, libraries and pngquant, as
+  # the user running task, so what it writes is theirs.
+  RUN: docker run --rm -u {{.UID}}:{{.GID}} -e FONT -e SIZE -v {{.ROOT_DIR}}:/w -w /w {{.IMAGE}}
   FRAMES_DIR: frames
   VIDEO: construct.mp4
   DURATION: 5
@@ -23,39 +29,19 @@ tasks:
     desc: Everything - video, sprite, compressed Plymouth frames and logo
     deps: [encode, sprite, plymouth, logo]
 
-  setup:
-    desc: Create {{.VENV}} and install the Python dependencies
-    sources: [requirements.txt]
-    generates: ['{{.VENV}}/bin/python']
+  image:
+    desc: Build the {{.IMAGE}} image every generator runs in (Docker)
+    sources: [Dockerfile, requirements.txt]
     cmds:
-      - python3 -m venv {{.VENV}}
-      - '{{.VENV}}/bin/pip install -q -r requirements.txt'
-
-  pngquant:
-    desc: Install pngquant with the system package manager
-    status:
-      - command -v pngquant
-    cmds:
-      - |
-        if command -v apt-get >/dev/null; then sudo apt-get install -y pngquant
-        elif command -v dnf >/dev/null; then sudo dnf install -y pngquant
-        elif command -v pacman >/dev/null; then sudo pacman -S --noconfirm pngquant
-        elif command -v zypper >/dev/null; then sudo zypper install -y pngquant
-        elif command -v brew >/dev/null; then brew install pngquant
-        else echo "install pngquant manually"; exit 1
-        fi
-
-  deps:
-    desc: Install everything (Python packages, pngquant); the font ships in fonts/
-    deps: [setup, pngquant]
+      - docker build -q -t {{.IMAGE}} .
 
   generate:
     desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
-    deps: [deps]
+    deps: [image]
     sources: [video.py, fonts/*.ttf]
     generates: ['{{.FRAMES_DIR}}/construct_*.png']
     cmds:
-      - '{{.PYTHON}} video.py {{.FRAMES_DIR}}'
+      - '{{.RUN}} python video.py {{.FRAMES_DIR}}'
 
   encode:
     desc: Build {{.VIDEO}} ({{.DURATION}}s) from the frames
@@ -64,13 +50,13 @@ tasks:
     sources: ['{{.FRAMES_DIR}}/construct_*.png', encode.py]
     generates: ['{{.VIDEO}}']
     cmds:
-      - '{{.PYTHON}} encode.py {{.FRAMES_DIR}} {{.VIDEO}} {{.DURATION}}'
+      - '{{.RUN}} python encode.py {{.FRAMES_DIR}} {{.VIDEO}} {{.DURATION}}'
 
   play:
-    desc: Play {{.VIDEO}} in a loop (q / Esc to quit)
+    desc: Open {{.VIDEO}} in this machine's video player
     deps: [encode]
     cmds:
-      - '{{.PYTHON}} play.py {{.VIDEO}}'
+      - if command -v xdg-open >/dev/null; then xdg-open {{.VIDEO}}; else open {{.VIDEO}}; fi
 
   sprite:
     desc: Build {{.SPRITE}}, a grid of all frames to see the progression
@@ -79,43 +65,62 @@ tasks:
     sources: ['{{.FRAMES_DIR}}/construct_*.png', sprite.py]
     generates: ['{{.SPRITE}}']
     cmds:
-      - '{{.PYTHON}} sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
+      - '{{.RUN}} python sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
 
   plymouth:
     desc: Transparent PNG per frame for Plymouth ({{.SIZE}}px, no background), compressed with pngquant, into {{.PLY_DIR}}/
-    label: plymouth-{{.SIZE}}-{{.QUALITY}}  # re-run when SIZE or QUALITY change
-    deps: [deps]
-    sources: [video.py, plymouth.py, fonts/*.ttf]
+    label: plymouth-{{.SIZE}}-{{.QUALITY}}-{{.PLY_DIR}}  # re-run when SIZE, QUALITY or the output change
+    deps: [image]
+    vars:
+      TMP: .frames-{{.PLY_DIR | replace "/" "-"}}
+    sources: [video.py, plymouth.py, fonts/*.ttf, Dockerfile, requirements.txt]
     generates: ['{{.PLY_DIR}}/*.png']
     cmds:
-      - rm -rf {{.PLY_DIR}}
-      - SIZE={{.SIZE}} {{.PYTHON}} video.py .plymouth-frames
-      - '{{.PYTHON}} plymouth.py .plymouth-frames {{.PLY_DIR}} 0'  # lossless RGBA...
-      - rm -rf .plymouth-frames
+      - rm -rf {{.PLY_DIR}} {{.TMP}}
+      - SIZE={{.SIZE}} {{.RUN}} python video.py {{.TMP}}
+      - '{{.RUN}} python plymouth.py {{.TMP}} {{.PLY_DIR}} 0'  # lossless RGBA, then pngquant
+      - rm -rf {{.TMP}}
       - task: compress
+        vars: {PLY_DIR: '{{.PLY_DIR}}'}
 
   compress:
     desc: Compress the PNGs in {{.PLY_DIR}}/ in place with pngquant (replaces the files)
-    deps: [pngquant]
+    label: compress-{{.PLY_DIR}}
+    deps: [image]
     cmds:
-      - |
-        for file in "{{.PLY_DIR}}"/*.png; do
-          pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} "$file" || {
-            code=$?
-            [ "$code" -eq 98 ] || exit "$code"
-          }
-        done
+      - >-
+        {{.RUN}} sh -c 'for file in "{{.PLY_DIR}}"/*.png; do
+        pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} "$file" ||
+        { code=$?; [ "$code" -eq 98 ] || exit "$code"; }; done'
       - du -sh {{.PLY_DIR}}
 
   logo:
-    desc: Logo proposals (SVG color/mono, PNG icon sizes, preview.png) into logos/
-    deps: [deps]
+    desc: The logo (SVG color, mono and GNOME symbolic; PNG icon sizes; preview.png) into logos/
+    label: logo-{{.LOGO_DIR}}
+    deps: [image]
+    vars:
+      LOGO_DIR: '{{.LOGO_DIR | default "logos"}}'
     sources: [logo.py, fonts/*.ttf]
-    generates: [logos/preview.png]
+    generates: ['{{.LOGO_DIR}}/preview.png']
     cmds:
-      - '{{.PYTHON}} logo.py logos'
+      - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
+
+  check:
+    desc: Fail if the committed plymouth/ and logos/ are not what the sources make
+    deps: [image]
+    cmds:
+      - rm -rf .check
+      - task: plymouth
+        vars: {PLY_DIR: .check/plymouth}
+      - task: logo
+        vars: {LOGO_DIR: .check/logos}
+      - '{{.RUN}} python check.py plymouth .check/plymouth'
+      - '{{.RUN}} python check.py logos .check/logos'
+      # The SVGs are text, written the same everywhere.
+      - for f in .check/logos/*.svg; do cmp "logos/$(basename "$f")" "$f" || exit 1; done
+      - rm -rf .check
 
   clean:
-    desc: Remove generated frames, video, sprite and Plymouth PNGs
+    desc: Remove the generated frames, video and sprite (plymouth/ and logos/ are committed)
     cmds:
-      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} {{.PLY_DIR}} logos
+      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} .check .frames-*

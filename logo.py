@@ -72,14 +72,22 @@ def hex2bgr(h):
     h = h.lstrip("#"); return tuple(int(h[i:i + 2], 16) for i in (4, 2, 0))
 
 def stroke_px(size):
-    # fine line, ~1% of the mark like the animation's grid; never below 1 px so it survives 16 px
+    # Large: a fine line, ~1% of the mark like the animation's grid. Icon sizes: whole pixels -
+    # 1 px only at 16, where 2 would fill the mark; from 24 to 64 two, or the line fades into
+    # the background (a 1 px cyan stroke at 32 px all but vanished).
+    if size <= 16:
+        return 1
+    if size <= SMALL:
+        return 2
     return max(1.0, size * 0.011)
 
-SMALL = 32  # at or below this size, lines are snapped to the pixel grid (crisp 1 px icon)
+SMALL = 64  # at or below this size, lines are snapped to the pixel grid (crisp icon)
 
 def snap(lines, size):
-    """Move endpoints to pixel centers so verticals/horizontals land on one pixel column/row."""
-    c = lambda v: (np.floor((v + 6) * size / 112) + 0.5) * 112 / size - 6
+    """Move endpoints onto the pixel grid so verticals and horizontals cover whole pixels: a
+    1 px line on a pixel's center, a 2 px one on the edge between two."""
+    off = 0.5 if stroke_px(size) % 2 else 0.0
+    c = lambda v: (np.floor((v + 6) * size / 112) + off) * 112 / size - 6
     return [(c(np.asarray(a)), c(np.asarray(b))) for a, b in lines]
 
 def render(lines, size, color, bg, neon=False):
@@ -91,7 +99,7 @@ def render(lines, size, color, bg, neon=False):
     k = S / 112
     T = lambda p: (int(round((p[0] + 6) * k * 16)), int(round((p[1] + 6) * k * 16)))
     ink = np.zeros((S, S), np.float32)
-    w = ss if small else max(1, int(round(stroke_px(size) * ss)))  # exactly 1 px when small
+    w = int(round(stroke_px(size) * ss))  # whole pixels when small
     for pts, closed in chain(lines):
         cv2.polylines(ink, [np.array([T(p) for p in pts], np.int32)], closed, 1.0, w, cv2.LINE_AA, 4)
     if neon:  # soft halo like the boot animation
@@ -100,9 +108,19 @@ def render(lines, size, color, bg, neon=False):
     c, b = np.array(hex2bgr(color), np.float32), np.array(hex2bgr(bg), np.float32)
     return (b + (c - b) * a).round().astype(np.uint8)
 
-SIZES = [512, 128, 64, 48, 32, 16]
+def symbolic(lines):
+    """GNOME's symbolic icon: the mark on a 16 px grid, one color GTK replaces with the
+    theme's (#2e3436 is the one it looks for), a stroke thick enough to read at 16 px."""
+    d = " ".join("M" + " L".join(f"{(p[0] + 6) * 16 / 112:.2f} {(p[1] + 6) * 16 / 112:.2f}" for p in pts) + (" Z" if closed else "")
+                 for pts, closed in chain(lines))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">\n'
+            f'<path d="{d}" fill="none" stroke="#2e3436" stroke-width="1.5" '
+            f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
+
+SIZES = [512, 128, 64, 48, 32, 24, 16]
 for variant, color in (("", CYAN), ("-mono", "currentColor")):
     open(f"{OUT}/{NAME}{variant}.svg", "w").write(svg(LINES, color))
+open(f"{OUT}/{NAME}-symbolic.svg", "w").write(symbolic(LINES))
 for s in SIZES:
     cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN, INK))
 cv2.imwrite(f"{OUT}/{NAME}-neon-512.png", render(LINES, 512, CYAN, INK, neon=True))
@@ -129,9 +147,9 @@ sheet = Image.new("RGB", (W, 560), INK)
 d = ImageDraw.Draw(sheet)
 note_font = ImageFont.truetype(FONT, 12)
 d.text((30, 22), NAME.upper(), font=ImageFont.truetype(FONT, 20), fill=CYAN)
-d.text((30, 54), "El último frame de la animación sin rejilla: el cuarto en trazo, abierto a la izquierda.", font=note_font, fill="#9FB3C0")
+d.text((30, 54), "The animation's last frame without the grid: the room in outline, open on the left.", font=note_font, fill="#9FB3C0")
 x = 30
-for s in [256, 128, 64, 48, 32, 16]:  # actual pixels, on dark
+for s in [256, 128, 64, 48, 32, 24, 16]:  # actual pixels, on dark
     sheet.paste(to_pil(render(LINES, s, CYAN, INK, neon=s == 256)), (x, 100 + 256 - s))
     d.text((x, 370), f"{s}px", font=note_font, fill="#5F7380")
     x += s + 30
@@ -144,4 +162,4 @@ sheet.paste(lockup(120, CYAN, INK, "#FFFFFF", neon=True), (30, 410))
 lk = lockup(120, "#11181E", PAPER, "#11181E")
 sheet.paste(lk, (W - 30 - lk.width, 410))
 sheet.save(f"{OUT}/preview.png")
-print(f"{OUT}/: {NAME} -> svg, mono svg, png {SIZES}, neon, preview.png")
+print(f"{OUT}/: {NAME} -> svg, mono and symbolic svg, png {SIZES}, neon, preview.png")
