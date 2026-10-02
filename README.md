@@ -1,8 +1,21 @@
 # CONSTRUCT
 
-Animación de 48 frames (1080×1080): una habitación en wireframe cian que se dibuja sola, el texto **CONSTRUCT** y, en los últimos frames, la frase *Your workspace on the grid* (solo en el splash; el logo es la habitación en trazo con la palabra). El video final dura 5 s (48 frames a 9.6 fps).
+Identidad y animación de arranque de **CONSTRUCT**, un escritorio Linux para desarrolladores sobre Wolfi: una imagen base de solo lectura, verificada, con actualización A/B y vuelta atrás automática; encima, GNOME.
 
-La animación va de menos a más: el contenido se dibuja a lo largo de los 48 frames y, a la vez, el color pasa de un turquesa apagado a cian saturado y el brillo del neón crece hasta el último frame (`intensity()` en `video.py`).
+La idea: **la imagen no se mueve; el espacio de trabajo sí.** La habitación abierta tiene dos capas con roles fijos:
+
+- **El contorno** (el símbolo del logo) es la base estable. Se dibuja temprano, en un solo gesto desde la esquina (cada línea sale de una ya dibujada; los cantos cuelgan del borde de arriba), y desde el frame 7 queda fijo, a intensidad plena, hasta el final.
+- **La grilla interior** es el espacio de trabajo: más fina y más tenue, se construye dentro del contorno, se activa, respira mientras el sistema espera y se apaga al final. Nunca toca ni modifica el contorno.
+
+La secuencia (48 frames, 1080×1080; el video de vista previa dura 5 s a 9.6 fps) tiene tres tramos:
+
+| Tramo | Frames | Qué pasa |
+|---|---|---|
+| intro | 1–26 | contorno (cerrado en el 7), CONSTRUCT (completa en el 10), grilla en trazo y activación |
+| espera | 27–38 | la grilla respira, uniforme y sin dirección; se repite sin costura todo lo que haga falta |
+| cierre | 39–48 | la grilla se apaga; quedan el símbolo y la palabra: el logo |
+
+Nada está conectado al estado real del arranque, así que nada simula progreso ni verificación: la intro es coreografía de duración fija y la espera no avanza hacia ningún lado. Si el arranque termina durante la intro, la marca ya es reconocible desde el primer segundo. La tagline no va en el splash; las exploraciones están en `review/comparison.png`.
 
 ## Requisitos
 
@@ -29,6 +42,7 @@ task deps
 | `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
 | `task plymouth` | PNG transparentes por frame para Plymouth en `plymouth/`, comprimidos con pngquant |
 | `task logo`     | Propuestas de logo en `logos/`: SVG color y mono, PNG de 16 a 512 px y `preview.png` |
+| `task review`   | `review/comparison.png` (antes/después, primer segundo, logo, exploración de tagline) y `review/sequence.png` (frames por tramo y niveles de luz) |
 | `task compress` | Vuelve a pasar pngquant sobre `plymouth/*.png`, reemplazando los archivos |
 | `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png`, `plymouth/` y `logos/` |
 
@@ -55,11 +69,18 @@ task plymouth QUALITY=65-85              # pngquant más agresivo
 
 ## Plymouth
 
-`task plymouth` genera `plymouth/construct-0001.png` … `construct-0048.png`:
+`task plymouth` genera un PNG por frame, separado por tramo (cada uno numerado desde 1):
+
+- `intro-0001.png` … `intro-0026.png`: se reproduce una vez al empezar.
+- `loop-0001.png` … `loop-0012.png`: se repite mientras el sistema arranca; el último frame empalma con el primero.
+- `outro-0001.png` … `outro-0010.png`: se reproduce una vez al terminar (después de una vuelta completa del loop); el último frame es el logo.
+- Si el arranque termina antes de que acabe la intro, lo más limpio es mostrar directamente `outro-0010.png` (el logo) en lugar de saltar al medio de la secuencia.
+
+Formato:
 
 - Un PNG por frame, sin números ni bordes, con **fondo transparente**: el negro lo pone Plymouth.
 - Se dibujan directamente al tamaño final (`SIZE`, 1080 por defecto; mínimo recomendado 800), no se escalan.
-- Se generan en RGBA sin pérdida (~4.6 MB) y `pngquant` los comprime en el mismo lugar (`--quality 80-95`, variable `QUALITY`): ~1.0 MB los 48 frames a 1080 px (~21 KiB por frame), pensado para un UKI sin initrd.
+- Se generan en RGBA sin pérdida (~4.6 MB) y `pngquant` los comprime en el mismo lugar (`--quality 80-95`, variable `QUALITY`): ~1.6 MB los 48 frames a 1080 px (~34 KiB por frame; la grilla está presente en casi todos), pensado para un UKI sin initrd.
 - Sin pngquant, `plymouth.py frames plymouth 256` hace una paleta propia (~1.1 MB, algo menos fiel).
 
 ## Fuente

@@ -3,4 +3,4 @@ frames/*
 plymouth/*
 .task/*
 .venv/
-.plymouth-frames
+.plymouth-frames__pycache__/
