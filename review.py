@@ -4,16 +4,14 @@ import cv2
 from PIL import Image, ImageDraw, ImageFont
 import video
 
-# usage: review.py [frames_dir] [before_dir] [out_dir]
+# usage: review.py [frames_dir] [out_dir]
 # Review sheets for the identity and the boot animation:
-#   comparison.png - before / after (end of the splash, the first second, the logo) and
-#                    selected tagline on the final frame (not part of the splash)
+#   comparison.png - key moments of the splash (first second, waiting, end = logo), the
+#                    logo next to the last frame, and the identity tagline (not in the splash)
 #   sequence.png   - every frame grouped by segment (intro / loop / outro) with the light
 #                    levels of the two layers: outline (base image) and grid (workspace)
-# before_dir is optional: a copy of a previous frames/ (frames_dir layout) to compare with.
 FRAMES = sys.argv[1] if len(sys.argv) > 1 else "frames"
-BEFORE = sys.argv[2] if len(sys.argv) > 2 else ""
-OUT = sys.argv[3] if len(sys.argv) > 3 else "review"
+OUT = sys.argv[2] if len(sys.argv) > 2 else "review"
 os.makedirs(OUT, exist_ok=True)
 
 INK, LINE, MUTED, TEXT, CYAN = "#0B1116", "#1C252C", "#5F7380", "#C9D6DE", "#00E5FF"
@@ -35,34 +33,26 @@ W = pad + cols * (T + pad)
 rows = []
 
 def row(title, sub, items):
-    """items: [(image or None, label)]"""
+    """items: [(image, label)]"""
     r = Image.new("RGB", (W, 100 + T + 50), INK)
     d = ImageDraw.Draw(r)
     caption(d, (pad, 28), title, sub)
     for k, (im, label) in enumerate(items):
         x = pad + k * (T + pad)
-        if im is not None:
-            r.paste(im.resize((T, T), Image.LANCZOS), (x, 100))
-        else:
-            d.rectangle((x, 100, x + T, 100 + T), outline=LINE)
-            d.text((x + T / 2, 100 + T / 2), "sin versión anterior", font=font(12), fill=MUTED, anchor="mm")
+        r.paste(im.resize((T, T), Image.LANCZOS), (x, 100))
         d.text((x, 100 + T + 14), label, font=font(12), fill=TEXT)
     rows.append(r)
 
-has_before = BEFORE and os.path.exists(f"{BEFORE}/construct_48.png")
-b = (lambda i: frame(BEFORE, i)) if has_before else (lambda i: None)
 loop_mid = (segments["loop"][0] + segments["loop"][1]) // 2
-row("Final del splash", "Antes: grilla encendida y tagline.  Ahora: la grilla se apaga y queda el símbolo con la palabra.",
-    [(b(48), "Antes - frame 48"), (frame(FRAMES, loop_mid), f"Ahora - espera (frame {loop_mid})"), (frame(FRAMES, n), f"Ahora - frame {n}")])
-row("El primer segundo", "Si el arranque termina temprano, ¿se reconoce la marca?",
-    [(b(10), "Antes - frame 10"), (frame(FRAMES, 7), "Ahora - frame 7: contorno cerrado"), (frame(FRAMES, 10), "Ahora - frame 10: contorno + palabra")])
-logo = Image.open("logos/construct-neon-512.png").convert("RGB") if os.path.exists("logos/construct-neon-512.png") else None
+row("El splash", "La marca se reconoce desde el primer segundo; la grilla vive dentro del contorno y se apaga al final.",
+    [(frame(FRAMES, 7), "Frame 7: contorno cerrado"), (frame(FRAMES, 10), "Frame 10: contorno + palabra"),
+     (frame(FRAMES, loop_mid), f"Frame {loop_mid}: espera, espacio activo")])
 row("Logo = último frame", "El símbolo es el contorno: la base estable. La grilla (el espacio de trabajo) vive solo en la animación.",
-    [(logo, "Símbolo"), (frame(FRAMES, n), "Splash, último frame"), (frame(FRAMES, loop_mid), "Splash, espacio activo")])
+    [(Image.open("logos/construct-neon-512.png").convert("RGB"), "Símbolo"), (frame(FRAMES, n), f"Frame {n}: cierre del splash")])
 
 # Identity tagline, rendered on the final frame for review only.
-tags = [None, "Your workspace on the grid", "the workspace.\nthe image, verified."]
-notes = ["Sin tagline (splash actual)", "Tagline anterior", "Tagline elegida - identidad"]
+tags = [None, "the workspace.\nthe image, verified."]
+notes = ["Sin tagline (splash)", "Con tagline - identidad"]
 tw = (W - pad * (len(tags) + 1)) // len(tags)
 r = Image.new("RGB", (W, 100 + tw + 50), INK)
 d = ImageDraw.Draw(r)

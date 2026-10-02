@@ -116,12 +116,12 @@ tasks:
       - '{{.PYTHON}} logo.py logos'
 
   review:
-    desc: Review sheets in review/ - before/after comparison + tagline exploration, frame sequence by segment
+    desc: Review sheets in review/ - key frames, logo vs last frame, tagline; frame sequence by segment
     deps: [generate, logo]
     sources: [review.py, video.py, '{{.FRAMES_DIR}}/construct_*.png', logos/construct-neon-512.png]
     generates: [review/comparison.png, review/sequence.png]
     cmds:
-      - '{{.PYTHON}} review.py {{.FRAMES_DIR}} review/before review'  # review/before: optional older frames
+      - '{{.PYTHON}} review.py {{.FRAMES_DIR}} review'
 
   clean:
     desc: Remove generated frames, video, sprite and Plymouth PNGs
