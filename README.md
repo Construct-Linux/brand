@@ -1,6 +1,6 @@
 # CONSTRUCT
 
-Animación de 48 frames (1080×1080): una habitación en wireframe cian que se dibuja sola, una puerta que se ilumina y el texto **CONSTRUCT**. El video final dura 5 s (48 frames a 9.6 fps).
+Animación de 48 frames (1080×1080): una habitación en wireframe cian que se dibuja sola, una entrada en la pared derecha cuyo marco se enciende y el texto **CONSTRUCT**. El video final dura 5 s (48 frames a 9.6 fps).
 
 La animación va de menos a más: el contenido se dibuja a lo largo de los 48 frames y, a la vez, el color pasa de un turquesa apagado a cian saturado y el brillo del neón crece hasta el último frame (`intensity()` en `video.py`).
 

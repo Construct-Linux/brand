@@ -53,12 +53,11 @@ def ease(t):
 def prog(f, a, b):
     return ease((f - a) / max(b - a, 1e-6))
 
-# segment list: (p0, p1, start, end, maxlen, alpha)
+# segment list: (p0, p1, start, end); every line ends on a vertex of the grid
 segs = []
-def S(p0, p1, a, b, maxlen=1.0, alpha=1.0):
-    segs.append((np.array(p0, float), np.array(p1, float), a, b, maxlen, alpha))
+def S(p0, p1, a, b):
+    segs.append((np.array(p0, float), np.array(p1, float), a, b))
 
-g = [0, 1, 2, 3]
 # 1) three edges from back-right-bottom corner (3,0,3)
 S((3, 0, 3), (0, 0, 3), 8, 16)      # floor back edge
 S((3, 0, 3), (3, 3, 3), 8, 16)      # back-right vertical
@@ -76,24 +75,23 @@ S((3, 3, 3), (3, 3, 0), 22, 28)     # top edge
 # 5) right wall grid: verticals continue floor rows, horizontals
 for i in (1, 2):
     S((3, 0, i), (3, 3, i), 25, 31)
-    S((3, i, 3), (3, i, 0), 26, 32)
+    if i == 1:  # the door opening (z 1..2, y 0..2) stays clear of grid lines
+        S((3, i, 3), (3, i, 2), 26, 29)
+        S((3, i, 1), (3, i, 0), 29, 32)
+    else:
+        S((3, i, 3), (3, i, 0), 26, 32)
 # 6) back wall (z=3)
 S((0, 0, 3), (0, 3, 3), 28, 34)     # back-left vertical
 S((3, 3, 3), (0, 3, 3), 29, 35)     # top edge
 for i in (1, 2):
     S((i, 0, 3), (i, 3, 3), 31, 37)  # verticals continue floor columns
     S((3, i, 3), (0, i, 3), 32, 38)  # horizontals continue right-wall rows
-# 7) left wall (x=0) – deliberately incomplete
-S((0, 0, 0), (0, 3, 0), 34, 41, 0.55, 0.85)
-S((0, 3, 3), (0, 3, 0), 35, 42, 0.40, 0.70)
-S((0, 0, 1), (0, 3, 1), 36, 42, 0.70, 0.80)
-S((0, 0, 2), (0, 3, 2), 35, 41, 0.35, 0.75)
-S((0, 1, 3), (0, 1, 0), 36, 43, 0.85, 0.85)
-S((0, 2, 3), (0, 2, 0), 37, 43, 0.30, 0.60)
+# the room is open on the left and the front: those sides end on the floor/back-wall edges
 
-# door: right wall, middle column (z 1..2), two lower rows (y 0..2)
+# door: an open entrance in the right wall, middle column (z 1..2), two lower rows (y 0..2).
+# No fill: the frame lights up brighter than the grid.
 DOOR = [(3, 0, 1), (3, 2, 1), (3, 2, 2), (3, 0, 2)]
-DOOR_A, DOOR_B = 36, 44
+DOOR_A, DOOR_B = 34, 42
 TEXT_A, TEXT_B = 40, 46
 CORNER_A, CORNER_B = 4, 9
 
@@ -107,7 +105,6 @@ def render(frame):
     g = intensity(frame)
     f = timeline(frame)
     lines = np.zeros((H * SS, W * SS, 3), np.float32)
-    fill = np.zeros_like(lines)
     lw = 3 * SS
     # starting point of light
     c = prog(f, CORNER_A, CORNER_B)
@@ -115,44 +112,26 @@ def render(frame):
     if c > 0:
         p = P((3, 0, 3)).astype(int)
         cv2.circle(lines, tuple(p), int(5 * SS), (c * fade,) * 3, -1, cv2.LINE_AA)
-    for p0, p1, a, b, ml, al in segs:
-        t = prog(f, a, b) * ml
+    for p0, p1, a, b in segs:
+        t = prog(f, a, b)
         if t <= 0: continue
         q0, q1 = P(p0), P(p0 + (p1 - p0) * t)
-        # fading tail for incomplete left-wall lines
-        if ml < 1:
-            n = 12
-            for k in range(n):
-                s0, s1 = k / n, (k + 1) / n
-                aa = al * (1 - s0 * 0.85)
-                cv2.line(lines, tuple((q0 + (q1 - q0) * s0).astype(int)),
-                         tuple((q0 + (q1 - q0) * s1).astype(int)), (aa,) * 3, lw, cv2.LINE_AA)
-        else:
-            cv2.line(lines, tuple(q0.astype(int)), tuple(q1.astype(int)), (al,) * 3, lw, cv2.LINE_AA)
-            # bright drawing head
-            if 0 < t < 1:
-                cv2.circle(lines, tuple(q1.astype(int)), int(4 * SS), (1.4,) * 3, -1, cv2.LINE_AA)
-    # door
+        cv2.line(lines, tuple(q0.astype(int)), tuple(q1.astype(int)), (1.0,) * 3, lw, cv2.LINE_AA)
+        # bright drawing head
+        if t < 1:
+            cv2.circle(lines, tuple(q1.astype(int)), int(4 * SS), (1.4,) * 3, -1, cv2.LINE_AA)
+    # door frame: jambs + lintel brighten over the grid
     d = prog(f, DOOR_A, DOOR_B)
     if d > 0:
-        poly = np.array([P(p) for p in DOOR], np.int32)
-        cv2.fillPoly(fill, [poly], (0.55 * d,) * 3, cv2.LINE_AA)
-        # floor reflection
-        refl = np.array([P((x, -y * 0.6, z)) for x, y, z in DOOR], np.int32)
-        r = np.zeros_like(fill)
-        cv2.fillPoly(r, [refl], (0.22 * d,) * 3, cv2.LINE_AA)
-        r = cv2.GaussianBlur(r, (0, 0), 14 * SS)
-        mask = np.zeros_like(r)
-        floor = np.array([P(p) for p in [(0,0,0),(3,0,0),(3,0,3),(0,0,3)]], np.int32)
-        cv2.fillPoly(mask, [floor], (1,1,1))
-        fill += r * mask
+        jamb_pts = np.array([P(p) for p in DOOR], np.int32)
+        cv2.polylines(lines, [jamb_pts], False, (1.0 + 0.8 * d,) * 3, int(lw * (1 + 0.5 * d)), cv2.LINE_AA)
     # from less to more: brightness, glow and saturation all ramp with g
     lines *= 0.6 + 0.4 * g
-    mono = glow(lines + fill, 0.15 + 1.15 * g)[..., 0]
+    mono = glow(lines, 0.15 + 1.15 * g)[..., 0]
     color = DIM + (CYAN - DIM) * g
     img = mono[..., None] * color[None, None, :]
     # white-hot core on lines
-    img += np.clip(lines[..., :1], 0, 1) * 0.35 * g + fill[..., :1] * np.array([0.6, 0.3, 0]) * g
+    img += np.clip(lines[..., :1], 0, 2) * 0.35 * g  # >1 only on the door frame: whiter core
     img = np.clip(img, 0, 1)
     img = cv2.resize(img, (W, H), interpolation=cv2.INTER_AREA)
     out = (img * 255).astype(np.uint8)
@@ -177,7 +156,7 @@ def draw_text(bgr, a, g=1.0):
         dr.text((x, y), ch, font=font, fill=255)
         x += w + spacing
     m = np.asarray(layer, np.float32) / 255 * a
-    halo = cv2.GaussianBlur(m, (0, 0), 6 + 6 * g) * (0.2 + 0.6 * g)
+    halo = cv2.GaussianBlur(m, (0, 0), 4 + 3 * g) * (0.1 + 0.2 * g)  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255
     base += halo[..., None] * np.array([1.0, 0.95, 0.7])
     base = base * (1 - m[..., None]) + m[..., None]
