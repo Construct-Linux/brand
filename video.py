@@ -32,13 +32,14 @@ def intensity(f):
     return (f / (N - 1)) ** 1.4  # ease-in: the neon keeps building up to the last frame
 
 # ---------- camera: room = cube 3x3x3, x right, y up, z depth (z=0 open front) ----------
-cam = np.array([0.55, 1.75, -2.6])
-target = np.array([1.9, 1.15, 2.4])
+# front view: camera low and centered in front of the open side, looking straight in
+cam = np.array([1.3, 1.2, -2.9])     # position (x, y=height, z=distance in front)
+target = np.array([1.5, 1.1, 3.0])   # point it looks at
 fwd = target - cam; fwd /= np.linalg.norm(fwd)
 right = np.cross([0, 1, 0], fwd); right /= np.linalg.norm(right)
 up = np.cross(fwd, right)
-F = 700 * SS
-CX, CY = W * SS * 0.47, H * SS * 0.41
+F = 620 * SS  # focal length: larger = closer / bigger room
+CX, CY = W * SS * 0.5, H * SS * 0.52  # where target lands on screen
 
 def P(p):
     d = np.array(p, float) - cam
