@@ -39,7 +39,8 @@ def intensity(f):
 # and every y line stays vertical; only depth converges, to the vanishing point.
 # Framing is done by shifting the image (like an architectural shift lens), never by
 # turning the camera.
-cam = np.array([1.3, 1.2, -2.9])  # position (x, y=height, z=distance in front)
+cam = np.array([0.6, 1.2, -2.9])  # position (x, y=height, z=distance in front); near the
+                                  # left side so the right wall and its entrance open up (same as logo.py)
 FOCAL = 620                       # focal length in design px: larger = closer / bigger room
 F = FOCAL * PX
 # vanishing point on screen; VX centers the floor front edge over the word:
@@ -101,9 +102,17 @@ for x in range(4):
         if x > 0: edge((x, 0, z), (x - 1, 0, z), d, FLOOR_A, FLOOR_STEP)
         if z > 0: edge((x, 0, z), (x, 0, z - 1), d, FLOOR_A, FLOOR_STEP)
 
-# door: an open entrance in the right wall, middle column (z 1..2), two lower rows (y 0..2).
-# No fill: the frame lights up brighter than the grid.
-DOOR = [(3, 0, 1), (3, 2, 1), (3, 2, 2), (3, 0, 2)]
+# door: an open entrance in the right wall, two rows high (y 0..2), centered on the wall
+# *as seen* (perspective squeezes the far half, so the 3D-centered z 1..2 would look pushed
+# to the back). Same door as the logo (logo.py). Its jambs are lines of their own; the grid
+# stops at them so the opening stays clear. No fill: the frame lights up brighter.
+def side_door(frac=0.29):  # frac = door width / wall width, on screen
+    X = lambda z: (3 - cam[0]) / (z - cam[2])  # screen x of the right wall at depth z
+    Z = lambda x: (3 - cam[0]) / x + cam[2]    # inverse
+    mid, half = (X(0) + X(3)) / 2, (X(0) - X(3)) * frac / 2
+    return Z(mid + half), Z(mid - half)
+DZ0, DZ1 = side_door()  # near and far jamb depth
+DOOR = [(3, 0, DZ0), (3, 2, DZ0), (3, 2, DZ1), (3, 0, DZ1)]
 
 S((3, 0, 3), (3, 3, 3), AXIS_A, AXIS_B)  # corner axis
 S((3, 3, 3), (3, 3, 0), TOP_A, TOP_B)    # right wall top edge
@@ -112,14 +121,17 @@ S((3, 0, 0), (3, 3, 0), *OUTER)  # right wall front edge
 S((0, 0, 3), (0, 3, 3), *OUTER)  # back wall left edge
 S((3, 2, 0), (3, 2, 3), HI_A, HI_B)        # right wall y=2 (door lintel line)
 S((0, 2, 3), (3, 2, 3), HI_A, HI_B)        # back wall y=2
-for k in (1, 2):  # right wall z=1, z=2 are the door jambs
+for k in (1, 2):
     for (y0, y1), win in (((3, 2), VERT_HI), ((2, 0), VERT_LO)):
-        S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
-        S((3 - k, y0, 3), (3 - k, y1, 3), *win)  # back wall
+        if not (y1 == 0 and DZ0 < 3 - k < DZ1):  # grid stops at the lintel over the opening
+            S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
+        S((3 - k, y0, 3), (3 - k, y1, 3), *win)      # back wall
+for z in (DZ0, DZ1):  # door jambs, hanging from the lintel line like the grid verticals
+    S((3, 2, z), (3, 0, z), *VERT_LO)
 S((0, 1, 3), (3, 1, 3), LO_A, LO_B)        # back wall y=1
 # right wall y=1 stops at the door jambs: one piece from the front edge, one from the axis
-S((3, 1, 0), (3, 1, 1), LO_A, LO_B)
-S((3, 1, 3), (3, 1, 2), LO_A, LO_B)
+S((3, 1, 0), (3, 1, DZ0), LO_A, LO_B)
+S((3, 1, 3), (3, 1, DZ1), LO_A, LO_B)
 # the room is open on the left and the front: those sides end on the floor/back-wall edges
 
 MIN_LEN = 14 * PX  # px a growing line needs before it is shown

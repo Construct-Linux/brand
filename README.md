@@ -29,8 +29,9 @@ task deps
 | `task play`     | Reproduce `construct.mp4` en bucle (`q` / `Esc` para salir) |
 | `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
 | `task plymouth` | PNG transparentes por frame para Plymouth en `plymouth/`, comprimidos con pngquant |
+| `task logo`     | Propuestas de logo en `logos/`: SVG color y mono, PNG de 16 a 512 px y `preview.png` |
 | `task compress` | Vuelve a pasar pngquant sobre `plymouth/*.png`, reemplazando los archivos |
-| `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png` y `plymouth/` |
+| `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png`, `plymouth/` y `logos/` |
 
 Cada tarea ejecuta antes las que necesita (`play` → `encode` → `generate` → `deps`) y se salta las que ya están al día.
 

@@ -21,7 +21,7 @@ tasks:
 
   all:
     desc: Everything - video, sprite and compressed Plymouth frames
-    deps: [encode, sprite, plymouth]
+    deps: [encode, sprite, plymouth, logo]
 
   setup:
     desc: Create {{.VENV}} and install the Python dependencies
@@ -113,7 +113,15 @@ tasks:
       - pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} {{.PLY_DIR}}/*.png
       - du -sh {{.PLY_DIR}}
 
+  logo:
+    desc: Logo proposals (SVG color/mono, PNG icon sizes, preview.png) into logos/
+    deps: [deps]
+    sources: [logo.py]
+    generates: [logos/preview.png]
+    cmds:
+      - '{{.PYTHON}} logo.py logos'
+
   clean:
     desc: Remove generated frames, video, sprite and Plymouth PNGs
     cmds:
-      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} {{.PLY_DIR}}
+      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} {{.PLY_DIR}} logos
