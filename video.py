@@ -1,8 +1,10 @@
 import numpy as np, cv2, os, sys
 from PIL import Image, ImageDraw, ImageFont
 
-W = H = 1080
+W = H = int(os.environ.get("SIZE", 1080))  # output px (square); the design is laid out at 1080
 SS = 2  # supersampling
+U = W / 1080  # layout scale
+PX = SS * U   # one design pixel on the supersampled canvas
 # DejaVu Sans Bold (same package as DejaVu Sans, the default font for Plymouth ("Sans" -> fontconfig) on Debian/Ubuntu/Fedora/Arch)
 FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",    # Debian/Ubuntu
@@ -32,19 +34,24 @@ def intensity(f):
     return (f / (N - 1)) ** 1.4  # ease-in: the neon keeps building up to the last frame
 
 # ---------- camera: room = cube 3x3x3, x right, y up, z depth (z=0 open front) ----------
-# front view: camera low and centered in front of the open side, looking straight in
-cam = np.array([1.3, 1.2, -2.9])     # position (x, y=height, z=distance in front)
-target = np.array([1.5, 1.1, 3.0])   # point it looks at
-fwd = target - cam; fwd /= np.linalg.norm(fwd)
-right = np.cross([0, 1, 0], fwd); right /= np.linalg.norm(right)
-up = np.cross(fwd, right)
-F = 620 * SS  # focal length: larger = closer / bigger room
-CX, CY = W * SS * 0.5, H * SS * 0.52  # where target lands on screen
+# Front view, one-point perspective: the camera looks straight down +z with no yaw, pitch
+# or roll, so every x line (floor front edge, the line above the word) stays horizontal
+# and every y line stays vertical; only depth converges, to the vanishing point.
+# Framing is done by shifting the image (like an architectural shift lens), never by
+# turning the camera.
+cam = np.array([1.3, 1.2, -2.9])  # position (x, y=height, z=distance in front)
+F = 620 * PX                      # focal length: larger = closer / bigger room
+VX, VY = 0.48, 0.51               # where the vanishing point (straight ahead) sits on screen
+CX, CY = W * SS * VX, H * SS * VY
 
 def P(p):
-    d = np.array(p, float) - cam
-    x, y, z = d @ right, d @ up, d @ fwd
+    x, y, z = np.array(p, float) - cam
     return np.array([CX + F * x / z, CY - F * y / z])
+
+SHIFT = 4  # cv2 fixed-point bits: draw at 1/16 px instead of rounding to whole pixels
+
+def pt(q):
+    return tuple(int(v) for v in np.round(np.asarray(q) * (1 << SHIFT)))
 
 def ease(t):
     t = min(max(t, 0), 1)
@@ -113,39 +120,39 @@ S((3, 1, 0), (3, 1, 1), LO_A, LO_B)
 S((3, 1, 3), (3, 1, 2), LO_A, LO_B)
 # the room is open on the left and the front: those sides end on the floor/back-wall edges
 
-MIN_LEN = 14 * SS  # px a growing line needs before it is shown
+MIN_LEN = 14 * PX  # px a growing line needs before it is shown
 
 def glow(img, strength=1.0):
     out = img.copy()
     for k, w in ((9, 0.9), (31, 0.7), (91, 0.55)):
-        out += cv2.GaussianBlur(img, (0, 0), k * SS / 3) * w * strength
+        out += cv2.GaussianBlur(img, (0, 0), k * PX / 3) * w * strength
     return out
 
 def render(frame):
     g = intensity(frame)
     f = timeline(frame)
     lines = np.zeros((H * SS, W * SS, 3), np.float32)
-    lw = 3 * SS
+    lw = max(1, round(3 * PX))
     # starting point of light
     c = prog(f, CORNER_A, CORNER_B)
     fade = 1 - 0.6 * prog(f, 14, 20)
     if c > 0:
-        p = P((3, 0, 3)).astype(int)
-        cv2.circle(lines, tuple(p), int(5 * SS), (c * fade,) * 3, -1, cv2.LINE_AA)
+        p = pt(P((3, 0, 3)))
+        cv2.circle(lines, p, round(5 * PX * (1 << SHIFT)), (c * fade,) * 3, -1, cv2.LINE_AA, SHIFT)
     for p0, p1, a, b in segs:
         t = min(max((f - a) / (b - a), 0), 1)  # linear: steady wavefront
         if t <= 0: continue
         q0, q1 = P(p0), P(p0 + (p1 - p0) * t)
         if t < 1 and np.linalg.norm(q1 - q0) < MIN_LEN: continue  # a dot is not a line yet
-        cv2.line(lines, tuple(q0.astype(int)), tuple(q1.astype(int)), (1.0,) * 3, lw, cv2.LINE_AA)
+        cv2.line(lines, pt(q0), pt(q1), (1.0,) * 3, lw, cv2.LINE_AA, SHIFT)
         # bright drawing head
         if t < 1:
-            cv2.circle(lines, tuple(q1.astype(int)), int(4 * SS), (1.4,) * 3, -1, cv2.LINE_AA)
+            cv2.circle(lines, pt(q1), round(4 * PX * (1 << SHIFT)), (1.4,) * 3, -1, cv2.LINE_AA, SHIFT)
     # door frame: jambs + lintel brighten over the grid
     d = prog(f, DOOR_A, DOOR_B)
     if d > 0:
-        jamb_pts = np.array([P(p) for p in DOOR], np.int32)
-        cv2.polylines(lines, [jamb_pts], False, (1.0 + 1.2 * d,) * 3, int(lw * (1 + 0.8 * d)), cv2.LINE_AA)
+        jamb_pts = np.array([pt(P(p)) for p in DOOR], np.int32)
+        cv2.polylines(lines, [jamb_pts], False, (1.0 + 1.2 * d,) * 3, int(lw * (1 + 0.8 * d)), cv2.LINE_AA, SHIFT)
     # from less to more: brightness, glow and saturation all ramp with g
     lines *= 0.6 + 0.4 * g
     mono = glow(lines, 0.15 + 1.15 * g)[..., 0]
@@ -164,20 +171,20 @@ def render(frame):
 
 def draw_text(bgr, a, g=1.0):
     txt = "CONSTRUCT"
-    size = 64
+    size = round(64 * U)
     font = ImageFont.truetype(FONT, size)
-    spacing = 30
+    spacing = 30 * U
     widths = [font.getlength(ch) for ch in txt]
     total = sum(widths) + spacing * (len(txt) - 1)
     layer = Image.new("L", (W, H), 0)
     dr = ImageDraw.Draw(layer)
     x = (W - total) / 2
-    y = 905
+    y = 905 * U
     for ch, w in zip(txt, widths):
         dr.text((x, y), ch, font=font, fill=255)
         x += w + spacing
     m = np.asarray(layer, np.float32) / 255 * a
-    halo = cv2.GaussianBlur(m, (0, 0), 4 + 3 * g) * (0.1 + 0.2 * g)  # soft: the room is the logo
+    halo = cv2.GaussianBlur(m, (0, 0), (4 + 3 * g) * U) * (0.1 + 0.2 * g)  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255
     base += halo[..., None] * np.array([1.0, 0.95, 0.7])
     base = base * (1 - m[..., None]) + m[..., None]

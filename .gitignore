@@ -1,3 +1,5 @@
 construct.mp4
 frames/*
+plymouth/*
 .task/*
+.venv/

@@ -1,5 +1,7 @@
 version: '3'
 
+run: once  # shared deps (setup, generate, ...) run a single time per invocation
+
 vars:
   VENV: .venv
   PYTHON: '{{.PYTHON | default ".venv/bin/python"}}'
@@ -8,8 +10,19 @@ vars:
   DURATION: 5
   SPRITE: sprite.png
   COLS: 8
+  SIZE: 1080            # Plymouth frame width/height (>= 800; 1080 for a 1080p boot)
+  QUALITY: 80-95        # pngquant quality range for the Plymouth PNGs
+  PLY_DIR: plymouth
 
 tasks:
+  default:
+    cmds:
+      - task: all
+
+  all:
+    desc: Everything - video, sprite and compressed Plymouth frames
+    deps: [encode, sprite, plymouth]
+
   setup:
     desc: Create {{.VENV}} and install the Python dependencies
     sources: [requirements.txt]
@@ -32,9 +45,23 @@ tasks:
         else echo "install DejaVu Sans manually or set FONT=/path/DejaVuSans-Bold.ttf"; exit 1
         fi
 
+  pngquant:
+    desc: Install pngquant with the system package manager
+    status:
+      - command -v pngquant
+    cmds:
+      - |
+        if command -v apt-get >/dev/null; then sudo apt-get install -y pngquant
+        elif command -v dnf >/dev/null; then sudo dnf install -y pngquant
+        elif command -v pacman >/dev/null; then sudo pacman -S --noconfirm pngquant
+        elif command -v zypper >/dev/null; then sudo zypper install -y pngquant
+        elif command -v brew >/dev/null; then brew install pngquant
+        else echo "install pngquant manually"; exit 1
+        fi
+
   deps:
-    desc: Install everything (Python packages + font)
-    deps: [setup, font]
+    desc: Install everything (Python packages, font, pngquant)
+    deps: [setup, font, pngquant]
 
   generate:
     desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
@@ -66,7 +93,27 @@ tasks:
     cmds:
       - '{{.PYTHON}} sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
 
-  clean:
-    desc: Remove generated frames, video and sprite
+  plymouth:
+    desc: Transparent PNG per frame for Plymouth ({{.SIZE}}px, no background), compressed with pngquant, into {{.PLY_DIR}}/
+    label: plymouth-{{.SIZE}}-{{.QUALITY}}  # re-run when SIZE or QUALITY change
+    deps: [deps]
+    sources: [video.py, plymouth.py]
+    generates: ['{{.PLY_DIR}}/construct-*.png']
     cmds:
-      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}}
+      - rm -rf {{.PLY_DIR}}
+      - SIZE={{.SIZE}} {{.PYTHON}} video.py .plymouth-frames
+      - '{{.PYTHON}} plymouth.py .plymouth-frames {{.PLY_DIR}} 0'  # lossless RGBA...
+      - rm -rf .plymouth-frames
+      - task: compress
+
+  compress:
+    desc: Compress the PNGs in {{.PLY_DIR}}/ in place with pngquant (replaces the files)
+    deps: [pngquant]
+    cmds:
+      - pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} {{.PLY_DIR}}/*.png
+      - du -sh {{.PLY_DIR}}
+
+  clean:
+    desc: Remove generated frames, video, sprite and Plymouth PNGs
+    cmds:
+      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} {{.PLY_DIR}}
