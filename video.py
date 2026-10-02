@@ -5,18 +5,9 @@ W = H = int(os.environ.get("SIZE", 1080))  # output px (square); the design is l
 SS = 2  # supersampling
 U = W / 1080  # layout scale
 PX = SS * U   # one design pixel on the supersampled canvas
-# DejaVu Sans Bold (same package as DejaVu Sans, the default font for Plymouth ("Sans" -> fontconfig) on Debian/Ubuntu/Fedora/Arch)
-FONT_CANDIDATES = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",    # Debian/Ubuntu
-    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans-Bold.ttf",  # Fedora/RHEL
-    "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",                # Arch
-    "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",             # openSUSE / older Fedora
-    os.path.expanduser("~/Library/Fonts/DejaVuSans-Bold.ttf"), # macOS (brew --cask font-dejavu)
-    "/Library/Fonts/DejaVuSans-Bold.ttf",                      # macOS
-]
-FONT = os.environ.get("FONT") or next((p for p in FONT_CANDIDATES if os.path.exists(p)), None)
-if not FONT:
-    sys.exit("DejaVuSans-Bold.ttf not found: install fonts-dejavu-core / dejavu-sans-fonts or set FONT=/path/DejaVuSans-Bold.ttf")
+# Audiowide (SIL Open Font License, fonts/OFL.txt), shipped in the repo: same file
+# everywhere, no system font needed. The word is baked into the frames.
+FONT = os.environ.get("FONT") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "Audiowide-Regular.ttf")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "frames"
 os.makedirs(OUT, exist_ok=True)
 N = 48  # total frames (encode.py turns them into a 5s video)
@@ -102,16 +93,10 @@ for x in range(4):
         if x > 0: edge((x, 0, z), (x - 1, 0, z), d, FLOOR_A, FLOOR_STEP)
         if z > 0: edge((x, 0, z), (x, 0, z - 1), d, FLOOR_A, FLOOR_STEP)
 
-# door: an open entrance in the right wall, two rows high (y 0..2), centered on the wall
-# *as seen* (perspective squeezes the far half, so the 3D-centered z 1..2 would look pushed
-# to the back). Same door as the logo (logo.py). Its jambs are lines of their own; the grid
-# stops at them so the opening stays clear. No fill: the frame lights up brighter.
-def side_door(frac=0.29):  # frac = door width / wall width, on screen
-    X = lambda z: (3 - cam[0]) / (z - cam[2])  # screen x of the right wall at depth z
-    Z = lambda x: (3 - cam[0]) / x + cam[2]    # inverse
-    mid, half = (X(0) + X(3)) / 2, (X(0) - X(3)) * frac / 2
-    return Z(mid + half), Z(mid - half)
-DZ0, DZ1 = side_door()  # near and far jamb depth
+# door: an open entrance in the right wall, middle cell column (z 1..2), two rows high
+# (y 0..2); its jambs and lintel are grid lines. Same door as the logo (logo.py).
+# No fill: the frame lights up brighter than the grid.
+DZ0, DZ1 = 1, 2
 DOOR = [(3, 0, DZ0), (3, 2, DZ0), (3, 2, DZ1), (3, 0, DZ1)]
 
 S((3, 0, 3), (3, 3, 3), AXIS_A, AXIS_B)  # corner axis
@@ -121,13 +106,10 @@ S((3, 0, 0), (3, 3, 0), *OUTER)  # right wall front edge
 S((0, 0, 3), (0, 3, 3), *OUTER)  # back wall left edge
 S((3, 2, 0), (3, 2, 3), HI_A, HI_B)        # right wall y=2 (door lintel line)
 S((0, 2, 3), (3, 2, 3), HI_A, HI_B)        # back wall y=2
-for k in (1, 2):
+for k in (1, 2):  # right wall z=1, z=2 are the door jambs
     for (y0, y1), win in (((3, 2), VERT_HI), ((2, 0), VERT_LO)):
-        if not (y1 == 0 and DZ0 < 3 - k < DZ1):  # grid stops at the lintel over the opening
-            S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
-        S((3 - k, y0, 3), (3 - k, y1, 3), *win)      # back wall
-for z in (DZ0, DZ1):  # door jambs, hanging from the lintel line like the grid verticals
-    S((3, 2, z), (3, 0, z), *VERT_LO)
+        S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
+        S((3 - k, y0, 3), (3 - k, y1, 3), *win)  # back wall
 S((0, 1, 3), (3, 1, 3), LO_A, LO_B)        # back wall y=1
 # right wall y=1 stops at the door jambs: one piece from the front edge, one from the axis
 S((3, 1, 0), (3, 1, DZ0), LO_A, LO_B)
@@ -185,18 +167,21 @@ def render(frame):
 
 def draw_text(bgr, a, g=1.0):
     txt = "CONSTRUCT"
-    size = round(64 * U)
-    font = ImageFont.truetype(FONT, size)
-    spacing = 30 * U
-    widths = [font.getlength(ch) for ch in txt]
-    total = sum(widths) + spacing * (len(txt) - 1)
+    # the word spans exactly the floor front edge above it (x 0..3 at z=0)
+    span = (P((3, 0, 0))[0] - P((0, 0, 0))[0]) / SS
+    track = 0.35  # letter spacing, in em
+    ref = ImageFont.truetype(FONT, 100)
+    em_width = (sum(ref.getlength(ch) for ch in txt[:-1]) + ref.getbbox(txt[-1])[2]) / 100 + track * (len(txt) - 1)
+    size = span / em_width
+    font = ImageFont.truetype(FONT, round(size))
+    spacing = track * size
     layer = Image.new("L", (W, H), 0)
     dr = ImageDraw.Draw(layer)
-    x = (W - total) / 2
-    y = 905 * U
-    for ch, w in zip(txt, widths):
-        dr.text((x, y), ch, font=font, fill=255)
-        x += w + spacing
+    x = (W - span) / 2
+    y = 940 * U  # cap middle, between the floor edge and the bottom
+    for ch in txt:
+        dr.text((x, y), ch, font=font, fill=255, anchor="lm")
+        x += font.getlength(ch) + spacing
     m = np.asarray(layer, np.float32) / 255 * a
     halo = cv2.GaussianBlur(m, (0, 0), (4 + 3 * g) * U) * (0.1 + 0.2 * g)  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255

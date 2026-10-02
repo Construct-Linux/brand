@@ -13,10 +13,9 @@ La animación va de menos a más: el contenido se dibuja a lo largo de los 48 fr
 task deps
 ```
 
-`task deps` ejecuta tres tareas:
+`task deps` ejecuta dos tareas:
 
 - `task setup`: crea `.venv` e instala `requirements.txt` (`numpy`, `opencv-python`, `pillow`).
-- `task font`: instala **DejaVu Sans**, la fuente por defecto de Plymouth, con el gestor de paquetes del sistema (`apt`, `dnf`, `pacman`, `zypper` o `brew`). Si la fuente ya está, no hace nada. En Linux pide `sudo`.
 - `task pngquant`: instala `pngquant` de la misma forma.
 
 ## Uso
@@ -65,8 +64,10 @@ task plymouth QUALITY=65-85              # pngquant más agresivo
 
 ## Fuente
 
-`video.py` busca `DejaVuSans-Bold.ttf` en las rutas habituales de Debian/Ubuntu, Fedora/RHEL, Arch y openSUSE. Para usar otra ruta:
+La palabra usa **Audiowide**, con licencia SIL Open Font License 1.1: se puede usar, incrustar en imágenes y redistribuir con la distro. El archivo va en el repo (`fonts/Audiowide-Regular.ttf`, licencia en `fonts/OFL.txt`), así que no hace falta instalar nada y sale igual en cualquier máquina. "Audiowide" es un nombre reservado de la licencia: se usa el archivo tal cual; si alguna vez se modifica la fuente, hay que cambiarle el nombre. La misma fuente y el mismo espaciado se usan en la animación y en el logo; en los dos casos la palabra mide lo mismo que el borde del piso que tiene encima.
+
+Para probar otra fuente:
 
 ```sh
-FONT=/ruta/DejaVuSans-Bold.ttf task generate
+FONT=/ruta/Fuente.ttf task generate
 ```
