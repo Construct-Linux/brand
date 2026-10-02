@@ -15,7 +15,14 @@ La secuencia (48 frames, 1080×1080; el video de vista previa dura 5 s a 9.6 fps
 | espera | 27–38 | la grilla respira, uniforme y sin dirección; se repite sin costura todo lo que haga falta |
 | cierre | 39–48 | la grilla se apaga; quedan el símbolo y la palabra: el logo |
 
-Nada está conectado al estado real del arranque, así que nada simula progreso ni verificación: la intro es coreografía de duración fija y la espera no avanza hacia ningún lado. Si el arranque termina durante la intro, la marca ya es reconocible desde el primer segundo. La tagline no va en el splash; las exploraciones están en `review/comparison.png`.
+Nada está conectado al estado real del arranque, así que nada simula progreso ni verificación: la intro es coreografía de duración fija y la espera no avanza hacia ningún lado. Si el arranque termina durante la intro, la marca ya es reconocible desde el primer segundo. El tagline no va en el splash.
+
+El tagline de identidad se presenta en minúsculas y en dos líneas:
+
+> the workspace.<br>
+> the image, verified.
+
+Primero, el espacio donde trabajás; después, la base verificada que lo sostiene. Se usa en la presentación de la distribución y piezas de identidad. La comparación con la versión anterior está en `review/comparison.png`.
 
 ## Requisitos
 
@@ -42,7 +49,7 @@ task deps
 | `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
 | `task plymouth` | PNG transparentes por frame para Plymouth en `plymouth/`, comprimidos con pngquant |
 | `task logo`     | Propuestas de logo en `logos/`: SVG color y mono, PNG de 16 a 512 px y `preview.png` |
-| `task review`   | `review/comparison.png` (antes/después, primer segundo, logo, exploración de tagline) y `review/sequence.png` (frames por tramo y niveles de luz) |
+| `task review`   | `review/comparison.png` (antes/después, primer segundo, logo, tagline de identidad) y `review/sequence.png` (frames por tramo y niveles de luz) |
 | `task compress` | Vuelve a pasar pngquant sobre `plymouth/*.png`, reemplazando los archivos |
 | `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png`, `plymouth/` y `logos/` |
 

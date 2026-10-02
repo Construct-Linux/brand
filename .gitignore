@@ -4,3 +4,5 @@ plymouth/*
 .task/*
 .venv/
 .plymouth-frames__pycache__/
+__pycache__
+*/*.pyc

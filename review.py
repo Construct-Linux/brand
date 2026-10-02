@@ -7,7 +7,7 @@ import video
 # usage: review.py [frames_dir] [before_dir] [out_dir]
 # Review sheets for the identity and the boot animation:
 #   comparison.png - before / after (end of the splash, the first second, the logo) and
-#                    tagline explorations on the final frame (not part of the splash)
+#                    selected tagline on the final frame (not part of the splash)
 #   sequence.png   - every frame grouped by segment (intro / loop / outro) with the light
 #                    levels of the two layers: outline (base image) and grid (workspace)
 # before_dir is optional: a copy of a previous frames/ (frames_dir layout) to compare with.
@@ -60,13 +60,13 @@ logo = Image.open("logos/construct-neon-512.png").convert("RGB") if os.path.exis
 row("Logo = último frame", "El símbolo es el contorno: la base estable. La grilla (el espacio de trabajo) vive solo en la animación.",
     [(logo, "Símbolo"), (frame(FRAMES, n), "Splash, último frame"), (frame(FRAMES, loop_mid), "Splash, espacio activo")])
 
-# tagline explorations, rendered on the final frame (review only)
-tags = [None, "Your workspace on the grid", "Una base firme. Tu espacio para construir", "A solid base. Your space to build"]
-notes = ["Sin tagline (splash actual)", "Anterior: habla solo del interior", "Exploración: nombra base y espacio", "Exploración, en inglés"]
-tw = (W - pad * 5) // 4
+# Identity tagline, rendered on the final frame for review only.
+tags = [None, "Your workspace on the grid", "the workspace.\nthe image, verified."]
+notes = ["Sin tagline (splash actual)", "Tagline anterior", "Tagline elegida - identidad"]
+tw = (W - pad * (len(tags) + 1)) // len(tags)
 r = Image.new("RGB", (W, 100 + tw + 50), INK)
 d = ImageDraw.Draw(r)
-caption(d, (pad, 28), "Tagline - exploración", "No incorporado al splash. Solo para evaluar dirección y peso.")
+caption(d, (pad, 28), "Tagline - identidad", "the workspace. / the image, verified. - en dos líneas, fuera del splash.")
 for k, (tag, note) in enumerate(zip(tags, notes)):
     im = Image.fromarray(cv2.cvtColor(video.render(n - 1, tagline=tag), cv2.COLOR_BGR2RGB))
     x = pad + k * (tw + pad)

@@ -199,10 +199,11 @@ def draw_text(bgr, a, tagline=None):
     if tagline:  # smaller, light tracking, light gray
         tf = ImageFont.truetype(FONT, round(size * 0.42))
         tsp = 0.12 * tf.size
-        tx = (W - sum(tf.getlength(ch) for ch in tagline) - tsp * (len(tagline) - 1)) / 2
-        for ch in tagline:
-            dr.text((tx, y + size * 1.25), ch, font=tf, fill=150, anchor="lm")
-            tx += tf.getlength(ch) + tsp
+        for line_index, line in enumerate(tagline.splitlines()):
+            tx = (W - sum(tf.getlength(ch) for ch in line) - tsp * (len(line) - 1)) / 2
+            for ch in line:
+                dr.text((tx, y + size * 1.25 + line_index * tf.size * 1.5), ch, font=tf, fill=150, anchor="lm")
+                tx += tf.getlength(ch) + tsp
     m = np.asarray(layer, np.float32) / 255 * a
     halo = cv2.GaussianBlur(m, (0, 0), 7 * U) * 0.3  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255
