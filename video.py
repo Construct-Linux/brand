@@ -15,9 +15,7 @@ if not FONT:
     sys.exit("DejaVuSans.ttf not found: install fonts-dejavu-core / dejavu-sans-fonts or set FONT=/path/DejaVuSans.ttf")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "frames"
 os.makedirs(OUT, exist_ok=True)
-N = 48          # total frames
-DURATION = 5.0  # seconds
-FPS = N / DURATION  # 9.6 fps -> 48 frames span 5s
+N = 48  # total frames (encode.py turns them into a 5s video)
 CYAN = np.array([1.0, 0.90, 0.0])  # BGR -> cyan (#00E5FF)
 
 # ---------- camera: room = cube 3x3x3, x right, y up, z depth (z=0 open front) ----------
@@ -168,14 +166,6 @@ def draw_text(bgr, a):
     return (np.clip(base, 0, 1) * 255).astype(np.uint8)
 
 frames = [int(x) for x in sys.argv[2:]] if len(sys.argv) > 2 else range(N)
-full = len(sys.argv) <= 2
-if full:
-    vw = cv2.VideoWriter(f"{OUT}/construct.mp4", cv2.VideoWriter_fourcc(*"mp4v"), FPS, (W, H))
 for f in frames:
-    img = render(f)
-    cv2.imwrite(f"{OUT}/construct_{f+1:02d}.png", img)
-    if full:
-        vw.write(img)
-if full:
-    vw.release()
+    cv2.imwrite(f"{OUT}/construct_{f+1:02d}.png", render(f))
 print("ok")
