@@ -20,8 +20,8 @@ tasks:
       - task: all
 
   all:
-    desc: Everything - video, sprite, compressed Plymouth frames, logo and review sheets
-    deps: [encode, sprite, plymouth, logo, review]
+    desc: Everything - video, sprite, compressed Plymouth frames and logo
+    deps: [encode, sprite, plymouth, logo]
 
   setup:
     desc: Create {{.VENV}} and install the Python dependencies
@@ -114,14 +114,6 @@ tasks:
     generates: [logos/preview.png]
     cmds:
       - '{{.PYTHON}} logo.py logos'
-
-  review:
-    desc: Review sheets in review/ - key frames, logo vs last frame, tagline; frame sequence by segment
-    deps: [generate, logo]
-    sources: [review.py, video.py, '{{.FRAMES_DIR}}/construct_*.png', logos/construct-neon-512.png]
-    generates: [review/comparison.png, review/sequence.png]
-    cmds:
-      - '{{.PYTHON}} review.py {{.FRAMES_DIR}} review'
 
   clean:
     desc: Remove generated frames, video, sprite and Plymouth PNGs

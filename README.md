@@ -22,7 +22,7 @@ El tagline de identidad se presenta en minúsculas y en dos líneas:
 > the workspace.<br>
 > the image, verified.
 
-Primero, el espacio donde trabajás; después, la base verificada que lo sostiene. Se usa en la presentación de la distribución y piezas de identidad. La revisión está en `review/comparison.png`.
+Primero, el espacio donde trabajás; después, la base verificada que lo sostiene. Se usa en la presentación de la distribución y piezas de identidad.
 
 ## Requisitos
 
@@ -42,14 +42,13 @@ task deps
 
 | Comando         | Qué hace                                                   |
 |-----------------|------------------------------------------------------------|
-| `task` / `task all` | **Todo**: dependencias, frames, video, sprite, frames de Plymouth comprimidos, logo y hojas de revisión |
+| `task` / `task all` | **Todo**: dependencias, frames, video, sprite, frames de Plymouth comprimidos y logo |
 | `task generate` | Renderiza `frames/construct_01.png` … `construct_48.png`   |
 | `task encode`   | Arma `construct.mp4` (5 s) a partir de los frames          |
 | `task play`     | Reproduce `construct.mp4` en bucle (`q` / `Esc` para salir) |
 | `task sprite`   | Arma `sprite.png`: grilla 8×6 con los 48 frames numerados  |
 | `task plymouth` | PNG transparentes por frame para Plymouth en `plymouth/`, comprimidos con pngquant |
 | `task logo`     | Propuestas de logo en `logos/`: SVG color y mono, PNG de 16 a 512 px y `preview.png` |
-| `task review`   | `review/comparison.png` (momentos clave del splash, logo junto al último frame, tagline de identidad) y `review/sequence.png` (frames por tramo y niveles de luz) |
 | `task compress` | Vuelve a pasar pngquant sobre `plymouth/*.png`, reemplazando los archivos |
 | `task clean`    | Borra `frames/`, `construct.mp4`, `sprite.png`, `plymouth/` y `logos/` |
 

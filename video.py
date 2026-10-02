@@ -137,7 +137,7 @@ def glow(img, strength=1.0):
         out += cv2.GaussianBlur(img, (0, 0), k * PX / 3) * w * strength
     return out
 
-def render(f, tagline=None):
+def render(f):
     shape = (H * SS, W * SS)
     base = np.zeros(shape, np.float32)   # outline: once drawn, always 1.0
     grid = np.zeros(shape, np.float32)   # workspace, scaled by grid_level
@@ -175,11 +175,11 @@ def render(f, tagline=None):
     out = (img * 255).astype(np.uint8)
     a = prog(f, *TEXT)
     if a > 0:
-        out = draw_text(out, a, tagline)
+        out = draw_text(out, a)
     return out
 
-def draw_text(bgr, a, tagline=None):
-    """The word (opacity a); optionally a tagline under it (only for reviews: not in the splash)."""
+def draw_text(bgr, a):
+    """The word, with opacity a."""
     txt = "CONSTRUCT"
     # the word spans exactly the floor front edge above it (x 0..3 at z=0)
     span = (P((3, 0, 0))[0] - P((0, 0, 0))[0]) / SS
@@ -196,14 +196,6 @@ def draw_text(bgr, a, tagline=None):
     for ch in txt:
         dr.text((x, y), ch, font=font, fill=255, anchor="lm")
         x += font.getlength(ch) + spacing
-    if tagline:  # smaller, light tracking, light gray
-        tf = ImageFont.truetype(FONT, round(size * 0.42))
-        tsp = 0.12 * tf.size
-        for line_index, line in enumerate(tagline.splitlines()):
-            tx = (W - sum(tf.getlength(ch) for ch in line) - tsp * (len(line) - 1)) / 2
-            for ch in line:
-                dr.text((tx, y + size * 1.25 + line_index * tf.size * 1.5), ch, font=tf, fill=150, anchor="lm")
-                tx += tf.getlength(ch) + tsp
     m = np.asarray(layer, np.float32) / 255 * a
     halo = cv2.GaussianBlur(m, (0, 0), 7 * U) * 0.3  # soft: the room is the logo
     base = bgr.astype(np.float32) / 255
@@ -217,6 +209,6 @@ if __name__ == "__main__":
     frames = [int(x) for x in sys.argv[2:]] if len(sys.argv) > 2 else range(N)
     for f in frames:
         cv2.imwrite(f"{OUT}/construct_{f+1:02d}.png", render(f))
-    # 1-based, inclusive frame ranges per segment, for plymouth.py and the review sheet
+    # 1-based, inclusive frame ranges per segment, for plymouth.py
     json.dump({k: [a + 1, b] for k, (a, b) in SEGMENTS.items()}, open(f"{OUT}/segments.json", "w"), indent=1)
     print("ok")
