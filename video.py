@@ -9,6 +9,8 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",  # Fedora/RHEL
     "/usr/share/fonts/TTF/DejaVuSans.ttf",                # Arch
     "/usr/share/fonts/dejavu/DejaVuSans.ttf",             # openSUSE / older Fedora
+    os.path.expanduser("~/Library/Fonts/DejaVuSans.ttf"), # macOS (brew --cask font-dejavu)
+    "/Library/Fonts/DejaVuSans.ttf",                      # macOS
 ]
 FONT = os.environ.get("FONT") or next((p for p in FONT_CANDIDATES if os.path.exists(p)), None)
 if not FONT:

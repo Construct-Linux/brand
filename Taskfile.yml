@@ -1,0 +1,72 @@
+version: '3'
+
+vars:
+  VENV: .venv
+  PYTHON: '{{.PYTHON | default ".venv/bin/python"}}'
+  FRAMES_DIR: frames
+  VIDEO: construct.mp4
+  DURATION: 5
+  SPRITE: sprite.png
+  COLS: 8
+
+tasks:
+  setup:
+    desc: Create {{.VENV}} and install the Python dependencies
+    sources: [requirements.txt]
+    generates: ['{{.VENV}}/bin/python']
+    cmds:
+      - python3 -m venv {{.VENV}}
+      - '{{.VENV}}/bin/pip install -q -r requirements.txt'
+
+  font:
+    desc: Install DejaVu Sans (the Plymouth default font) with the system package manager
+    status:
+      - test -n "$FONT" || ls /usr/share/fonts/*/DejaVuSans.ttf /usr/share/fonts/*/*/DejaVuSans.ttf ~/Library/Fonts/DejaVuSans.ttf /Library/Fonts/DejaVuSans.ttf 2>/dev/null | grep -q .
+    cmds:
+      - |
+        if command -v apt-get >/dev/null; then sudo apt-get install -y fonts-dejavu-core
+        elif command -v dnf >/dev/null; then sudo dnf install -y dejavu-sans-fonts
+        elif command -v pacman >/dev/null; then sudo pacman -S --noconfirm ttf-dejavu
+        elif command -v zypper >/dev/null; then sudo zypper install -y dejavu-fonts
+        elif command -v brew >/dev/null; then brew install --cask font-dejavu
+        else echo "install DejaVu Sans manually or set FONT=/path/DejaVuSans.ttf"; exit 1
+        fi
+
+  deps:
+    desc: Install everything (Python packages + font)
+    deps: [setup, font]
+
+  generate:
+    desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
+    deps: [deps]
+    sources: [video.py]
+    generates: ['{{.FRAMES_DIR}}/construct_*.png']
+    cmds:
+      - '{{.PYTHON}} video.py {{.FRAMES_DIR}}'
+
+  encode:
+    desc: Build {{.VIDEO}} ({{.DURATION}}s) from the frames
+    deps: [generate]
+    sources: ['{{.FRAMES_DIR}}/construct_*.png', encode.py]
+    generates: ['{{.VIDEO}}']
+    cmds:
+      - '{{.PYTHON}} encode.py {{.FRAMES_DIR}} {{.VIDEO}} {{.DURATION}}'
+
+  play:
+    desc: Play {{.VIDEO}} in a loop (q / Esc to quit)
+    deps: [encode]
+    cmds:
+      - '{{.PYTHON}} play.py {{.VIDEO}}'
+
+  sprite:
+    desc: Build {{.SPRITE}}, a grid of all frames to see the progression
+    deps: [generate]
+    sources: ['{{.FRAMES_DIR}}/construct_*.png', sprite.py]
+    generates: ['{{.SPRITE}}']
+    cmds:
+      - '{{.PYTHON}} sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
+
+  clean:
+    desc: Remove generated frames, video and sprite
+    cmds:
+      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}}
