@@ -59,6 +59,7 @@ tasks:
 
   encode:
     desc: Build {{.VIDEO}} ({{.DURATION}}s) from the frames
+    label: encode-{{.DURATION}}
     deps: [generate]
     sources: ['{{.FRAMES_DIR}}/construct_*.png', encode.py]
     generates: ['{{.VIDEO}}']
@@ -73,6 +74,7 @@ tasks:
 
   sprite:
     desc: Build {{.SPRITE}}, a grid of all frames to see the progression
+    label: sprite-{{.COLS}}
     deps: [generate]
     sources: ['{{.FRAMES_DIR}}/construct_*.png', sprite.py]
     generates: ['{{.SPRITE}}']
@@ -96,7 +98,13 @@ tasks:
     desc: Compress the PNGs in {{.PLY_DIR}}/ in place with pngquant (replaces the files)
     deps: [pngquant]
     cmds:
-      - pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} {{.PLY_DIR}}/*.png
+      - |
+        for file in "{{.PLY_DIR}}"/*.png; do
+          pngquant --force --ext .png --strip --speed 1 --skip-if-larger --quality {{.QUALITY}} "$file" || {
+            code=$?
+            [ "$code" -eq 98 ] || exit "$code"
+          }
+        done
       - du -sh {{.PLY_DIR}}
 
   logo:
