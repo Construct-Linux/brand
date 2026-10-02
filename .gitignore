@@ -1,8 +1,5 @@
-construct.mp4
 frames/*
-plymouth/*
 .task/*
 .venv/
-.plymouth-frames
 __pycache__/
 *.pyc
