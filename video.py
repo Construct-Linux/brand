@@ -3,18 +3,18 @@ from PIL import Image, ImageDraw, ImageFont
 
 W = H = 1080
 SS = 2  # supersampling
-# DejaVu Sans: default font for Plymouth ("Sans" -> fontconfig) on Debian/Ubuntu/Fedora/Arch
+# DejaVu Sans Bold (same package as DejaVu Sans, the default font for Plymouth ("Sans" -> fontconfig) on Debian/Ubuntu/Fedora/Arch)
 FONT_CANDIDATES = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",    # Debian/Ubuntu
-    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",  # Fedora/RHEL
-    "/usr/share/fonts/TTF/DejaVuSans.ttf",                # Arch
-    "/usr/share/fonts/dejavu/DejaVuSans.ttf",             # openSUSE / older Fedora
-    os.path.expanduser("~/Library/Fonts/DejaVuSans.ttf"), # macOS (brew --cask font-dejavu)
-    "/Library/Fonts/DejaVuSans.ttf",                      # macOS
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",    # Debian/Ubuntu
+    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans-Bold.ttf",  # Fedora/RHEL
+    "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",                # Arch
+    "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",             # openSUSE / older Fedora
+    os.path.expanduser("~/Library/Fonts/DejaVuSans-Bold.ttf"), # macOS (brew --cask font-dejavu)
+    "/Library/Fonts/DejaVuSans-Bold.ttf",                      # macOS
 ]
 FONT = os.environ.get("FONT") or next((p for p in FONT_CANDIDATES if os.path.exists(p)), None)
 if not FONT:
-    sys.exit("DejaVuSans.ttf not found: install fonts-dejavu-core / dejavu-sans-fonts or set FONT=/path/DejaVuSans.ttf")
+    sys.exit("DejaVuSans-Bold.ttf not found: install fonts-dejavu-core / dejavu-sans-fonts or set FONT=/path/DejaVuSans-Bold.ttf")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "frames"
 os.makedirs(OUT, exist_ok=True)
 N = 48  # total frames (encode.py turns them into a 5s video)
@@ -53,47 +53,67 @@ def ease(t):
 def prog(f, a, b):
     return ease((f - a) / max(b - a, 1e-6))
 
-# segment list: (p0, p1, start, end); every line ends on a vertex of the grid
+# Construction grows outward from the back-right-bottom corner (3,0,3) like a wavefront:
+# every line is one cell edge that starts at a vertex already reached and is drawn
+# while the wave moves one step (Manhattan distance on the grid) away from the corner.
+#   1) floor:  d = (3-x) + (3-z)
+#   2) walls, in order, each line starting on something already drawn:
+#      corner axis -> top edges from its tip -> outer vertical edges from the floor up to
+#      the top edge (walls framed) -> grid from those edges inward: upper horizontals,
+#      verticals hanging from the top edge, lower horizontals between existing lines
+# segment list: (p0, p1, start, end)
 segs = []
 def S(p0, p1, a, b):
     segs.append((np.array(p0, float), np.array(p1, float), a, b))
 
-# 1) three edges from back-right-bottom corner (3,0,3)
-S((3, 0, 3), (0, 0, 3), 8, 16)      # floor back edge
-S((3, 0, 3), (3, 3, 3), 8, 16)      # back-right vertical
-S((3, 0, 3), (3, 0, 0), 8, 16)      # floor/right-wall seam
-# 2) rest of floor outline
-S((0, 0, 3), (0, 0, 0), 13, 19)     # floor/left seam
-S((3, 0, 0), (0, 0, 0), 13, 19)     # floor front edge
-# 3) floor grid
-for i in (1, 2):
-    S((i, 0, 3), (i, 0, 0), 17, 23)  # columns (back -> front)
-    S((3, 0, i), (0, 0, i), 18, 24)  # rows (right -> left)
-# 4) right wall outline (x=3)
-S((3, 0, 0), (3, 3, 0), 21, 27)     # front vertical
-S((3, 3, 3), (3, 3, 0), 22, 28)     # top edge
-# 5) right wall grid: verticals continue floor rows, horizontals
-for i in (1, 2):
-    S((3, 0, i), (3, 3, i), 25, 31)
-    if i == 1:  # the door opening (z 1..2, y 0..2) stays clear of grid lines
-        S((3, i, 3), (3, i, 2), 26, 29)
-        S((3, i, 1), (3, i, 0), 29, 32)
-    else:
-        S((3, i, 3), (3, i, 0), 26, 32)
-# 6) back wall (z=3)
-S((0, 0, 3), (0, 3, 3), 28, 34)     # back-left vertical
-S((3, 3, 3), (0, 3, 3), 29, 35)     # top edge
-for i in (1, 2):
-    S((i, 0, 3), (i, 3, 3), 31, 37)  # verticals continue floor columns
-    S((3, i, 3), (0, i, 3), 32, 38)  # horizontals continue right-wall rows
-# the room is open on the left and the front: those sides end on the floor/back-wall edges
+CORNER_A, CORNER_B = 4, 9    # spark at the corner
+FLOOR_A, FLOOR_STEP = 9, 2.5  # 6 waves -> floor closed at 24
+AXIS_A, AXIS_B = 24, 27       # walls: corner axis
+TOP_A, TOP_B = 27, 29.5       # top edges
+def snap(n):
+    """Timing for a line drawn entirely between frames n-1 and n (1-based): no frame shows
+    it half-way. Used for vertical lines, which would otherwise read as loose posts/cuts."""
+    return timeline(n - 2) + 0.02, timeline(n - 1) - 0.02
+
+OUTER = snap(30)              # outer vertical edges, floor -> top edge: whole in frame 30
+HI_A, HI_B = 31.1, 33.3       # y=2 horizontals, outer edge -> axis
+VERT_HI = snap(33)            # inner verticals, top edge -> y=2 line: whole in frame 33
+VERT_LO = snap(34)            # ...then y=2 line -> floor: whole in frame 34
+LO_A, LO_B = 34.6, 37         # y=1 horizontals -> room closed at 37
+DOOR_A, DOOR_B = 37.2, 40.5   # entrance lights up once the room is closed...
+TEXT_A, TEXT_B = 41.2, 45.2   # ...then the word, fully white for the last frames
+
+def edge(p0, p1, d, start, step):
+    S(p0, p1, start + d * step, start + (d + 1) * step)
+
+for x in range(4):
+    for z in range(4):
+        d = (3 - x) + (3 - z)
+        if x > 0: edge((x, 0, z), (x - 1, 0, z), d, FLOOR_A, FLOOR_STEP)
+        if z > 0: edge((x, 0, z), (x, 0, z - 1), d, FLOOR_A, FLOOR_STEP)
 
 # door: an open entrance in the right wall, middle column (z 1..2), two lower rows (y 0..2).
 # No fill: the frame lights up brighter than the grid.
 DOOR = [(3, 0, 1), (3, 2, 1), (3, 2, 2), (3, 0, 2)]
-DOOR_A, DOOR_B = 34, 42
-TEXT_A, TEXT_B = 40, 46
-CORNER_A, CORNER_B = 4, 9
+
+S((3, 0, 3), (3, 3, 3), AXIS_A, AXIS_B)  # corner axis
+S((3, 3, 3), (3, 3, 0), TOP_A, TOP_B)    # right wall top edge
+S((3, 3, 3), (0, 3, 3), TOP_A, TOP_B)    # back wall top edge
+S((3, 0, 0), (3, 3, 0), *OUTER)  # right wall front edge
+S((0, 0, 3), (0, 3, 3), *OUTER)  # back wall left edge
+S((3, 2, 0), (3, 2, 3), HI_A, HI_B)        # right wall y=2 (door lintel line)
+S((0, 2, 3), (3, 2, 3), HI_A, HI_B)        # back wall y=2
+for k in (1, 2):  # right wall z=1, z=2 are the door jambs
+    for (y0, y1), win in (((3, 2), VERT_HI), ((2, 0), VERT_LO)):
+        S((3, y0, 3 - k), (3, y1, 3 - k), *win)  # right wall
+        S((3 - k, y0, 3), (3 - k, y1, 3), *win)  # back wall
+S((0, 1, 3), (3, 1, 3), LO_A, LO_B)        # back wall y=1
+# right wall y=1 stops at the door jambs: one piece from the front edge, one from the axis
+S((3, 1, 0), (3, 1, 1), LO_A, LO_B)
+S((3, 1, 3), (3, 1, 2), LO_A, LO_B)
+# the room is open on the left and the front: those sides end on the floor/back-wall edges
+
+MIN_LEN = 14 * SS  # px a growing line needs before it is shown
 
 def glow(img, strength=1.0):
     out = img.copy()
@@ -113,9 +133,10 @@ def render(frame):
         p = P((3, 0, 3)).astype(int)
         cv2.circle(lines, tuple(p), int(5 * SS), (c * fade,) * 3, -1, cv2.LINE_AA)
     for p0, p1, a, b in segs:
-        t = prog(f, a, b)
+        t = min(max((f - a) / (b - a), 0), 1)  # linear: steady wavefront
         if t <= 0: continue
         q0, q1 = P(p0), P(p0 + (p1 - p0) * t)
+        if t < 1 and np.linalg.norm(q1 - q0) < MIN_LEN: continue  # a dot is not a line yet
         cv2.line(lines, tuple(q0.astype(int)), tuple(q1.astype(int)), (1.0,) * 3, lw, cv2.LINE_AA)
         # bright drawing head
         if t < 1:
@@ -124,7 +145,7 @@ def render(frame):
     d = prog(f, DOOR_A, DOOR_B)
     if d > 0:
         jamb_pts = np.array([P(p) for p in DOOR], np.int32)
-        cv2.polylines(lines, [jamb_pts], False, (1.0 + 0.8 * d,) * 3, int(lw * (1 + 0.5 * d)), cv2.LINE_AA)
+        cv2.polylines(lines, [jamb_pts], False, (1.0 + 1.2 * d,) * 3, int(lw * (1 + 0.8 * d)), cv2.LINE_AA)
     # from less to more: brightness, glow and saturation all ramp with g
     lines *= 0.6 + 0.4 * g
     mono = glow(lines, 0.15 + 1.15 * g)[..., 0]

@@ -48,8 +48,8 @@ task sprite COLS=12                      # grilla de 12 columnas
 
 ## Fuente
 
-`video.py` busca `DejaVuSans.ttf` en las rutas habituales de Debian/Ubuntu, Fedora/RHEL, Arch y openSUSE. Para usar otra ruta:
+`video.py` busca `DejaVuSans-Bold.ttf` en las rutas habituales de Debian/Ubuntu, Fedora/RHEL, Arch y openSUSE. Para usar otra ruta:
 
 ```sh
-FONT=/ruta/DejaVuSans.ttf task generate
+FONT=/ruta/DejaVuSans-Bold.ttf task generate
 ```
