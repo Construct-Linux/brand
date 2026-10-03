@@ -51,13 +51,6 @@ def chain(segments, eps=1e-6):
         out.append((pts[:-1] if closed else pts, closed))
     return out
 
-def svg(lines, color, stroke=1.2):
-    d = " ".join("M" + " L".join(f"{p[0]:.2f} {p[1]:.2f}" for p in pts) + (" Z" if closed else "")
-                 for pts, closed in chain(lines))
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 112 112">\n'
-            f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{stroke}" '
-            f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
-
 def hex2bgr(h):
     h = h.lstrip("#"); return tuple(int(h[i:i + 2], 16) for i in (4, 2, 0))
 
@@ -90,28 +83,30 @@ def render(lines, size, color):
     out[..., 3] = (a * 255).round()
     return out
 
-def symbolic(lines):
-    """GNOME's symbolic icon: the mark on a 16 px grid, one color GTK replaces with the
-    theme's (#2e3436 is the one it looks for), a stroke thick enough to read at 16 px."""
-    d = " ".join("M" + " L".join(f"{(p[0] + 6) * 16 / 112:.2f} {(p[1] + 6) * 16 / 112:.2f}" for p in pts) + (" Z" if closed else "")
-                 for pts, closed in chain(lines))
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">\n'
-            f'<path d="{d}" fill="none" stroke="#2e3436" stroke-width="1.5" '
+def svg(lines, size, inset, width, color):
+    """The mark as a size px SVG, its 0..100 box inset from the edges, drawn width px wide."""
+    k = (size - 2 * inset) / 100
+    xy = lambda p: f"{inset + p[0] * k:.2f} {inset + p[1] * k:.2f}"
+    d = " ".join("M" + " L".join(xy(p) for p in pts) + (" Z" if closed else "") for pts, closed in chain(lines))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">\n'
+            f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width}" '
             f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
 
-def activities(lines):
-    """The Activities button of Orchis' GNOME Shell theme (its -i option): 48 px, white, as the
-    theme's own icons are; the shell tints nothing, so the stroke is drawn at panel weight."""
-    d = " ".join("M" + " L".join(f"{6 + (p[0] + 6) * 36 / 112:.2f} {6 + (p[1] + 6) * 36 / 112:.2f}" for p in pts) + (" Z" if closed else "")
-                 for pts, closed in chain(lines))
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">\n'
-            f'<path d="{d}" fill="none" stroke="#fff" stroke-width="3" '
-            f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
+# name: (size, inset, line width, color)
+SVGS = {
+    # the color mark, the app icon at any size
+    "": (112, 6, 1.2, CYAN),
+    # GNOME's symbolic icon: on a 16 px grid, one color the toolkit replaces with the theme's
+    # (#2e3436 is the one it looks for), a line thick enough to read at 16 px
+    "-symbolic": (16, 6 * 16 / 112, 1.5, "#2e3436"),
+    # the Activities button of Orchis' GNOME Shell theme (its -i option): 48 px, white, as the
+    # theme's own icons are; the shell tints nothing, so the line is drawn at panel weight
+    "-activities": (48, 6 + 6 * 36 / 112, 3, "#fff"),
+}
 
 SIZES = [64, 48, 32, 24, 16]  # above 64 px the SVG is the icon
-open(f"{OUT}/{NAME}.svg", "w").write(svg(LINES, CYAN))
-open(f"{OUT}/{NAME}-symbolic.svg", "w").write(symbolic(LINES))
-open(f"{OUT}/{NAME}-activities.svg", "w").write(activities(LINES))
+for variant, spec in SVGS.items():
+    open(f"{OUT}/{NAME}{variant}.svg", "w").write(svg(LINES, *spec))
 for s in SIZES:
     cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN))
 print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}")
