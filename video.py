@@ -100,7 +100,9 @@ def grid_level(f):
         return DRAFT + (ACTIVE - DRAFT) * prog(f, *ACTIVATE)
     if f < INTRO + LOOP:  # one breath per loop; starts and ends at ACTIVE, so it repeats seamlessly
         u = (f - INTRO) / LOOP
-        return ACTIVE - BREATH * (1 - np.cos(2 * np.pi * u)) / 2
+        # a Python float, as the other branches return: a NumPy float64 would carry the grid into
+        # float64 and the loop's first frame would land a shade off the outro's, the same state
+        return ACTIVE - BREATH * (1 - float(np.cos(2 * np.pi * u))) / 2
     return ACTIVE * (1 - prog(f, *FADE))
 
 def glow(img, strength=1.0):

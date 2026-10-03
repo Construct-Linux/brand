@@ -54,7 +54,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task encode` | Builds `construct.mp4` (5 s) from the frames |
 | `task play` | Opens `construct.mp4` in this machine's video player |
 | `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
-| `task plymouth` | Transparent PNGs per frame for Plymouth in `plymouth/`, compressed with pngquant |
+| `task plymouth` | Transparent PNGs for Plymouth in `plymouth/`, each picture once and compressed with pngquant, and the order they play in |
 | `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 64 px |
 | `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
 | `task wallpaper` | The desktop backgrounds, dark and light, at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/` |
@@ -90,8 +90,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `video.py [dir] [frame ...]`: renders every frame, or only the indexes given (from 0), e.g.
   `python video.py out 0 47`.
 - `encode.py [dir] [out.mp4] [seconds]`: joins the PNGs into an mp4 with fps = frames / seconds.
-- `plymouth.py [dir] [out]`: turns the frames into transparent RGBA PNGs, which `task plymouth`
-  compresses with pngquant.
+- `plymouth.py [dir] [out]`: turns the frames into transparent RGBA PNGs, each picture once, and
+  writes `sequence.json`; `task plymouth` compresses the PNGs with pngquant.
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
 - `logo.py [out_dir]`: the logo files.
@@ -106,25 +106,34 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 
 ## Plymouth
 
-`task plymouth` makes one PNG per frame, split by part (each numbered from 1):
+`task plymouth` writes each picture of the animation once, as `frame-NNNN.png` (numbered from 1
+in order of first appearance: 39 pictures for the 48 frames shown, since the loop breathes out
+through the pictures it breathed in by and the outro ends on the logo the intro reached at frame
+11), and `sequence.json`, the frame numbers each part plays:
 
-- `intro-0001.png` … `intro-0026.png`: played once at the start.
-- `loop-0001.png` … `loop-0012.png`: repeated while the system boots; the last frame joins the
-  first.
-- `outro-0001.png` … `outro-0010.png`: played once at the end; its last frame is the logo.
-  Plymouth hands the screen to the login screen as soon as the boot is done, so the
-  distribution plays the outro when the disk asks for its password, with the prompt under the
-  logo.
-- If the boot ends before the intro does, the cleanest thing is to show `outro-0010.png` (the
-  logo) directly instead of jumping into the middle of the sequence.
+```json
+{
+ "intro": [1, 2, ..., 26],
+ "loop": [27, 28, 29, 30, 31, 32, 33, 32, 31, 30, 29, 28],
+ "outro": [27, 34, 35, 36, 37, 38, 39, 11, 11, 11]
+}
+```
+
+- `intro`: played once at the start.
+- `loop`: repeated while the system boots; its last frame joins its first.
+- `outro`: played once at the end; its last frame is the logo. Plymouth hands the screen to the
+  login screen as soon as the boot is done, so the distribution plays the outro when the disk
+  asks for its password, with the prompt under the logo.
+- If the boot ends before the intro does, the cleanest thing is to show the outro's last frame
+  (the logo) directly instead of jumping into the middle of the sequence.
 
 Format:
 
-- One PNG per frame, with no numbers or borders, on a **transparent background**: Plymouth puts
+- One PNG per picture, with no numbers or borders, on a **transparent background**: Plymouth puts
   the black behind it.
 - Drawn at their final size (`SIZE`, 1080 by default; 800 at least) rather than scaled.
-- Made as lossless RGBA (~7.4 MB) and compressed in place by `pngquant` (`--quality 80-95`,
-  variable `QUALITY`): ~1.7 MB for the 48 frames at 1080 px (~34 KiB a frame; the grid is in
+- Made as lossless RGBA (~5.8 MB) and compressed in place by `pngquant` (`--quality 80-95`,
+  variable `QUALITY`): ~1.3 MB for the 39 pictures at 1080 px (~33 KiB each; the grid is in
   almost all of them). They go into the boot's initrd, which the firmware reads from the disk
   before anything else, so every kilobyte is in the boot time.
 

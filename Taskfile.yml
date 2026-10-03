@@ -69,11 +69,11 @@ tasks:
       - '{{.RUN}} python sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
 
   plymouth:
-    desc: Transparent PNG per frame for Plymouth ({{.SIZE}}px, no background) from {{.FRAMES_DIR}}/, compressed with pngquant, into {{.PLY_DIR}}/
+    desc: Transparent PNGs for Plymouth ({{.SIZE}}px, no background, each picture once) and sequence.json from {{.FRAMES_DIR}}/, compressed with pngquant, into {{.PLY_DIR}}/
     label: plymouth-{{.SIZE}}-{{.QUALITY}}-{{.PLY_DIR}}  # re-run when SIZE, QUALITY or the output change
     deps: [generate]
     sources: ['{{.FRAMES_DIR}}/construct_*.png', '{{.FRAMES_DIR}}/segments.json', plymouth.py, Dockerfile, requirements.txt]
-    generates: ['{{.PLY_DIR}}/*.png']
+    generates: ['{{.PLY_DIR}}/*']
     cmds:
       - rm -rf {{.PLY_DIR}}
       - '{{.RUN}} python plymouth.py {{.FRAMES_DIR}} {{.PLY_DIR}}'  # lossless RGBA, then pngquant
