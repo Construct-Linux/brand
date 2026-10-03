@@ -65,8 +65,9 @@ same images on any machine. `task image` builds it; every task that needs it bui
 
 `plymouth/`, `logos/`, `wallpapers/` and `palette/` are committed - they are what the
 distribution takes - and `task check` holds them to the sources: it regenerates them and compares
-each image over black, within a small tolerance (OpenCV picks its vector code by processor, and
-pngquant's palette follows the pixels), and the SVGs and the palette byte for byte. After
+each image over black, within a tolerance per directory (OpenCV picks its vector code by
+processor; pngquant's palette follows the pixels, so the Plymouth frames get more), every other
+file byte for byte, and fails on a file only one side has. After
 changing `video.py`, `room.py`, `plymouth.py`, `logo.py`, `wallpaper.py`, `palette.toml` or the font, run
 `task plymouth logo palette wallpaper` and commit the result. The video and the sprite are previews,
 not committed.
@@ -100,7 +101,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
   `gnome-background-properties` entry.
 - `room.py`: the room, its camera and its lines, which `video.py`, `wallpaper.py` and `logo.py`
   all draw.
-- `check.py <committed_dir> <regenerated_dir>`: compares two sets of images over black.
+- `check.py <committed_dir> <regenerated_dir>`: compares a committed directory with a regenerated
+  one.
 
 ## Plymouth
 

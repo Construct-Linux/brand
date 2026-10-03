@@ -149,9 +149,7 @@ tasks:
       - '{{.RUN}} python check.py plymouth .check/plymouth'
       - '{{.RUN}} python check.py logos .check/logos'
       - '{{.RUN}} python check.py wallpapers .check/wallpapers'
-      # The SVGs and the palette are text, written the same everywhere.
-      - for f in .check/logos/*.svg; do cmp "logos/$(basename "$f")" "$f" || exit 1; done
-      - diff -r palette .check/palette
+      - '{{.RUN}} python check.py palette .check/palette'
       - rm -rf .check
 
   clean:
