@@ -36,10 +36,8 @@ fill itself, by brightness.
 
 | File | For |
 |---|---|
-| `construct.json` | everything, flat (`dark-accent`, `neutral-e`, `icons-folder`, ...) |
-| `construct.css` | custom properties: dark under `:root`, light under `prefers-color-scheme` or `data-mode="light"` |
+| `construct.css` | `preview.html`'s custom properties: dark under `:root`, light under `prefers-color-scheme` or `data-mode="light"` |
 | `construct.scss` | Orchis: `$construct-light`/`$construct-dark`, `$construct-bg-a` ... `-h`, the semantic colors |
-| `bibata-render.json` | the two entries for Bibata's `render.json` |
 
 ## Repository by repository
 
@@ -52,13 +50,14 @@ palette's surfaces, the semantic colors. The GTK 4 accent is the theme's whateve
 `logos/construct-activities.svg` is the Activities button. Copy the palette again when it changes.
 
 **Tela-icon-theme**: Tela, Tela-dark and Tela-light, with upstream's blue recolored in the
-sources to `icons-folder` (glyph `icons-folder-glyph`); `sh ./install.sh -d DIR`. Upstream icons
+sources to `palette.toml`'s `icons.folder` (glyph `icons.folder_glyph`); `sh ./install.sh -d DIR`. Upstream icons
 merged later arrive blue: the recipe fails if `#5294e2` is left.
 
 **Bibata_Cursor**: Bibata-Modern-Construct, X cursors and GNOME Shell's `cursors_scalable/`, built
-from the SVGs by `build.py` with Python and rsvg-convert; its color table is `cursor` here.
+from the SVGs by `build.py` with Python and rsvg-convert; its color table (`COLORS`) holds
+`palette.toml`'s `cursor`, copied by hand.
 
-**tilingshell, dash-to-panel**: their highlight colors set to `dark-accent`, as gsettings
+**tilingshell, dash-to-panel**: their highlight colors set to `dark.accent`, as gsettings
 overrides in the image, not in the fork.
 
 **Vitals, caffeine, clipboard-indicator, appindicator, dash-to-panel, tilingshell**: GNOME Shell
@@ -66,5 +65,5 @@ overrides in the image, not in the fork.
 
 **The image** (spin-desktop): the dconf defaults that tie it together - `gtk-theme` and the shell
 theme Orchis-Construct-Dark, `icon-theme` Tela-dark, `cursor-theme` Bibata-Modern-Construct,
-`accent-color` = `gnome-accent`, `color-scheme` = `prefer-dark`, the wallpapers, the fonts from
+`accent-color` = `gnome.accent`, `color-scheme` = `prefer-dark`, the wallpapers, the fonts from
 `type` - and the Plymouth theme from `plymouth/`.

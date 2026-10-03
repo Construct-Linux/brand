@@ -190,12 +190,12 @@ next   <span class="w">staged</span>    reboot to apply
   <h2>Where each piece goes</h2>
   <div class="scroll"><table>
     <tr><th>Repository</th><th>Takes</th><th>From</th></tr>
-    <tr><td>Orchis-theme</td><td>accent per variant, background scale, semantic colors, Activities icon, wallpaper</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code>, <code>wallpapers/</code></td></tr>
-    <tr><td>Tela-icon-theme</td><td>folder and glyph color, a <i>construct</i> variant</td><td><code>palette/construct.json</code> (<code>icons-folder</code>, <code>icons-folder-glyph</code>)</td></tr>
-    <tr><td>Bibata_Cursor</td><td>Bibata-Modern-Construct and -Right</td><td><code>palette/bibata-render.json</code></td></tr>
-    <tr><td>tilingshell, dash-to-panel</td><td>highlight color</td><td><code>dark-accent</code> (gsettings override in os)</td></tr>
+    <tr><td>Orchis-theme</td><td>accent per variant, background scale, semantic colors, Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
+    <tr><td>Tela-icon-theme</td><td>folder and glyph color, a <i>construct</i> variant</td><td><code>palette.toml</code> (<code>icons</code>), recolored in the sources</td></tr>
+    <tr><td>Bibata_Cursor</td><td>Bibata-Modern-Construct and -Right</td><td><code>palette.toml</code> (<code>cursor</code>), <code>build.py</code>'s <code>COLORS</code></td></tr>
+    <tr><td>tilingshell, dash-to-panel</td><td>highlight color</td><td><code>dark.accent</code> (gsettings override in os)</td></tr>
     <tr><td>Vitals, caffeine, clipboard-indicator, appindicator, gsconnect</td><td>nothing of their own: the shell theme draws them</td><td>-</td></tr>
-    <tr><td>libadwaita apps</td><td>the nearest fixed accent</td><td><code>gnome-accent</code> = teal</td></tr>
+    <tr><td>libadwaita apps</td><td>the nearest fixed accent</td><td><code>gnome.accent</code> = teal</td></tr>
   </table></div>
 </main>
 

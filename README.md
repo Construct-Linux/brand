@@ -55,7 +55,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task play` | Opens `construct.mp4` in this machine's video player |
 | `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
 | `task plymouth` | Transparent PNGs per frame for Plymouth in `plymouth/`, compressed with pngquant |
-| `task logo` | The logo in `logos/`: SVG in color, mono, GNOME symbolic and Orchis' Activities button, PNG from 16 to 512 px, and `preview.png` |
+| `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 512 px |
 | `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
 | `task wallpaper` | The desktop backgrounds, dark and light, at 4K into `wallpapers/` |
 | `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
@@ -93,7 +93,7 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
   (`colors=0`: full RGBA).
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
-- `logo.py [out_dir]`: the logo files and the preview sheet.
+- `logo.py [out_dir]`: the logo files.
 - `palette.py [out_dir]`: checks the palette's contrast and writes it out; `palette.load()` is what
   the other generators read the colors from.
 - `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds.

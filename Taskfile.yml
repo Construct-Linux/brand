@@ -95,18 +95,18 @@ tasks:
       - du -sh {{.PLY_DIR}}
 
   logo:
-    desc: The logo (SVG color, mono and GNOME symbolic; PNG icon sizes; preview.png) into logos/
+    desc: The logo (SVG color, GNOME symbolic and Activities; PNG icon sizes) into logos/
     label: logo-{{.LOGO_DIR}}
     deps: [image]
     vars:
       LOGO_DIR: '{{.LOGO_DIR | default "logos"}}'
     sources: [logo.py, room.py, palette.py, palette.toml, fonts/*.ttf]
-    generates: ['{{.LOGO_DIR}}/preview.png']
+    generates: ['{{.LOGO_DIR}}/*']
     cmds:
       - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
 
   palette:
-    desc: Check the palette's contrast and write it for the theme forks (JSON, CSS, SCSS, Bibata) into palette/
+    desc: Check the palette's contrast and write it for the theme forks (CSS for preview.html, SCSS for Orchis) into palette/
     label: palette-{{.PALETTE_DIR}}
     deps: [image]
     vars:

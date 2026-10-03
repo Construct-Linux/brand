@@ -1,12 +1,10 @@
-import json, os, sys, tomllib
+import os, sys, tomllib
 
 # usage: palette.py [out_dir]
 # Reads palette.toml, fails if a pair the desktop draws one on the other reads badly, and writes
 # the palette out in the forms the theme forks take (THEMING.md):
-#   construct.json         everything, flat
 #   construct.css          custom properties, dark by default and light under prefers-color-scheme
 #   construct.scss         Orchis' variables: the accent per variant and the background scale
-#   bibata-render.json     the entries for Bibata's render.json
 # The other generators import load() instead of copying hex values.
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -122,17 +120,6 @@ def scss(p):
     return "\n".join(lines) + "\n"
 
 
-def bibata(p):
-    c = p["cursor"]
-    colors = [{"match": "#00FF00", "replace": c["fill"].upper()},
-              {"match": "#0000FF", "replace": c["outline"].upper()},
-              {"match": "#FF0000", "replace": c["watch"].upper()}]
-    return {f"Bibata-Modern-Construct{side}": {"dir": f"svg/modern{side.lower()}",
-                                              "out": f"bitmaps/Bibata-Modern-Construct{side}",
-                                              "colors": colors}
-            for side in ("", "-Right")}
-
-
 if __name__ == "__main__":
     OUT = sys.argv[1] if len(sys.argv) > 1 else "palette"
     p = load()
@@ -141,8 +128,6 @@ if __name__ == "__main__":
     if problems:
         sys.exit("palette.toml:\n  " + "\n  ".join(problems))
     os.makedirs(OUT, exist_ok=True)
-    json.dump(flat(p), open(f"{OUT}/construct.json", "w"), indent=1)
     open(f"{OUT}/construct.css", "w").write(css(p))
     open(f"{OUT}/construct.scss", "w").write(scss(p))
-    json.dump(bibata(p), open(f"{OUT}/bibata-render.json", "w"), indent=2)
-    print(f"{OUT}/: construct.json, construct.css, construct.scss, bibata-render.json")
+    print(f"{OUT}/: construct.css, construct.scss")
