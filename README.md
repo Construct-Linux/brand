@@ -3,6 +3,11 @@
 The identity and boot animation of **CONSTRUCT**, a Linux desktop for developers built on Wolfi:
 a read-only, verified base image with A/B updates and automatic rollback, and GNOME on top.
 
+**[See the desktop with the palette](https://construct-linux.github.io/brand/)** - `preview.html`,
+published by GitHub Pages from `main`
+([dark](https://construct-linux.github.io/brand/preview.html?mode=dark),
+[light](https://construct-linux.github.io/brand/preview.html?mode=light)).
+
 The idea: **the image does not move; the workspace does.** The open room has two layers with
 fixed roles:
 
@@ -53,7 +58,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task logo` | The logo in `logos/`: SVG in color, mono, GNOME symbolic and Orchis' Activities button, PNG from 16 to 512 px, and `preview.png` |
 | `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
 | `task wallpaper` | The desktop backgrounds, dark and light, at 4K into `wallpapers/` |
-| `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light |
+| `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
 | `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
 | `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
