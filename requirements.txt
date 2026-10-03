@@ -1,5 +1,16 @@
 # Pinned: the frames and logos are committed, and are checked against what these produce.
 # OpenCV without its GUI: the container has no display (task play opens the video on the host).
-numpy==2.5.3
-opencv-python-headless==5.0.0.93
-pillow==12.3.0
+# Hashed: pip installs these wheels and no other - CPython 3.13 on Linux, x86_64 and aarch64 -
+# so a version republished or a mirror's file cannot change the images. A new pin takes the
+# hashes PyPI lists for the version (https://pypi.org/pypi/<name>/<version>/json).
+numpy==2.5.3 \
+    --hash=sha256:a5fa86b80fd24bcd1aff83ad23be44ea323de3f787be8f8b15d4a65621e25321 \
+    --hash=sha256:c76d5dde9f445058f83d0c02af00557a4db91de9a9a57c0df87d1535001d654b
+opencv-python-headless==5.0.0.93 \
+    --hash=sha256:09a872a157c1376ab922a69bbf22f9a95bcc7b658a9d8b436a60212b02b2eeb4 \
+    --hash=sha256:ed709fdf9aa0bd1f2ed8549e71d19449b03a675bb581eb292285f6861953be37 \
+    --hash=sha256:10818d91510e05c04568ae12b5cd120779c70c01bf897b001a6221fe430df80f \
+    --hash=sha256:840bd717c21e5c11cadadc022a823315ea417f961213d06b4df010e019eb16f4
+pillow==12.3.0 \
+    --hash=sha256:0847a763afefb695bc912d7c131e7e0632d4edc1d8698f58ddabec8e46b8b6d3 \
+    --hash=sha256:f7401aebd7f581d7f83a439d87d474999317ee099218e5ad25d125290990ba65

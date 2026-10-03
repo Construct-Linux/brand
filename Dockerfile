@@ -13,4 +13,4 @@ RUN rm -f /etc/apt/sources.list.d/debian.sources && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -r /tmp/requirements.txt
