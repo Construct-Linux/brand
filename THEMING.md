@@ -32,12 +32,21 @@ buttons filled with success, warning or error), 3:1 for parts that are not text 
 would choose a different text color on the accent than the palette's: Orchis picks the text on a
 fill itself, by brightness.
 
+## GNOME Shell's surfaces
+
+The shell is Orchis' dark variant in both modes. Its desktop is `e`, which is also the wallpaper's
+ink, so nothing the shell lays over it may be `e`: its menus - quick settings, the calendar, the
+panel's menus - its OSDs and its notifications stand on the raised surface, `h`, ringed with a
+1px border in `dark.border`. A shadow alone does not lift them: black on ink does not show.
+GNOME Shell 51's St draws a `border` with rounded corners, an `outline` only square, and a single
+`box-shadow`, so the ring is a border. `preview.html` shows them open.
+
 ## What `palette/` holds
 
 | File | For |
 |---|---|
-| `construct.css` | `preview.html`'s custom properties: dark under `:root`, light under `prefers-color-scheme` or `data-mode="light"` |
-| `construct.scss` | Orchis: `$construct-light`/`$construct-dark`, `$construct-bg-a` ... `-h`, the semantic colors |
+| `construct.css` | `preview.html`'s custom properties: dark under `:root`, light under `prefers-color-scheme` or `data-mode="light"`; GNOME Shell's, `--shell-*`, dark in both |
+| `construct.scss` | Orchis: `$construct-light`/`$construct-dark`, `$construct-bg-a` ... `-h`, the border and the semantic colors per variant |
 
 ## Repository by repository
 
@@ -46,10 +55,11 @@ All on the `gnome-51` branch (`gnome-shell-51` for Orchis) of github.com/Constru
 **Orchis-theme** (GTK 3, GTK 4/libadwaita, GNOME Shell): Orchis-Construct-Light and
 Orchis-Construct-Dark, `./install.sh -d DIR -c light dark`. `construct.scss` is copied in as
 `src/_sass/_construct-palette.scss`: the accent per variant, `background(a ... h)` on the
-palette's surfaces, the semantic colors. The GTK 4 accent is the theme's whatever Settings picks.
+palette's surfaces, the border and the semantic colors; the shell's menus take `h` and the border
+(above). The GTK 4 accent is the theme's whatever Settings picks.
 `logos/construct-activities.svg` is the Activities button. Copy the palette again when it changes.
 
-**Tela-icon-theme**: Tela, Tela-dark and Tela-light, with upstream's blue recolored in the
+**Tela-icon-theme**: Tela and Tela-dark, with upstream's blue recolored in the
 sources to `palette.toml`'s `icons.folder` (glyph `icons.folder_glyph`); `sh ./install.sh -d DIR`. Upstream icons
 merged later arrive blue: the recipe fails if `#5294e2` is left.
 

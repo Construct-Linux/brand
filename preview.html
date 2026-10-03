@@ -29,21 +29,25 @@
              container-type: inline-size; font-size: clamp(9px, 1.15cqi, 15px); }
   @media (prefers-color-scheme: light) { :root:not([data-mode="dark"]) .desktop { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); } }
   :root[data-mode="light"] .desktop { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); }
-  /* the shell is dark in both modes (Orchis' dark top bar) */
-  .topbar { position: absolute; inset: 0 0 auto 0; height: 2.2em; background: rgba(11, 17, 22, .82); color: #E6EDF2;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 .8em; font-size: .95em; }
-  .topbar .left, .topbar .right { display: flex; align-items: center; gap: 1em; }
-  .topbar img { height: 1.5em; }
-  .topbar .vitals { font-family: var(--font-mono); font-size: .85em; color: #9FB3C0; display: flex; gap: .9em; }
-  .topbar .vitals b { color: var(--brand-cyan); font-weight: 600; }
-  .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--brand-cyan); display: inline-block; }
-  .panel { position: absolute; inset: auto 0 0 0; height: 3.4em; background: rgba(11, 17, 22, .82);
-           display: flex; align-items: center; gap: .6em; padding: 0 .8em; }
-  .panel .app { width: 2.3em; height: 2.3em; border-radius: .5em; background: var(--neutral-h); position: relative;
-                display: grid; place-items: center; color: #E6EDF2; font-size: .8em; }
-  .panel .app.on::after { content: ""; position: absolute; bottom: -.45em; left: 35%; right: 35%; height: .2em; border-radius: 1em; background: var(--brand-cyan); }
-  .panel .start { background: none; }
-  .panel .start img { width: 1.8em; }
+  /* The shell is Orchis' dark variant in both modes (--shell-*): GNOME's top bar, black at 65%
+     over the wallpaper, with the clock beside the indicators (just-perfection) and Vitals; and
+     dash-to-panel's dock, floating, centred and sized to its icons. */
+  .topbar { position: absolute; inset: .3em .4em auto .4em; height: 2.4em; border-radius: .8em;
+            background: color-mix(in srgb, black 65%, transparent); color: var(--shell-text);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 .9em; font-size: .95em; font-weight: 700; }
+  .topbar .left, .topbar .right { display: flex; align-items: center; gap: 1.1em; }
+  .topbar img { height: 1.3em; }
+  .topbar .clock { padding: .25em .8em; border-radius: 1em; }
+  .topbar .vitals { display: flex; gap: .9em; }
+  .topbar .icons { display: flex; gap: .9em; padding: .25em .7em; border-radius: 1em; }
+  .topbar .open { background: color-mix(in srgb, var(--shell-text) 22%, transparent); }
+  .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--shell-accent); display: inline-block; }
+  .panel { position: absolute; bottom: .5em; left: 50%; transform: translateX(-50%); height: 3.4em; border-radius: .8em;
+           background: color-mix(in srgb, black 65%, transparent); display: flex; align-items: center; gap: .7em; padding: 0 .9em; }
+  .panel .app { width: 2.7em; height: 2.7em; border-radius: .5em; background: var(--shell-surface); position: relative;
+                display: grid; place-items: center; color: var(--shell-text); font-size: .8em; }
+  .panel .app.on::after { content: ""; position: absolute; bottom: -.45em; left: 35%; right: 35%; height: .2em; border-radius: 1em; background: var(--shell-accent); }
+  .panel .start { background: none; font-size: 1.3em; }
 
   .win { position: absolute; background: var(--view); color: var(--text); border-radius: .8em; overflow: hidden;
          box-shadow: 0 1.2em 3em rgba(0, 0, 0, .45), 0 0 0 1px var(--border); display: flex; flex-direction: column; }
@@ -77,17 +81,50 @@
   .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
 
   /* the terminal is dark in both modes */
-  .term { right: 2%; top: 40%; width: 38%; height: 48%; background: var(--brand-ink); color: #E6EDF2; }
-  .term .titlebar { background: #11181E; border-color: #2A3843; color: #E6EDF2; }
-  .term .titlebar .wbtn { background: #172028; border-color: #2A3843; }
+  .term { right: 2%; top: 40%; width: 38%; height: 48%; background: var(--shell-bg); color: var(--shell-text); box-shadow: 0 1.2em 3em rgba(0, 0, 0, .45), 0 0 0 1px var(--shell-border); }
+  .term .titlebar { background: var(--shell-alt); border-color: var(--shell-border); color: var(--shell-text); }
+  .term .titlebar .wbtn { background: var(--shell-view); border-color: var(--shell-border); }
   .term pre { margin: 0; padding: .8em; font: .88em/1.5 var(--font-mono); white-space: pre-wrap; }
-  .term .p { color: var(--brand-cyan); } .term .ok { color: #3DDC97; } .term .w { color: #FFC857; } .term .m { color: #9FB3C0; }
+  .term .p { color: var(--shell-accent); } .term .ok { color: var(--shell-success); } .term .w { color: var(--shell-warning); } .term .m { color: var(--shell-muted); }
+  .term .caret { background: var(--shell-accent); }
 
-  .toast { position: absolute; right: 2%; top: 3.2em; width: 30%; background: var(--raised); color: var(--text); border-radius: .7em;
-           padding: .7em .9em; box-shadow: 0 .8em 2em rgba(0, 0, 0, .35), 0 0 0 1px var(--border); display: flex; gap: .7em; align-items: flex-start; font-size: .9em; }
-  .toast img { width: 2em; }
-  .toast b { display: block; }
-  .toast span { color: var(--muted); }
+
+  /* GNOME Shell's menus - quick settings, the calendar, a notification, the OSDs: the raised
+     surface (h) and a 1px ring in the border colour, so they stand off the desktop, which is e,
+     the wallpaper's own colour. A shadow alone does not: black on ink does not show. */
+  .menu { position: absolute; background: var(--shell-surface); color: var(--shell-text); border-radius: 1em;
+          border: 1px solid var(--shell-border); box-shadow: 0 .4em 1.2em rgba(0, 0, 0, .5); }
+  .fill { background: color-mix(in srgb, var(--shell-text) 9%, transparent); }
+  .qs { right: .8em; top: 3.4em; width: 30%; padding: 1.1em; display: flex; flex-direction: column; gap: .9em; font-weight: 700; }
+  .qs .top { display: flex; gap: .6em; }
+  .qs .top span { width: 2.4em; height: 2.4em; border-radius: 50%; display: grid; place-items: center; }
+  .qs .top .gap { flex: 1; background: none; }
+  .qs .slider { display: flex; align-items: center; gap: .8em; color: var(--shell-muted); }
+  .qs .slider i { flex: 1; height: .25em; border-radius: 1em; background: linear-gradient(to right, var(--shell-accent) 42%, var(--shell-border) 42%); position: relative; }
+  .qs .slider i::after { content: ""; position: absolute; left: 42%; top: 50%; width: 1em; height: 1em; border-radius: 50%; background: var(--shell-text); transform: translate(-50%, -50%); }
+  .qs .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; }
+  .qs .toggles div { border-radius: 2em; padding: .65em 1em; line-height: 1.2; }
+  .qs .toggles small { display: block; font-weight: 400; font-size: .8em; color: var(--shell-muted); }
+  .qs .toggles .on { background: var(--shell-accent); color: var(--shell-on-accent); }
+  .cal { left: 30%; top: 3.4em; width: 56%; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+  .cal .msgs { padding: 1em; display: flex; flex-direction: column; gap: .6em; border-right: 1px solid var(--shell-border); }
+  .cal .note { border-radius: .8em; padding: .7em .9em; font-size: .9em; }
+  .cal .note b { display: block; }
+  .cal .note span { color: var(--shell-muted); }
+  .cal .clear { margin-top: auto; color: var(--shell-muted); }
+  .cal .when { padding: 1em; display: flex; flex-direction: column; gap: .6em; }
+  .cal .day { color: var(--shell-muted); font-weight: 700; font-size: 1.1em; }
+  .cal .date { font-size: 1.4em; margin-top: -.4em; }
+  .cal .month { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: .85em; row-gap: .5em; }
+  .cal .month .h { color: var(--shell-muted); font-weight: 700; }
+  .cal .month .o { color: color-mix(in srgb, var(--shell-text) 40%, transparent); }
+  .cal .month .t { justify-self: center; width: 2em; aspect-ratio: 1; display: grid; place-items: center; background: var(--shell-accent); color: var(--shell-on-accent); border-radius: 50%; font-weight: 700; }
+  .cal .box { border-radius: .7em; padding: .5em .8em; font-size: .9em; }
+  .cal .box b { display: block; }
+  .cal .box i { color: var(--shell-muted); }
+  .osd { left: 50%; bottom: 5em; transform: translateX(-50%); padding: .7em 1.1em; display: flex; align-items: center; gap: .8em; width: 22%; }
+  .osd i { flex: 1; height: .3em; border-radius: 1em; background: linear-gradient(to right, var(--shell-text) 70%, var(--shell-border) 70%); }
+  svg.i { width: 1.1em; height: 1.1em; vertical-align: -.15em; color: inherit; }
   .cursor { position: absolute; left: 47%; top: 58%; width: 1.6em; filter: drop-shadow(0 .1em .15em rgba(0, 0, 0, .4)); }
 
   /* ---------- swatches ---------- */
@@ -107,7 +144,7 @@
   th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
   td code { font: 13px var(--font-mono); color: var(--accent); }
   .scroll { overflow-x: auto; }
-  @media (max-width: 640px) { .term, .toast { display: none; } .files { width: 88%; } }
+  @media (max-width: 640px) { .term, .qs, .cal { display: none; } .files { width: 88%; } }
 </style>
 </head>
 <body>
@@ -121,11 +158,12 @@
 
   <div class="desktop" aria-label="The desktop with the palette">
     <div class="topbar">
-      <div class="left"><img src="logos/construct-activities.svg" alt="Activities"><span>Files</span></div>
-      <div>Fri 2 Oct  19:42</div>
+      <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
-        <span class="vitals"><span>CPU <b>12%</b></span><span>MEM <b>4.1G</b></span><span>58°C</span></span>
-        <span class="dot" title="caffeine"></span><span>⏻</span>
+        <span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span>
+        <span class="vitals"><span>▤ 29%</span><span>▭ 1.1</span><span>☁ 12 B/s</span></span>
+        <span class="dot" title="Caffeine"></span>
+        <span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span>
       </div>
     </div>
 
@@ -159,19 +197,81 @@
 <span class="p">~/construct</span> $ sysupdate status
 image  <span class="ok">verified</span>  slot B
 next   <span class="w">staged</span>    reboot to apply
-<span class="p">~/construct</span> $ <span style="background:#00E5FF"> </span></pre>
+<span class="p">~/construct</span> $ <span class="caret"> </span></pre>
     </div>
 
-    <div class="toast"><img src="logos/construct.svg" alt=""><div><b>Update ready</b><span>The new image is verified. Restart to switch to it.</span></div></div>
 
     <svg class="cursor" viewBox="0 0 24 32" aria-hidden="true"><path d="M2 2 L2 26 L8 20 L12 30 L16 28 L12 18 L20 18 Z" fill="var(--cursor-fill)" stroke="var(--cursor-outline)" stroke-width="1.6" stroke-linejoin="round"/></svg>
 
     <div class="panel">
-      <div class="app start"><img src="logos/construct-activities.svg" alt=""></div>
+      <div class="app start">⠿</div>
       <div class="app on">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
     </div>
   </div>
   <p class="note" style="margin-top:10px">Files on the left and the terminal on the right; the top bar and the bottom panel are GNOME Shell with Orchis, dash-to-panel and Vitals. The shell and the terminal stay dark in both modes, as Orchis' dark top bar does. The cursor is the Bibata shape in the cursor colors; the folders are Tela's in the folder color.</p>
+
+  <h2>The shell's menus</h2>
+  <p class="note">Quick settings and the calendar open, and the volume OSD: GNOME Shell's menus on the raised surface, ringed in the border colour. The desktop under them is the wallpaper's ink - their own colour before, which no shadow could lift them from.</p>
+  <div class="desktop" aria-label="Quick settings open">
+    <div class="topbar">
+      <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
+      <div class="right">
+        <span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span>
+        <span class="vitals"><span>▤ 29%</span><span>▭ 1.1</span><span>☁ 12 B/s</span></span>
+        <span class="dot" title="Caffeine"></span>
+        <span class="icons open"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span>
+      </div>
+    </div>
+    <div class="menu qs">
+      <div class="top"><span class="fill"><svg class="i"><use href="#i-shot"/></svg></span><span class="fill"><svg class="i"><use href="#i-gear"/></svg></span><span class="gap"></span><span class="fill"><svg class="i"><use href="#i-lock"/></svg></span><span class="fill"><svg class="i"><use href="#i-power"/></svg></span></div>
+      <div class="slider"><svg class="i"><use href="#i-vol"/></svg><i></i></div>
+      <div class="toggles">
+        <div class="on">Wired</div><div class="fill">Power Mode<small>Balanced</small></div>
+        <div class="fill">Night Light</div><div class="on">Dark Style</div>
+        <div class="fill">Do Not Disturb</div><div class="fill">Caffeine</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="app start">⠿</div>
+      <div class="app on">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
+    </div>
+  </div>
+
+  <div class="desktop" aria-label="The calendar open" style="margin-top:16px">
+    <div class="topbar">
+      <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
+      <div class="right">
+        <span class="clock open">Oct 3&nbsp;&nbsp;5:56 PM</span>
+        <span class="vitals"><span>▤ 29%</span><span>▭ 1.1</span><span>☁ 12 B/s</span></span>
+        <span class="dot" title="Caffeine"></span>
+        <span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span>
+      </div>
+    </div>
+    <div class="menu cal">
+      <div class="msgs">
+        <div class="note fill"><b>Update ready</b><span>The new image is verified. Restart to switch to it.</span></div>
+        <div class="note fill"><b>Tailscale</b><span>Connected to construct-lab.</span></div>
+        <span class="clear">Clear</span>
+      </div>
+      <div class="when">
+        <span class="day">Saturday</span><span class="date">October 3 2026</span>
+        <div class="month">
+          <span class="h">S</span><span class="h">M</span><span class="h">T</span><span class="h">W</span><span class="h">T</span><span class="h">F</span><span class="h">S</span>
+          <span class="o">27</span><span class="o">28</span><span class="o">29</span><span class="o">30</span><span>01</span><span>02</span><span class="t">03</span>
+          <span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span>
+          <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+        </div>
+        <div class="box fill"><b>Today</b><i>No Events</i></div>
+        <div class="box fill">Add World Clocks…</div>
+      </div>
+    </div>
+    <div class="menu osd"><svg class="i"><use href="#i-vol"/></svg><i></i></div>
+    <div class="panel">
+      <div class="app start">⠿</div>
+      <div class="app on">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
+    </div>
+  </div>
+
 
   <h2>Accent and text, this mode</h2>
   <div class="sw" id="mode-sw"></div>
@@ -184,13 +284,13 @@ next   <span class="w">staged</span>    reboot to apply
     <div class="card"><div class="img" style="background:#000"><img src="plymouth/frame-0011.png" alt="The last boot frame"></div><div class="c"><b>Boot</b>Plymouth's last frame, on black</div></div>
     <div class="card"><div class="img" style="background:var(--brand-ink)"><img src="wallpapers/construct-dark.png" alt="Dark wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, dark</b>wallpapers/construct-dark.png</div></div>
     <div class="card"><div class="img" style="background:var(--brand-paper)"><img src="wallpapers/construct-light.png" alt="Light wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, light</b>wallpapers/construct-light.png</div></div>
-    <div class="card"><div class="img" style="background:#1F2A33"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg</div></div>
+    <div class="card"><div class="img" style="background:var(--shell-surface)"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg</div></div>
   </div>
 
   <h2>Where each piece goes</h2>
   <div class="scroll"><table>
     <tr><th>Repository</th><th>Takes</th><th>From</th></tr>
-    <tr><td>Orchis-theme</td><td>accent per variant, background scale, semantic colors, Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
+    <tr><td>Orchis-theme</td><td>accent, border and semantic colors per variant, background scale, the shell's menus on <code>h</code>, Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
     <tr><td>Tela-icon-theme</td><td>folder and glyph color, a <i>construct</i> variant</td><td><code>palette.toml</code> (<code>icons</code>), recolored in the sources</td></tr>
     <tr><td>Bibata_Cursor</td><td>Bibata-Modern-Construct and -Right</td><td><code>palette.toml</code> (<code>cursor</code>), <code>build.py</code>'s <code>COLORS</code></td></tr>
     <tr><td>tilingshell, dash-to-panel</td><td>highlight color</td><td><code>dark.accent</code> (gsettings override in os)</td></tr>
@@ -200,6 +300,13 @@ next   <span class="w">staged</span>    reboot to apply
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- The shell's symbolic icons, roughly: drawn in currentColor. -->
+  <symbol id="i-vol" viewBox="0 0 16 16"><path d="M2 6h3l4-3v10l-4-3H2z M11 5.5a3.5 3.5 0 0 1 0 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-net" viewBox="0 0 16 16"><path d="M2 3h12v8H2z M6 13h4" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-power" viewBox="0 0 16 16"><path d="M8 2v6 M4.5 4.5a5 5 0 1 0 7 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 16 16"><path d="M4 7h8v7H4z M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v2 M8 12.5v2 M1.5 8h2 M12.5 8h2 M3.4 3.4l1.4 1.4 M11.2 11.2l1.4 1.4 M3.4 12.6l1.4-1.4 M11.2 4.8l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-shot" viewBox="0 0 16 16"><path d="M2 5V2h3 M11 2h3v3 M14 11v3h-3 M5 14H2v-3" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" fill="currentColor"/></symbol>
   <symbol id="folder" viewBox="0 0 64 64">
     <path d="M6 14 a4 4 0 0 1 4 -4 h14 l5 5 h25 a4 4 0 0 1 4 4 v31 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)"/>
     <path d="M6 22 h52 v28 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)" style="filter:brightness(1.12)"/>

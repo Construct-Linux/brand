@@ -20,6 +20,18 @@
   --font-wordmark: "Audiowide", sans-serif;
   --font-ui: "Cantarell", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --shell-bg: #0B1116;
+  --shell-surface: #1F2A33;
+  --shell-view: #172028;
+  --shell-alt: #11181E;
+  --shell-accent: #00E5FF;
+  --shell-on-accent: #0B1116;
+  --shell-text: #E6EDF2;
+  --shell-muted: #9FB3C0;
+  --shell-border: #2A3843;
+  --shell-success: #3DDC97;
+  --shell-warning: #FFC857;
+  --shell-error: #FF7A90;
   color-scheme: dark;
   --bg: #0B1116;
   --view: #172028;
