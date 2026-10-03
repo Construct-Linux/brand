@@ -78,7 +78,7 @@ tasks:
     cmds:
       - rm -rf {{.PLY_DIR}} {{.TMP}}
       - SIZE={{.SIZE}} {{.RUN}} python video.py {{.TMP}}
-      - '{{.RUN}} python plymouth.py {{.TMP}} {{.PLY_DIR}} 0'  # lossless RGBA, then pngquant
+      - '{{.RUN}} python plymouth.py {{.TMP}} {{.PLY_DIR}}'
       - rm -rf {{.TMP}}
       - task: compress
         vars: {PLY_DIR: '{{.PLY_DIR}}'}

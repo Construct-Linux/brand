@@ -90,8 +90,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `video.py [dir] [frame ...]`: renders every frame, or only the indexes given (from 0), e.g.
   `python video.py out 0 47`.
 - `encode.py [dir] [out.mp4] [seconds]`: joins the PNGs into an mp4 with fps = frames / seconds.
-- `plymouth.py [dir] [out] [colors]`: turns the frames into transparent paletted PNGs
-  (`colors=0`: full RGBA).
+- `plymouth.py [dir] [out]`: turns the frames into transparent RGBA PNGs, which `task plymouth`
+  compresses with pngquant.
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
 - `logo.py [out_dir]`: the logo files.
@@ -123,12 +123,10 @@ Format:
 - One PNG per frame, with no numbers or borders, on a **transparent background**: Plymouth puts
   the black behind it.
 - Drawn at their final size (`SIZE`, 1080 by default; 800 at least) rather than scaled.
-- Made as lossless RGBA (~4.6 MB) and compressed in place by `pngquant` (`--quality 80-95`,
+- Made as lossless RGBA (~7.4 MB) and compressed in place by `pngquant` (`--quality 80-95`,
   variable `QUALITY`): ~1.7 MB for the 48 frames at 1080 px (~34 KiB a frame; the grid is in
   almost all of them). They go into the boot's initrd, which the firmware reads from the disk
   before anything else, so every kilobyte is in the boot time.
-- Without pngquant, `plymouth.py frames plymouth 256` makes its own palette (~1.1 MB, a little
-  less faithful).
 
 ## Font
 
