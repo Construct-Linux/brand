@@ -38,7 +38,7 @@ tasks:
   generate:
     desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
     deps: [image]
-    sources: [video.py, palette.py, palette.toml, fonts/*.ttf]
+    sources: [video.py, room.py, palette.py, palette.toml, fonts/*.ttf]
     generates: ['{{.FRAMES_DIR}}/construct_*.png']
     cmds:
       - '{{.RUN}} python video.py {{.FRAMES_DIR}}'
@@ -73,7 +73,7 @@ tasks:
     deps: [image]
     vars:
       TMP: .frames-{{.PLY_DIR | replace "/" "-"}}
-    sources: [video.py, plymouth.py, palette.py, palette.toml, fonts/*.ttf, Dockerfile, requirements.txt]
+    sources: [video.py, room.py, plymouth.py, palette.py, palette.toml, fonts/*.ttf, Dockerfile, requirements.txt]
     generates: ['{{.PLY_DIR}}/*.png']
     cmds:
       - rm -rf {{.PLY_DIR}} {{.TMP}}
@@ -100,7 +100,7 @@ tasks:
     deps: [image]
     vars:
       LOGO_DIR: '{{.LOGO_DIR | default "logos"}}'
-    sources: [logo.py, palette.py, palette.toml, fonts/*.ttf]
+    sources: [logo.py, room.py, palette.py, palette.toml, fonts/*.ttf]
     generates: ['{{.LOGO_DIR}}/preview.png']
     cmds:
       - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
@@ -122,7 +122,7 @@ tasks:
     deps: [image]
     vars:
       WALLPAPER_DIR: '{{.WALLPAPER_DIR | default "wallpapers"}}'
-    sources: [wallpaper.py, palette.py, palette.toml]
+    sources: [wallpaper.py, room.py, palette.py, palette.toml]
     generates: ['{{.WALLPAPER_DIR}}/*.png']
     cmds:
       - '{{.RUN}} python wallpaper.py {{.WALLPAPER_DIR}}'

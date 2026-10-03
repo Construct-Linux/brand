@@ -67,7 +67,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 distribution takes - and `task check` holds them to the sources: it regenerates them and compares
 each image over black, within a small tolerance (OpenCV picks its vector code by processor, and
 pngquant's palette follows the pixels), and the SVGs and the palette byte for byte. After
-changing `video.py`, `plymouth.py`, `logo.py`, `wallpaper.py`, `palette.toml` or the font, run
+changing `video.py`, `room.py`, `plymouth.py`, `logo.py`, `wallpaper.py`, `palette.toml` or the font, run
 `task plymouth logo palette wallpaper` and commit the result. The video and the sprite are previews,
 not committed.
 
@@ -97,6 +97,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `palette.py [out_dir]`: checks the palette's contrast and writes it out; `palette.load()` is what
   the other generators read the colors from.
 - `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds.
+- `room.py`: the room, its camera and its lines, which `video.py`, `wallpaper.py` and `logo.py`
+  all draw.
 - `check.py <committed_dir> <regenerated_dir>`: compares two sets of images over black.
 
 ## Plymouth

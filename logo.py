@@ -2,11 +2,11 @@ import os, sys
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
-import palette
+import palette, room
 
 # usage: logo.py [out_dir]
 # The Construct mark: the animation's last frame without the grid - the room in outline,
-# open on the left. Same one-point camera as video.py. The strokes live in a 0..100 box;
+# open on the left. Same room and camera as video.py (room.py). The strokes live in a 0..100 box;
 # they are written as SVG (color + mono) and rendered to PNG at icon sizes.
 OUT = sys.argv[1] if len(sys.argv) > 1 else "logos"
 os.makedirs(OUT, exist_ok=True)
@@ -18,26 +18,17 @@ PAPER = PAL["brand"]["paper"]   # light background for mono previews
 DEEP = PAL["neutral"]["f"]      # the mono mark and word on paper
 FONT = os.environ.get("FONT") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "Audiowide-Regular.ttf")  # OFL, same as video.py
 
-# ---------- camera from video.py: room = cube 3x3x3, looking straight down +z ----------
-CAM = np.array([0.6, 1.2, -2.9])  # same camera as video.py
-
-def proj(p):
-    x, y, z = np.array(p, float) - CAM
-    return np.array([x / z, -y / z])
-
+# ---------- the room's outline (room.py), seen by the animation's camera ----------
 def mark(lines3d):
     """Project 3D strokes and normalize them into the 0..100 box (aspect kept)."""
-    lines = [(proj(a), proj(b)) for a, b in lines3d]
+    lines = [(room.project(a), room.project(b)) for a, b in lines3d]
     pts = np.array([p for l in lines for p in l])
     lo, hi = pts.min(0), pts.max(0)
     s = 100 / (hi - lo).max()
     off = (100 - (hi - lo) * s) / 2 - lo * s
     return [(a * s + off, b * s + off) for a, b in lines]
 
-BACK = [((0, 0, 3), (3, 0, 3)), ((0, 0, 3), (0, 3, 3)), ((0, 3, 3), (3, 3, 3)), ((3, 0, 3), (3, 3, 3))]
-FLOOR = [((0, 0, 0), (3, 0, 0)), ((0, 0, 0), (0, 0, 3)), ((3, 0, 0), (3, 0, 3))]
-RIGHT = [((3, 0, 0), (3, 3, 0)), ((3, 3, 0), (3, 3, 3))]
-LINES = mark(BACK + FLOOR + RIGHT)
+LINES = mark(room.OUTLINE)
 NAME = "construct"
 
 # ---------- output ----------

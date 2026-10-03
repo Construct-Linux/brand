@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np
 import cv2
-import palette
+import palette, room
 
 # usage: wallpaper.py [out_dir] [width] [height]
 # The desktop background: the boot animation's wait - the room with its workspace grid lit -
@@ -17,24 +17,10 @@ os.makedirs(OUT, exist_ok=True)
 PAL = palette.load()
 U = H / 1080  # design px, as in video.py
 
-# ---------- camera and room: video.py's ----------
-cam = np.array([0.6, 1.2, -2.9])
+# ---------- camera and room: room.py's ----------
 F = 620 * U * 0.82                  # a little further back than the splash: room for windows
-CX = W / 2 - F * (1.5 - cam[0]) / -cam[2]  # the floor's front edge centered, as in video.py
-CY = H * 0.47
-
-def P(p):
-    x, y, z = np.array(p, float) - cam
-    return np.array([CX + F * x / z, CY - F * y / z])
-
-OUTLINE = [((3, 0, 3), (0, 0, 3)), ((3, 0, 3), (3, 0, 0)), ((3, 0, 3), (3, 3, 3)),
-           ((0, 0, 3), (0, 0, 0)), ((3, 0, 0), (0, 0, 0)), ((3, 3, 3), (0, 3, 3)),
-           ((3, 3, 3), (3, 3, 0)), ((0, 3, 3), (0, 0, 3)), ((3, 3, 0), (3, 0, 0))]
-GRID = []
-for i in (1, 2):
-    GRID += [((i, 0, 3), (i, 0, 0)), ((3, 0, i), (0, 0, i)),   # floor
-             ((3, i, 0), (3, i, 3)), ((0, i, 3), (3, i, 3)),   # walls, rows
-             ((3, 3, 3 - i), (3, 0, 3 - i)), ((3 - i, 3, 3), (3 - i, 0, 3))]  # walls, columns
+P = room.view(F, W, H * 0.47)       # the floor's front edge centered, as in video.py
+GRID = room.FLOOR + room.rows(1) + room.rows(2) + room.COLUMNS
 
 SHIFT = 4
 pt = lambda q: tuple(int(v) for v in np.round(np.asarray(q) * (1 << SHIFT)))
@@ -48,7 +34,7 @@ def layer(edges, width):
 def rgb(h):
     return np.array(palette.rgb(h)[::-1], np.float32) / 255  # BGR, as cv2 writes
 
-outline, grid = layer(OUTLINE, 3), layer(GRID, 2)
+outline, grid = layer(room.OUTLINE, 3), layer(GRID, 2)
 # (background, lines, outline level, grid level, glow): the dark one glows like the splash,
 # the light one is ink on paper and does not
 MODES = {

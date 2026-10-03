@@ -1,6 +1,6 @@
 import json, numpy as np, cv2, os, sys
 from PIL import Image, ImageDraw, ImageFont
-import palette
+import palette, room
 
 # CONSTRUCT boot animation. "The image doesn't move. The workspace does."
 # Two layers with fixed roles:
@@ -28,22 +28,11 @@ INTRO, LOOP, OUTRO = 26, 12, 10
 N = INTRO + LOOP + OUTRO  # 48: the preview clip plays the loop once (5 s at 9.6 fps)
 SEGMENTS = {"intro": (0, INTRO), "loop": (INTRO, INTRO + LOOP), "outro": (INTRO + LOOP, N)}
 
-# ---------- camera: room = cube 3x3x3, x right, y up, z depth (z=0 open front) ----------
-# Front view, one-point perspective: the camera looks straight down +z with no yaw, pitch
-# or roll, so every x line (floor front edge, the line above the word) stays horizontal
-# and every y line stays vertical; only depth converges, to the vanishing point.
-# Framing is done by shifting the image (like an architectural shift lens), never by
-# turning the camera.
-cam = np.array([0.6, 1.2, -2.9])  # position (x, y=height, z=distance in front); same as logo.py
+# ---------- camera (room.py) ----------
 FOCAL = 620                       # focal length in design px: larger = closer / bigger room
 F = FOCAL * PX
-# vanishing point on screen; VX centers the floor front edge over the word:
-VX, VY = 0.5 - FOCAL * (1.5 - cam[0]) / -cam[2] / 1080, 0.49
-CX, CY = W * SS * VX, H * SS * VY
-
-def P(p):
-    x, y, z = np.array(p, float) - cam
-    return np.array([CX + F * x / z, CY - F * y / z])
+# the floor's front edge centered, over the word; the vanishing point at 49% of the height
+P = room.view(F, W * SS, H * SS * 0.49)
 
 SHIFT = 4  # cv2 fixed-point bits: draw at 1/16 px instead of rounding to whole pixels
 
@@ -78,26 +67,14 @@ ACTIVATE = (21.5, INTRO)     # grid switches on, all at once; reaches ACTIVE as 
 DRAFT, ACTIVE, BREATH = 0.35, 0.8, 0.12  # grid levels: while drawn, switched on, loop depth
 FADE = (INTRO + LOOP, N - 3) # outro: grid fades out; the last frames are the logo lockup
 
-# ---------- geometry ----------
+# ---------- geometry (room.py) ----------
 # outline: pens leave the back-right-bottom corner at the same constant speed (on screen);
 # each edge starts when a pen reaches its first vertex, so every line extends one already
 # drawn. Outer verticals hang from the top edges down to the floor: never a loose post.
-OUTLINE_EDGES = [  # (from, to), in drawing direction
-    ((3, 0, 3), (0, 0, 3)),  # floor back edge
-    ((3, 0, 3), (3, 0, 0)),  # floor / right wall seam
-    ((3, 0, 3), (3, 3, 3)),  # corner axis
-    ((0, 0, 3), (0, 0, 0)),  # floor left edge
-    ((3, 0, 0), (0, 0, 0)),  # floor front edge
-    ((3, 3, 3), (0, 3, 3)),  # back wall top edge
-    ((3, 3, 3), (3, 3, 0)),  # right wall top edge
-    ((0, 3, 3), (0, 0, 3)),  # back wall left edge, down
-    ((3, 3, 0), (3, 0, 0)),  # right wall front edge, down
-]
-
 def outline_schedule():
     """(p0, p1, start, end) per edge, in pen-length units normalized to 0..1."""
     arrive, sched = {(3, 0, 3): 0.0}, []
-    for a, b in OUTLINE_EDGES:  # listed so that every edge's start vertex is already reached
+    for a, b in room.OUTLINE:  # listed so that every edge's start vertex is already reached
         l = np.linalg.norm(P(b) - P(a))
         t0 = arrive[a]
         sched.append((np.array(a, float), np.array(b, float), t0, t0 + l))
@@ -108,18 +85,12 @@ def outline_schedule():
 OUTLINE_SCHED = outline_schedule()
 
 # interior grid: every line runs between two lines already drawn (outline or grid)
-GRID = []  # (p0, p1, (start, end))
-for i in (1, 2):
-    GRID.append(((i, 0, 3), (i, 0, 0), FLOOR))     # floor columns, back -> front
-    GRID.append(((3, 0, i), (0, 0, i), FLOOR))     # floor rows, right -> left
-GRID.append(((3, 2, 0), (3, 2, 3), HI))            # right wall y=2, front edge -> axis
-GRID.append(((0, 2, 3), (3, 2, 3), HI))            # back wall y=2, left edge -> axis
-for k in (1, 2):
-    for (y0, y1), win in (((3, 2), VERT_HI), ((2, 0), VERT_LO)):
-        GRID.append(((3, y0, 3 - k), (3, y1, 3 - k), win))  # right wall verticals
-        GRID.append(((3 - k, y0, 3), (3 - k, y1, 3), win))  # back wall verticals
-GRID.append(((3, 1, 0), (3, 1, 3), LO))            # right wall y=1, front edge -> axis
-GRID.append(((0, 1, 3), (3, 1, 3), LO))            # back wall y=1, left edge -> axis
+GRID = [(a, b, FLOOR) for a, b in room.FLOOR]   # (p0, p1, (start, end))
+GRID += [(a, b, HI) for a, b in room.rows(2)]
+for top, bottom in room.COLUMNS:  # top edge -> y=2 line, then y=2 line -> floor
+    mid = (top[0], 2, top[2])
+    GRID += [(top, mid, VERT_HI), (mid, bottom, VERT_LO)]
+GRID += [(a, b, LO) for a, b in room.rows(1)]
 
 MIN_LEN = 14 * PX  # px a growing line needs before it is shown
 
