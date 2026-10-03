@@ -99,7 +99,9 @@ def grid_level(f):
     if f < INTRO:
         return DRAFT + (ACTIVE - DRAFT) * prog(f, *ACTIVATE)
     if f < INTRO + LOOP:  # one breath per loop; starts and ends at ACTIVE, so it repeats seamlessly
-        u = (f - INTRO) / LOOP
+        # breathing out takes the breath-in's levels from the same number, not cos(2pi - x),
+        # which can land an ulp apart: plymouth.py writes those pictures once
+        u = min(f - INTRO, INTRO + LOOP - f) / LOOP
         # a Python float, as the other branches return: a NumPy float64 would carry the grid into
         # float64 and the loop's first frame would land a shade off the outro's, the same state
         return ACTIVE - BREATH * (1 - float(np.cos(2 * np.pi * u))) / 2
