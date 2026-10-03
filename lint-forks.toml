@@ -1,0 +1,25 @@
+# What lint.py reads in each fork, and the exceptions, each with its reason. A color the shell or
+# an app's chrome draws is never an exception: it is one of palette.toml's, or white or black at an alpha.
+[fork.Orchis-theme]
+files = ["src/_sass/**/*.scss", "src/gnome-shell/**/*.svg", "src/gtk/assets.svg"]
+[fork.Orchis-theme.skip]
+"src/_sass/_construct-palette.scss" = "the palette itself: compared with palette/construct.scss instead (lint.py mirrors())"
+"src/_sass/_color-palette-default.scss" = "named colors apps' styles use for content (sticky notes, weather); the shell must not reference them"
+"src/_sass/gtk/_colors-libadwaita.scss" = "GNOME's named palette (@define-color blue_1...), API apps read"
+"src/_sass/gtk/_colors-public.scss" = "elementary/Pantheon's public named colors, API apps read"
+"src/_sass/gtk/apps/_libadwaita.scss" = "libadwaita's color-picker swatches: content, not chrome"
+[fork.Orchis-theme.allow]
+
+[fork.dash-to-panel]
+files = ["src/stylesheet.css"]
+[fork.dash-to-panel.allow]
+
+[fork.tilingshell]
+files = ["src/styles/*.scss"]
+[fork.tilingshell.skip]
+"src/styles/prefs.scss" = "the preferences window is GTK, which Orchis draws; its own tints are previews"
+[fork.tilingshell.allow]
+
+[fork.Vitals]
+files = ["stylesheet.css"]
+[fork.Vitals.allow]

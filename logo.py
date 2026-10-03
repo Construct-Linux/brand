@@ -6,8 +6,8 @@ import palette, room
 # usage: logo.py [out_dir]
 # The Construct mark: the animation's last frame without the grid - the room in outline,
 # open on the left. Same room and camera as video.py (room.py). The strokes live in a 0..100 box;
-# they are written as SVG (color, GNOME symbolic, Orchis' Activities button) and rendered to PNG
-# at icon sizes.
+# they are written as SVG (color, GNOME symbolic, Orchis' Activities button, the installer's app
+# tile) and rendered to PNG at icon sizes.
 OUT = sys.argv[1] if len(sys.argv) > 1 else "logos"
 os.makedirs(OUT, exist_ok=True)
 
@@ -83,13 +83,13 @@ def render(lines, size, color):
     out[..., 3] = (a * 255).round()
     return out
 
-def svg(lines, size, inset, width, color):
-    """The mark as a size px SVG, its 0..100 box inset from the edges, its lines width px wide.
-    Each line is written as its outline - a capsule, round at both ends - and filled, never
-    stroked: GTK and the shell recolor a symbolic icon by setting its fill, and leave a stroke
-    as it is. The capsules all turn the same way, so where they overlap at the corners the
-    nonzero fill joins them into one round-cornered shape."""
-    k, r = (size - 2 * inset) / 100, width / 2
+def capsules(lines, inset, k, width):
+    """The mark's lines as path data: each line's outline - a capsule, round at both ends - its
+    0..100 box scaled by k and moved inset from the edges. Filled, never stroked: GTK and the
+    shell recolor a symbolic icon by setting its fill, and leave a stroke as it is. The capsules
+    all turn the same way, so where they overlap at the corners the nonzero fill joins them into
+    one round-cornered shape."""
+    r = width / 2
     xy = lambda p: f"{p[0]:.2f} {p[1]:.2f}"
     d = []
     for a, b in lines:
@@ -98,8 +98,26 @@ def svg(lines, size, inset, width, color):
         n = np.array([-u[1], u[0]]) * r
         arc = f"A{r:g} {r:g} 0 0 0"
         d.append(f"M{xy(a + n)} L{xy(b + n)} {arc} {xy(b - n)} L{xy(a - n)} {arc} {xy(a + n)} Z")
+    return " ".join(d)
+
+def svg(lines, size, inset, width, color):
+    """The mark as a size px SVG, its 0..100 box inset from the edges, its lines width px wide."""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">\n'
-            f'<path d="{" ".join(d)}" fill="{color}"/>\n</svg>\n')
+            f'<path d="{capsules(lines, inset, (size - 2 * inset) / 100, width)}" fill="{color}"/>\n</svg>\n')
+
+# The installer's app icon, a tile in Tela's own geometry so it sits among Tela's app icons: 64 px
+# on Tela's 16.933 grid, the rounded square in the folder color with Tela's white film over it at
+# 10%, and the mark in the folder's glyph color, fitted to a box in the middle.
+TILE, TILE_BOX = 16.933, 9.26
+
+def tile(lines):
+    folder, glyph, white = PAL["icons"]["folder"], PAL["icons"]["folder_glyph"], PAL["neutral"]["a"]
+    rect = 'x="1.058" y="1.058" width="14.817" height="14.817" rx="1.587"'
+    inset = (TILE - TILE_BOX) / 2
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 {TILE} {TILE}">\n'
+            f'<rect {rect} fill="{folder}"/>\n'
+            f'<rect {rect} fill="{white}" opacity=".1"/>\n'
+            f'<path d="{capsules(lines, inset, TILE_BOX / 100, 0.8)}" fill="{glyph}"/>\n</svg>\n')
 
 # name: (size, inset, line width, color)
 SVGS = {
@@ -116,6 +134,7 @@ SVGS = {
 SIZES = [64, 48, 32, 24, 16]  # above 64 px the SVG is the icon
 for variant, spec in SVGS.items():
     open(f"{OUT}/{NAME}{variant}.svg", "w").write(svg(LINES, *spec))
+open(f"{OUT}/io.github.construct_linux.Installer.svg", "w").write(tile(LINES))
 for s in SIZES:
     cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN))
-print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}")
+print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}; the installer's tile")

@@ -103,7 +103,7 @@ tasks:
       - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
 
   palette:
-    desc: Check the palette's contrast and write it for the theme forks (CSS for preview.html, SCSS for Orchis) into palette/
+    desc: Check the palette's contrast and write it out into palette/ - CSS for preview.html, SCSS for Orchis, JSON for the image, Ghostty's and VS Code's themes
     label: palette-{{.PALETTE_DIR}}
     deps: [image]
     vars:
@@ -129,6 +129,14 @@ tasks:
     deps: [palette, wallpaper, logo]
     cmds:
       - if command -v xdg-open >/dev/null; then xdg-open preview.html; else open preview.html; fi
+
+  lint:
+    desc: Fail if a fork in {{.FORKS}} writes a color palette.toml does not, or holds a stale copy of the palette (lint-forks.toml says which files and why)
+    deps: [image]
+    vars:
+      FORKS: '{{.FORKS | default ".."}}'  # the forks checked out beside brand, as Construct-Linux's are
+    cmds:
+      - docker run --rm -u {{.UID}}:{{.GID}} -v {{.ROOT_DIR}}:/w -v "$(realpath {{.FORKS}})":/forks:ro -w /w {{.IMAGE}} python lint.py /forks
 
   check:
     desc: Fail if the committed plymouth/, logos/, wallpapers/ and palette/ are not what the sources make

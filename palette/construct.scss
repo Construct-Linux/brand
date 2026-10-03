@@ -21,3 +21,29 @@ $construct-warning-light: #FFC857;
 $construct-warning-dark: #8F5B00;
 $construct-error-light: #FF7A90;
 $construct-error-dark: #C62840;
+
+// Text: the accent standing alone (labels on a tint, links), body, muted, on a fill of the accent
+$construct-accent-text-light: #00E5FF;
+$construct-accent-text-dark: #00646D;
+$construct-text-light: #E6EDF2;
+$construct-text-dark: #11181E;
+$construct-muted-light: #9FB3C0;
+$construct-muted-dark: #5F7380;
+$construct-on-accent-light: #0B1116;
+$construct-on-accent-dark: #FFFFFF;
+
+// The ground under the overview, the lock and login screens; the desktop's ink
+$construct-boot: #000000;
+$construct-ink: #0B1116;
+
+// The accent's alpha over a surface: (rest, hover, active), and selection
+$construct-tint-light: (0.16, 0.22, 0.28);
+$construct-tint-dark: (0.10, 0.14, 0.18);
+$construct-selection-light: 0.25;
+$construct-selection-dark: 0.20;
+
+// libadwaita's radius steps; both bars' distance from the screen edge
+$construct-radius-control: 9px;
+$construct-radius-surface: 15px;
+$construct-radius-sheet: 24px;
+$construct-inset: 6px;

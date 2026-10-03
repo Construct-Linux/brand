@@ -55,11 +55,12 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task play` | Opens `construct.mp4` in this machine's video player |
 | `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
 | `task plymouth` | Transparent PNGs for Plymouth in `plymouth/`, each picture once and compressed with pngquant, and the order they play in |
-| `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 64 px |
-| `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
+| `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 64 px, and the installer's app tile |
+| `task palette` | Checks `palette.toml`'s contrast and edges and writes it into `palette/`: for the theme forks, the image, Ghostty and VS Code ([THEMING.md](THEMING.md)) |
 | `task wallpaper` | The desktop backgrounds, dark and light, at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/` |
 | `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
+| `task lint` | Fails if a fork checked out beside brand (`FORKS=..`) writes a color `palette.toml` does not, or holds a stale copy of the palette (`lint-forks.toml`) |
 | `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
 | `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
 
@@ -95,14 +96,16 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
 - `logo.py [out_dir]`: the logo files.
-- `palette.py [out_dir]`: checks the palette's contrast and writes it out; `palette.load()` is what
-  the other generators read the colors from.
+- `palette.py [out_dir]`: checks the palette's contrast and edges and writes it out (CSS, SCSS,
+  JSON, Ghostty, VS Code); `palette.load()` is what the other generators read the colors from.
 - `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds and their
   `gnome-background-properties` entry.
 - `room.py`: the room, its camera and its lines, which `video.py`, `wallpaper.py` and `logo.py`
   all draw.
 - `check.py <committed_dir> <regenerated_dir>`: compares a committed directory with a regenerated
   one.
+- `lint.py <forks_dir>`: the forks' colors against the palette, and their copies of it
+  (`lint-forks.toml`).
 
 ## Plymouth
 
@@ -115,7 +118,8 @@ through the pictures it breathed in by and the outro ends on the logo the intro 
 {
  "intro": [1, 2, ..., 26],
  "loop": [27, 28, 29, 30, 31, 32, 33, 32, 31, 30, 29, 28],
- "outro": [27, 34, 35, 36, 37, 38, 39, 11, 11, 11]
+ "outro": [27, 34, 35, 36, 37, 38, 39, 11, 11, 11],
+ "mark_center": 0.4329
 }
 ```
 
@@ -126,6 +130,8 @@ through the pictures it breathed in by and the outro ends on the logo the intro 
   asks for its password, with the prompt under the logo.
 - If the boot ends before the intro does, the cleanest thing is to show the outro's last frame
   (the logo) directly instead of jumping into the middle of the sequence.
+- `mark_center`: the mark's vertical centre as a fraction of the frame's height, without the
+  wordmark under it, so the theme can put the mark where the wallpaper draws it.
 
 Format:
 

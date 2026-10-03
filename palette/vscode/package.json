@@ -1,0 +1,36 @@
+{
+  "name": "construct-theme",
+  "displayName": "CONSTRUCT",
+  "description": "The desktop's colors, light and dark",
+  "version": "1.0.0",
+  "publisher": "construct",
+  "license": "CC-BY-SA-4.0",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "id": "Construct Dark",
+        "label": "Construct Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/construct-dark.json"
+      },
+      {
+        "id": "Construct Light",
+        "label": "Construct Light",
+        "uiTheme": "vs",
+        "path": "./themes/construct-light.json"
+      }
+    ],
+    "configurationDefaults": {
+      "workbench.colorTheme": "Construct Dark",
+      "workbench.preferredDarkColorTheme": "Construct Dark",
+      "workbench.preferredLightColorTheme": "Construct Light",
+      "window.autoDetectColorScheme": true
+    }
+  }
+}

@@ -1,22 +1,24 @@
 # The colors of CONSTRUCT: the one place they are written. logo.py and wallpaper.py read them,
-# and palette.py checks their contrast and writes them out (palette/) for the theme forks:
-# Orchis (GTK and GNOME Shell), Tela (folders) and Bibata (cursor). THEMING.md says where each
-# one goes.
+# and palette.py checks their contrast and writes them out (palette/) for the theme forks -
+# Orchis (GTK and GNOME Shell), Tela (folders), Bibata (cursor) - for the apps GTK does not draw -
+# Ghostty, VS Code - and for the image (palette.json). THEMING.md says where each one goes.
 #
-# Two modes. Dark is the default and the boot's: the cyan of the logo on ink. Light keeps the
-# same hue, darkened until text in it reads on white.
+# Two modes. Dark is the default: the cyan of the logo on ink, the wallpaper's. The boot draws the
+# same cyan on black. Light keeps the same hue, darkened until text in it reads on white.
 # The neutrals carry the ink's blue (hue ~207), so the desktop, the boot and the logo are one
 # surface, not cyan on a stock grey.
 
 [brand]
 cyan = "#00E5FF"        # the mark, the animation, the accent in dark mode
-ink = "#0B1116"         # behind the mark: boot, previews, the darkest surface
+ink = "#0B1116"         # the wallpaper behind the mark, previews: the darkest surface the desktop shows
 paper = "#F4F6F8"       # behind the mono mark: the lightest surface but white
-boot = "#000000"        # Plymouth draws the frames on black
+boot = "#000000"        # the ground under all that is not a window or the desktop: firmware, Plymouth,
+                        # GNOME's overview, lock and login ground
 
 # Surfaces, Orchis' scale: a-d light (a is the brightest), e-h dark (e is the darkest).
-# Orchis uses c and e as the window background, a and g for views (lists, text),
-# b and f for alternating rows, d and h for raised surfaces (popovers, headers).
+# Orchis uses c and f as the window background (e is the desktop's: a window on it has no edge),
+# a and g for views (lists, text) and the headerbar, b and f for alternating rows, d and h for
+# raised surfaces (popovers, the shell's menus).
 [neutral]
 a = "#FFFFFF"
 b = "#F9FAFB"
@@ -28,7 +30,9 @@ g = "#172028"
 h = "#1F2A33"
 
 [dark]
-accent = "#00E5FF"      # links, selection, focus, the suggested button
+accent = "#00E5FF"      # focus ring, switches, sliders, progress, today's ring, indicators; areas
+                        # larger than a mark take it as a tint
+accent_text = "#00E5FF" # the accent standing alone: labels and icons on a tint, links
 on_accent = "#0B1116"   # text on the accent
 text = "#E6EDF2"
 muted = "#9FB3C0"
@@ -39,6 +43,7 @@ error = "#FF7A90"
 
 [light]
 accent = "#007A85"
+accent_text = "#00646D" # #007A85 is 4.25:1 on its own 10% tint; this is >= 5.0 on every tint
 on_accent = "#FFFFFF"
 text = "#11181E"
 muted = "#5F7380"
@@ -46,6 +51,30 @@ border = "#C9D1D8"
 success = "#1B7F4E"
 warning = "#8F5B00"
 error = "#C62840"
+
+# The accent over a surface, for anything larger than a mark (quick toggles on, the selected
+# day, selection in lists and sidebars, the default button): an alpha, not a color, so one table
+# serves every surface. The label and icon on a tint are accent_text; muted text never goes on one.
+[tint.dark]
+rest = 0.16
+hover = 0.22
+active = 0.28   # the ceiling: 0.32 over h drops accent_text to 4.29
+selection = 0.25
+
+[tint.light]
+rest = 0.10
+hover = 0.14
+active = 0.18
+selection = 0.20
+
+# libadwaita's steps, so the shell and the apps match; a container takes its child's radius plus
+# its padding (THEMING.md).
+[shape]
+radius_control = 9   # buttons, entries, menu items, rows, tooltips
+radius_surface = 15  # windows, popovers, the shell's menus, banners, the dock
+radius_sheet = 24    # the date menu, modal dialogs, app tiles
+space = [3, 6, 12, 18, 24]
+inset = 6            # both bars from the screen edge
 
 # Tela: the folder body; its glyph is drawn in folder_glyph. Folders sit on both modes, so the
 # color is between the two accents.
@@ -70,3 +99,29 @@ wordmark = "Audiowide"
 ui = "Adwaita Sans"         # GNOME's own since 48, regular weight; the image sets no other
 mono = "Adwaita Mono"       # GNOME's monospaced, in apps' code and text editors
 terminal = "JetBrains Mono" # the terminal only: Ghostty's own default, built in
+
+# The terminal's sixteen colors (Ghostty; VS Code's terminal), on the view surface: g in dark, a
+# in light. Red, green, yellow and cyan are the semantic colors and the accent, black and white
+# the neutrals, bright black the muted text; only blue, magenta and the brights are written
+# here. Blue sits on the ink's hue, magenta opposite the success green, both at the semantic
+# colors' OKLCH lightness and chroma; the brights keep each hue, lighter in dark and darker in
+# light, where lighter would not read on white.
+[ansi.dark]
+blue = "#5DB2F7"
+magenta = "#CA91E3"
+bright_red = "#FF9BAB"
+bright_green = "#7CEEB4"
+bright_yellow = "#FFDE8C"
+bright_blue = "#82C8FF"
+bright_magenta = "#DCACF2"
+bright_cyan = "#82F3FF"
+
+[ansi.light]
+blue = "#0068AD"
+magenta = "#863CA4"
+bright_red = "#B10029"
+bright_green = "#006C38"
+bright_yellow = "#7C4500"
+bright_blue = "#00539B"
+bright_magenta = "#732091"
+bright_cyan = "#006773"
