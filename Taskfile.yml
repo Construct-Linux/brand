@@ -117,13 +117,13 @@ tasks:
       - '{{.RUN}} python palette.py {{.PALETTE_DIR}}'
 
   wallpaper:
-    desc: The desktop backgrounds, dark and light, at 4K into wallpapers/
+    desc: The desktop backgrounds, dark and light, at 2880x1800, and Settings' construct.xml into wallpapers/
     label: wallpaper-{{.WALLPAPER_DIR}}
     deps: [image]
     vars:
       WALLPAPER_DIR: '{{.WALLPAPER_DIR | default "wallpapers"}}'
     sources: [wallpaper.py, room.py, palette.py, palette.toml]
-    generates: ['{{.WALLPAPER_DIR}}/*.png']
+    generates: ['{{.WALLPAPER_DIR}}/*']
     cmds:
       - '{{.RUN}} python wallpaper.py {{.WALLPAPER_DIR}}'
 

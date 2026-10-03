@@ -57,7 +57,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task plymouth` | Transparent PNGs per frame for Plymouth in `plymouth/`, compressed with pngquant |
 | `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 64 px |
 | `task palette` | Checks `palette.toml`'s contrast and writes it for the theme forks into `palette/` ([THEMING.md](THEMING.md)) |
-| `task wallpaper` | The desktop backgrounds, dark and light, at 4K into `wallpapers/` |
+| `task wallpaper` | The desktop backgrounds, dark and light, at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/` |
 | `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
 | `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
@@ -96,7 +96,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `logo.py [out_dir]`: the logo files.
 - `palette.py [out_dir]`: checks the palette's contrast and writes it out; `palette.load()` is what
   the other generators read the colors from.
-- `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds.
+- `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds and their
+  `gnome-background-properties` entry.
 - `room.py`: the room, its camera and its lines, which `video.py`, `wallpaper.py` and `logo.py`
   all draw.
 - `check.py <committed_dir> <regenerated_dir>`: compares two sets of images over black.

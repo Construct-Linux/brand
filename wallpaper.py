@@ -8,11 +8,14 @@ import palette, room
 # held still and set back behind the windows. Same camera and room as video.py; no word, the
 # top bar and the dock already say whose desktop it is.
 # One image per mode: the dark one is the boot's cyan on ink, quieter; the light one draws the
-# room in the light accent on paper. GNOME scales them to the screen, so they are made once, at
-# 4K.
+# room in the light accent on paper. GNOME zooms them to the screen, so they are made once, at
+# 16:10 and 2880x1800, the ThinkPad X9's panel; a 16:9 screen crops a little from the top and
+# the bottom, where there is only background.
+# construct.xml offers the pair to Settings (gnome-background-properties): the light one with
+# the dark one for dark mode, as GNOME's own backgrounds are, the ink as the color behind them.
 OUT = sys.argv[1] if len(sys.argv) > 1 else "wallpapers"
-W = int(sys.argv[2]) if len(sys.argv) > 2 else 3840
-H = int(sys.argv[3]) if len(sys.argv) > 3 else 2160
+W = int(sys.argv[2]) if len(sys.argv) > 2 else 2880
+H = int(sys.argv[3]) if len(sys.argv) > 3 else 1800
 os.makedirs(OUT, exist_ok=True)
 PAL = palette.load()
 U = H / 1080  # design px, as in video.py
@@ -49,4 +52,20 @@ for mode, (bg, ink, lo, lg, glow) in MODES.items():
     img = rgb(bg) + (rgb(ink) - rgb(bg)) * a
     cv2.imwrite(f"{OUT}/construct-{mode}.png", (img * 255).round().astype(np.uint8),
                 [cv2.IMWRITE_PNG_COMPRESSION, 9])
-print(f"{OUT}/: construct-dark.png, construct-light.png ({W}x{H})")
+
+# Where the image installs them: the paths are absolute, as Settings reads them.
+DIR = "/usr/share/backgrounds/construct"
+open(f"{OUT}/construct.xml", "w").write(f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>CONSTRUCT</name>
+    <filename>{DIR}/construct-light.png</filename>
+    <filename-dark>{DIR}/construct-dark.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>{PAL["brand"]["ink"]}</pcolor>
+  </wallpaper>
+</wallpapers>
+""")
+print(f"{OUT}/: construct-dark.png, construct-light.png ({W}x{H}), construct.xml")
