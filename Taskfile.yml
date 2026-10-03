@@ -36,12 +36,13 @@ tasks:
       - docker build -q -t {{.IMAGE}} .
 
   generate:
-    desc: Render the 48 PNG frames into {{.FRAMES_DIR}}/
+    desc: Render the 48 PNG frames ({{.SIZE}}px) into {{.FRAMES_DIR}}/
+    label: generate-{{.SIZE}}-{{.FRAMES_DIR}}
     deps: [image]
-    sources: [video.py, room.py, palette.py, palette.toml, fonts/*.ttf]
-    generates: ['{{.FRAMES_DIR}}/construct_*.png']
+    sources: [video.py, room.py, palette.py, palette.toml, fonts/*.ttf, Dockerfile, requirements.txt]
+    generates: ['{{.FRAMES_DIR}}/construct_*.png', '{{.FRAMES_DIR}}/segments.json']
     cmds:
-      - '{{.RUN}} python video.py {{.FRAMES_DIR}}'
+      - SIZE={{.SIZE}} {{.RUN}} python video.py {{.FRAMES_DIR}}
 
   encode:
     desc: Build {{.VIDEO}} ({{.DURATION}}s) from the frames
@@ -68,18 +69,14 @@ tasks:
       - '{{.RUN}} python sprite.py {{.FRAMES_DIR}} {{.SPRITE}} {{.COLS}}'
 
   plymouth:
-    desc: Transparent PNG per frame for Plymouth ({{.SIZE}}px, no background), compressed with pngquant, into {{.PLY_DIR}}/
+    desc: Transparent PNG per frame for Plymouth ({{.SIZE}}px, no background) from {{.FRAMES_DIR}}/, compressed with pngquant, into {{.PLY_DIR}}/
     label: plymouth-{{.SIZE}}-{{.QUALITY}}-{{.PLY_DIR}}  # re-run when SIZE, QUALITY or the output change
-    deps: [image]
-    vars:
-      TMP: .frames-{{.PLY_DIR | replace "/" "-"}}
-    sources: [video.py, room.py, plymouth.py, palette.py, palette.toml, fonts/*.ttf, Dockerfile, requirements.txt]
+    deps: [generate]
+    sources: ['{{.FRAMES_DIR}}/construct_*.png', '{{.FRAMES_DIR}}/segments.json', plymouth.py, Dockerfile, requirements.txt]
     generates: ['{{.PLY_DIR}}/*.png']
     cmds:
-      - rm -rf {{.PLY_DIR}} {{.TMP}}
-      - SIZE={{.SIZE}} {{.RUN}} python video.py {{.TMP}}
-      - '{{.RUN}} python plymouth.py {{.TMP}} {{.PLY_DIR}}'
-      - rm -rf {{.TMP}}
+      - rm -rf {{.PLY_DIR}}
+      - '{{.RUN}} python plymouth.py {{.FRAMES_DIR}} {{.PLY_DIR}}'  # lossless RGBA, then pngquant
       - task: compress
         vars: {PLY_DIR: '{{.PLY_DIR}}'}
 
@@ -137,7 +134,7 @@ tasks:
     desc: Fail if the committed plymouth/, logos/, wallpapers/ and palette/ are not what the sources make
     deps: [image]
     cmds:
-      - rm -rf .check
+      - rm -rf .check {{.FRAMES_DIR}}  # the frames are rendered again, not taken as they are
       - task: plymouth
         vars: {PLY_DIR: .check/plymouth}
       - task: logo
@@ -155,4 +152,4 @@ tasks:
   clean:
     desc: Remove the generated frames, video and sprite (plymouth/, logos/, wallpapers/ and palette/ are committed)
     cmds:
-      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} .check .frames-*
+      - rm -rf {{.FRAMES_DIR}} {{.VIDEO}} {{.SPRITE}} .check

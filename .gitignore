@@ -4,7 +4,6 @@ frames/
 construct.mp4
 sprite.png
 .check/
-.frames-*/
 .task/
 __pycache__/
 *.pyc
