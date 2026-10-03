@@ -18,8 +18,9 @@
   --cursor-outline: #FFFFFF;
   --cursor-watch: #00E5FF;
   --font-wordmark: "Audiowide", sans-serif;
-  --font-ui: "Cantarell", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-ui: "Adwaita Sans", system-ui, sans-serif;
+  --font-mono: "Adwaita Mono", ui-monospace, monospace;
+  --font-terminal: "JetBrains Mono", ui-monospace, monospace;
   --shell-bg: #0B1116;
   --shell-surface: #1F2A33;
   --shell-view: #172028;

@@ -21,7 +21,7 @@ arrives in upstream's color until it is recolored. Each fork's README says what 
 | `icons` | Tela's folder body and its glyph |
 | `cursor` | Bibata's fill, outline and the watch |
 | `gnome` | the fixed libadwaita accent nearest to the cyan |
-| `type` | the wordmark, the interface and the monospaced fonts |
+| `type` | the wordmark's font; the interface's and apps' monospaced, GNOME's own (Adwaita Sans, regular; Adwaita Mono); the terminal's |
 
 Dark is the default. Light keeps the cyan's hue, darkened to `#007A85` so links and selected text
 read on white: the logo's `#00E5FF` on white is 1.5:1.
@@ -75,5 +75,6 @@ overrides in the image, not in the fork.
 
 **The image** (spin-desktop): the dconf defaults that tie it together - `gtk-theme` and the shell
 theme Orchis-Construct-Dark, `icon-theme` Tela-dark, `cursor-theme` Bibata-Modern-Construct,
-`accent-color` = `gnome.accent`, `color-scheme` = `prefer-dark`, the wallpapers, the fonts from
-`type` - and the Plymouth theme from `plymouth/`.
+`accent-color` = `gnome.accent`, `color-scheme` = `prefer-dark`, the wallpapers - and the
+Plymouth theme from `plymouth/`. The fonts in `type` are GNOME's and Ghostty's defaults, so the
+image sets none.

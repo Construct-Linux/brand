@@ -154,6 +154,12 @@ FONT=/path/Font.ttf task generate
 
 The path must be inside the repository: the generators run in a container that only sees it.
 
+The desktop's own text is GNOME's: **Adwaita Sans** for the interface, in its regular weight, and
+**Adwaita Mono** where apps show code; the terminal alone uses **JetBrains Mono**, Ghostty's
+default. `palette.toml`'s `type` names them. `preview.html` draws with the same faces: Adwaita
+Sans and Mono from `fonts/` (GNOME's adwaita-fonts 51.0, `LICENSES/OFL-1.1-Adwaita.txt`),
+JetBrains Mono from Google Fonts.
+
 ## License
 
 - The artwork - the logo (`logos/`), the animation's frames (`plymouth/` and what `task`
@@ -161,4 +167,5 @@ The path must be inside the repository: the generators run in a container that o
   International license (`LICENSES/CC-BY-SA-4.0.txt`).
 - The scripts, `preview.html`, the `Taskfile.yml` and the `Dockerfile` are under the MIT license
   (`LICENSES/MIT.txt`).
-- The Audiowide font is under the SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`).
+- The Audiowide font is under the SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`); Adwaita
+  Sans and Adwaita Mono too, with their authors' notice (`LICENSES/OFL-1.1-Adwaita.txt`).

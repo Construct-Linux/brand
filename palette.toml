@@ -67,5 +67,6 @@ accent = "teal"
 # Type. Audiowide is only the wordmark: it is a display face, not one to read menus in.
 [type]
 wordmark = "Audiowide"
-ui = "Cantarell"        # GNOME's own; nothing to add to the image
-mono = "JetBrains Mono" # terminals and editors: a developer desktop
+ui = "Adwaita Sans"         # GNOME's own since 48, regular weight; the image sets no other
+mono = "Adwaita Mono"       # GNOME's monospaced, in apps' code and text editors
+terminal = "JetBrains Mono" # the terminal only: Ghostty's own default, built in

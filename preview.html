@@ -8,9 +8,12 @@
 <title>CONSTRUCT desktop</title>
 <link rel="stylesheet" href="palette/construct.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
   @font-face { font-family: "Audiowide"; src: url("fonts/Audiowide-Regular.ttf"); }
+  /* GNOME's own faces, as the desktop draws them: Adwaita Sans is variable, every weight in one file. */
+  @font-face { font-family: "Adwaita Sans"; src: url("fonts/AdwaitaSans-Regular.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Adwaita Mono"; src: url("fonts/AdwaitaMono-Regular.ttf"); }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font-ui); }
   main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
@@ -34,7 +37,7 @@
      dash-to-panel's dock, floating, centred and sized to its icons. */
   .topbar { position: absolute; inset: .3em .4em auto .4em; height: 2.4em; border-radius: .8em;
             background: color-mix(in srgb, black 65%, transparent); color: var(--shell-text);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 .9em; font-size: .95em; font-weight: 700; }
+            display: flex; align-items: center; justify-content: space-between; padding: 0 .9em; font-size: .95em; }
   .topbar .left, .topbar .right { display: flex; align-items: center; gap: 1.1em; }
   .topbar img { height: 1.3em; }
   .topbar .clock { padding: .25em .8em; border-radius: 1em; }
@@ -84,7 +87,7 @@
   .term { right: 2%; top: 40%; width: 38%; height: 48%; background: var(--shell-bg); color: var(--shell-text); box-shadow: 0 1.2em 3em rgba(0, 0, 0, .45), 0 0 0 1px var(--shell-border); }
   .term .titlebar { background: var(--shell-alt); border-color: var(--shell-border); color: var(--shell-text); }
   .term .titlebar .wbtn { background: var(--shell-view); border-color: var(--shell-border); }
-  .term pre { margin: 0; padding: .8em; font: .88em/1.5 var(--font-mono); white-space: pre-wrap; }
+  .term pre { margin: 0; padding: .8em; font: .88em/1.5 var(--font-terminal); white-space: pre-wrap; }
   .term .p { color: var(--shell-accent); } .term .ok { color: var(--shell-success); } .term .w { color: var(--shell-warning); } .term .m { color: var(--shell-muted); }
   .term .caret { background: var(--shell-accent); }
 
