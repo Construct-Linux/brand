@@ -84,13 +84,22 @@ def render(lines, size, color):
     return out
 
 def svg(lines, size, inset, width, color):
-    """The mark as a size px SVG, its 0..100 box inset from the edges, drawn width px wide."""
-    k = (size - 2 * inset) / 100
-    xy = lambda p: f"{inset + p[0] * k:.2f} {inset + p[1] * k:.2f}"
-    d = " ".join("M" + " L".join(xy(p) for p in pts) + (" Z" if closed else "") for pts, closed in chain(lines))
+    """The mark as a size px SVG, its 0..100 box inset from the edges, its lines width px wide.
+    Each line is written as its outline - a capsule, round at both ends - and filled, never
+    stroked: GTK and the shell recolor a symbolic icon by setting its fill, and leave a stroke
+    as it is. The capsules all turn the same way, so where they overlap at the corners the
+    nonzero fill joins them into one round-cornered shape."""
+    k, r = (size - 2 * inset) / 100, width / 2
+    xy = lambda p: f"{p[0]:.2f} {p[1]:.2f}"
+    d = []
+    for a, b in lines:
+        a, b = inset + np.asarray(a) * k, inset + np.asarray(b) * k
+        u = (b - a) / np.linalg.norm(b - a)
+        n = np.array([-u[1], u[0]]) * r
+        arc = f"A{r:g} {r:g} 0 0 0"
+        d.append(f"M{xy(a + n)} L{xy(b + n)} {arc} {xy(b - n)} L{xy(a - n)} {arc} {xy(a + n)} Z")
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">\n'
-            f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width}" '
-            f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
+            f'<path d="{" ".join(d)}" fill="{color}"/>\n</svg>\n')
 
 # name: (size, inset, line width, color)
 SVGS = {
