@@ -13,7 +13,6 @@ os.makedirs(OUT, exist_ok=True)
 
 PAL = palette.load()
 CYAN = PAL["brand"]["cyan"]
-INK = PAL["brand"]["ink"]       # behind the icons
 
 # ---------- the room's outline (room.py), seen by the animation's camera ----------
 def mark(lines3d):
@@ -63,16 +62,9 @@ def hex2bgr(h):
     h = h.lstrip("#"); return tuple(int(h[i:i + 2], 16) for i in (4, 2, 0))
 
 def stroke_px(size):
-    # Large: a fine line, ~1% of the mark like the animation's grid. Icon sizes: whole pixels -
-    # 1 px only at 16, where 2 would fill the mark; from 24 to 64 two, or the line fades into
-    # the background (a 1 px cyan stroke at 32 px all but vanished).
-    if size <= 16:
-        return 1
-    if size <= SMALL:
-        return 2
-    return max(1.0, size * 0.011)
-
-SMALL = 64  # at or below this size, lines are snapped to the pixel grid (crisp icon)
+    # Whole pixels: 1 px only at 16, where 2 would fill the mark; from 24 up two, or the line
+    # fades (a 1 px cyan stroke at 32 px all but vanished).
+    return 1 if size <= 16 else 2
 
 def snap(lines, size):
     """Move endpoints onto the pixel grid so verticals and horizontals cover whole pixels: a
@@ -81,21 +73,22 @@ def snap(lines, size):
     c = lambda v: (np.floor((v + 6) * size / 112) + off) * 112 / size - 6
     return [(c(np.asarray(a)), c(np.asarray(b))) for a, b in lines]
 
-def render(lines, size, color, bg):
+def render(lines, size, color):
+    """The mark in color on a transparent background, as the SVG is: BGRA."""
     ss = 8
-    small = size <= SMALL
-    if small:
-        lines = snap(lines, size)
+    lines = snap(lines, size)
     S = size * ss
     k = S / 112
     T = lambda p: (int(round((p[0] + 6) * k * 16)), int(round((p[1] + 6) * k * 16)))
     ink = np.zeros((S, S), np.float32)
-    w = int(round(stroke_px(size) * ss))  # whole pixels when small
+    w = int(round(stroke_px(size) * ss))
     for pts, closed in chain(lines):
         cv2.polylines(ink, [np.array([T(p) for p in pts], np.int32)], closed, 1.0, w, cv2.LINE_AA, 4)
-    a = cv2.resize(np.clip(ink, 0, 1), (size, size), interpolation=cv2.INTER_AREA)[..., None]
-    c, b = np.array(hex2bgr(color), np.float32), np.array(hex2bgr(bg), np.float32)
-    return (b + (c - b) * a).round().astype(np.uint8)
+    a = cv2.resize(np.clip(ink, 0, 1), (size, size), interpolation=cv2.INTER_AREA)
+    out = np.empty((size, size, 4), np.uint8)
+    out[..., :3] = hex2bgr(color)
+    out[..., 3] = (a * 255).round()
+    return out
 
 def symbolic(lines):
     """GNOME's symbolic icon: the mark on a 16 px grid, one color GTK replaces with the
@@ -115,10 +108,10 @@ def activities(lines):
             f'<path d="{d}" fill="none" stroke="#fff" stroke-width="3" '
             f'stroke-linecap="round" stroke-linejoin="round"/>\n</svg>\n')
 
-SIZES = [512, 128, 64, 48, 32, 24, 16]
+SIZES = [64, 48, 32, 24, 16]  # above 64 px the SVG is the icon
 open(f"{OUT}/{NAME}.svg", "w").write(svg(LINES, CYAN))
 open(f"{OUT}/{NAME}-symbolic.svg", "w").write(symbolic(LINES))
 open(f"{OUT}/{NAME}-activities.svg", "w").write(activities(LINES))
 for s in SIZES:
-    cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN, INK))
+    cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN))
 print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}")
