@@ -9,9 +9,11 @@ files = ["src/_sass/**/*.scss", "src/gnome-shell/**/*.svg", "src/gtk/assets.svg"
 "src/_sass/gtk/_colors-public.scss" = "elementary/Pantheon's public named colors, API apps read"
 "src/_sass/gtk/apps/_libadwaita.scss" = "libadwaita's color-picker swatches: content, not chrome"
 [fork.Orchis-theme.allow]
-# The accent at an alpha or a shade that is not a token of the scale (lint.py C7): none yet. The
-# one expected is a swatch that shows a color rather than a level, as Settings' accent buttons.
+# The accent at an alpha or a shade that is not a token of the scale (lint.py C7). St draws one
+# background and has no opacity, so the shell's solid primary has its states mixed into it.
 [fork.Orchis-theme.accent]
+"src/_sass/gnome-shell/widgets/_buttons.scss mix(on($primary" = "the shell's primary: on_accent at 8% and 16% over the solid fill for hover and press, and the insensitive label at half opacity, each mixed into one colour, as St draws one background and has no opacity"
+"src/_sass/gnome-shell/widgets/_buttons.scss mix($primary" = "the shell's insensitive primary: the solid accent at half opacity over the raised surface, mixed into one colour for St"
 
 [fork.dash-to-panel]
 files = ["src/stylesheet.css"]
