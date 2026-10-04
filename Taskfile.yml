@@ -131,7 +131,7 @@ tasks:
       - if command -v xdg-open >/dev/null; then xdg-open preview.html; else open preview.html; fi
 
   lint:
-    desc: Fail if a fork in {{.FORKS}} writes a color palette.toml does not, draws the accent at an alpha that is not a token, or holds a stale copy of the palette (lint-forks.toml says which files and why)
+    desc: Fail if a fork in {{.FORKS}} writes a color palette.toml does not, draws the accent at an alpha that is not a token, rounds, spaces or shadows off THEMING.md's tables, or holds a stale copy of the palette (lint-forks.toml says which files and why)
     deps: [image]
     vars:
       FORKS: '{{.FORKS | default ".."}}'  # the forks checked out beside brand, as Construct-Linux's are

@@ -378,9 +378,10 @@ lint`, **H** the image's harness (`lf:` checks), **N** its needles.
 | E5 | Light edges: `c` on the desk 1.15:1, the shelf against `c` and the desk 1.07:1, the sheet on the shelf 1.15:1, the ring line 1.6:1, the border line 1.45:1, the divider 1.25:1 | P |
 | F1 | Every focusable shell control shows focus as `inset 0 0 0 2px` accent, calendar days included; popup-menu items are exempt (hover is focus). Today is `accent_text` at 700, never a ring | H |
 | F2 | GTK's focus outlines are the accent | H |
-| R1 | Radii 9 / 15 / 24 / pill, concentric | P, H |
+| R1 | Radii 9 / 15 / 24 / pill, concentric | P, L, H |
 | R2 | GTK cards and boxed lists 12, alert dialogs 18 | H |
-| SP1 | Spacing on 3 / 6 / 12 / 18 / 24 | P |
+| SP1 | Spacing on 3 / 6 / 12 / 18 / 24 | P, L |
+| G7 | Orchis' SCSS rounds, spaces and shadows only as R1, SP1 and the elevation table say: a radius 0, a pill, 9 / 15 / 24 or a concentric one this page names (12, 18, 21, 40, 48); spacing 0 or on the grid; a shadow that blurs or casts `$shadow-z16`, `$shadow-z4`, `$elevation-2` or `$elevation-3`, any other a line or a ring. Every other value is listed in `lint-forks.toml` with its reason | L |
 | SP2 | Both bars 6px from the edge; the top bar 36px, the dock 44px | H |
 | T1 | The shell's `stage` is 1em; every size under it in `em` | H |
 | T2 | Weights 400 and 700 only, in the shell and in GTK (TY1) | L, H |
@@ -400,7 +401,7 @@ lint`, **H** the image's harness (`lf:` checks), **N** its needles.
 |---|---|---|
 | `task palette` | brand | contrast of every pair, the tints, the selection, the edges (dark and light), the shell's resting fill, the terminal's colors; ΔE00 per tier under colour-vision deficiencies, IPS and dim panels; the desk and shelf as steps of `d`; whole-pixel radii and an ascending grid |
 | `task wallpaper` | brand | each variant calmer than its mode's default, quiet's levels, the mark's centre, light in ink |
-| `task lint` | brand, over the forks checked out beside it | a color no palette writes, the accent at an alpha that is not a token (C7), an exception nothing needs, a stale copy of the palette |
+| `task lint` | brand, over the forks checked out beside it | a color no palette writes, the accent at an alpha that is not a token (C7), a radius, spacing or shadow off the tables (G7), an exception nothing needs, a stale copy of the palette |
 | harness `lf:` | spin-desktop's image test | St's computed styles through eval, pixel probes inside the chrome's extents, the CSS and gsettings in the guest |
 | needles | spin-desktop's image test | whether any view changed at all |
 

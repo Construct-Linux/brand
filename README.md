@@ -60,7 +60,7 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task wallpaper` | The desktop backgrounds - default, quiet, offset and mark, each dark and light - at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/`; fails unless each variant is calmer than the default |
 | `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
-| `task lint` | Fails if a fork checked out beside brand (`FORKS=..`) writes a color `palette.toml` does not, draws the accent at an alpha that is not a token, or holds a stale copy of the palette (`lint-forks.toml`) |
+| `task lint` | Fails if a fork checked out beside brand (`FORKS=..`) writes a color `palette.toml` does not, draws the accent at an alpha that is not a token, rounds, spaces or shadows off THEMING.md's shape and elevation tables, or holds a stale copy of the palette (`lint-forks.toml`) |
 | `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
 | `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
 
@@ -106,8 +106,8 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
   all draw.
 - `check.py <committed_dir> <regenerated_dir>`: compares a committed directory with a regenerated
   one.
-- `lint.py <forks_dir>`: the forks' colors against the palette, and their copies of it
-  (`lint-forks.toml`).
+- `lint.py <forks_dir>`: the forks' colors, and Orchis' radii, spacing and shadows, against the
+  palette and THEMING.md's tables, and their copies of the palette (`lint-forks.toml`).
 
 ## Plymouth
 
