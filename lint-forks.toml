@@ -14,6 +14,7 @@ files = ["src/_sass/**/*.scss", "src/gnome-shell/**/*.svg", "src/gtk/assets.svg"
 [fork.Orchis-theme.accent]
 "src/_sass/gnome-shell/widgets/_buttons.scss mix(on($primary" = "the shell's primary: on_accent at 8% and 16% over the solid fill for hover and press, and the insensitive label at half opacity, each mixed into one colour, as St draws one background and has no opacity"
 "src/_sass/gnome-shell/widgets/_buttons.scss mix($primary" = "the shell's insensitive primary: the solid accent at half opacity over the raised surface, mixed into one colour for St"
+"src/_sass/gnome-shell/widgets/_calendar-44.scss rgba($primary, 0.02)" = "a focused calendar day's background, which no eye sees: St paints an inset box-shadow (the focus ring) only over a background, and a day has none; 0.02 as St keeps alpha in 8 bits and 0.01 is 0"
 
 [fork.dash-to-panel]
 files = ["src/stylesheet.css"]
