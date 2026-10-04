@@ -302,6 +302,11 @@ thumbnail that follows the style switch. All from `room.py`'s camera and edges. 
 accent on ink; light draws the room in the ink's hue (`light.muted`) on the desk, a technical
 drawing, with no cyan - except the mark, the brand mark.
 
+Each pair is for one thing. The default is the identity: the boot's drawing, held still. Quiet and
+mark are its calm forms, for long sessions: the same drawing at a third of the level, and the mark
+alone in a corner. Offset is functional: the room moved out of where windows open, so they stand
+on an empty field.
+
 | Pair | What | Dark: outline / grid / glow | Light: outline / grid |
 |---|---|---|---|
 | `construct` (default) | the boot's drawing held still, its mark at 0.4222 of the height | 55% / 22% / 0.6 | 50% / 15% |
