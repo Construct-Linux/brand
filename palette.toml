@@ -43,6 +43,9 @@ border = "#2A3843"
 success = "#3DDC97"
 warning = "#FFC857"
 error = "#E8789B"       # leans pink, so deutans still tell it from success (ΔE00 10.6)
+destructive = "#BE364E" # the destructive action's fill, its label white: error is a colour to read
+                        # as text, and dark's pink as a fill read as a disabled button. 2.96:1 on h,
+                        # as libadwaita's own red: the label carries the button
 
 [light]
 accent = "#007A85"
@@ -56,6 +59,7 @@ success = "#226D46"     # darker than the accent: at one lightness teal and gree
                         # tritans; this is ΔE00 7.7 from the accent for them
 warning = "#8F5B00"
 error = "#BE364E"
+destructive = "#BE364E"
 desk = "#DEE4E8"        # the light desktop and the wallpaper's ground: d at 50% over c, so a c window
                         # stands on something (1.18:1); on paper it would stand on itself
 shelf = "#E9EDF0"       # the light sidebar pane: d at 25% over c, a step below the window, as

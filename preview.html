@@ -52,7 +52,9 @@
   .btn.pri { background: var(--accent); color: var(--on-accent); }
   .btn.pri.foc { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sh .btn.pri.foc { outline: 0; box-shadow: inset 0 0 0 2px var(--on-accent); }
-  .btn.des { color: var(--error); }
+  /* The destructive action: solid, the deep red in both modes with a white label. Error is a
+     colour for text; as a fill dark's pink read as a disabled button. */
+  .btn.des { background: var(--destructive); color: #FFFFFF; }
   /* Level 3, selected or on: a tint and accent_text; light adds the neutral line inside it. */
   .picked { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--tint-edge); }
   /* Level 4, indicators: small and full. A switch's track is the accent at .50, the knob full. */

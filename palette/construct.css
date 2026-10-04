@@ -47,6 +47,7 @@
   --shell-success: #3DDC97;
   --shell-warning: #FFC857;
   --shell-error: #E8789B;
+  --shell-destructive: #BE364E;
   color-scheme: dark;
   --bg: #11181E;
   --view: #172028;
@@ -61,6 +62,7 @@
   --success: #3DDC97;
   --warning: #FFC857;
   --error: #E8789B;
+  --destructive: #BE364E;
   --desk: #0B1116;
   --shelf: #11181E;
   --line-divider: #2A3843;
@@ -109,6 +111,7 @@
     --success: #226D46;
     --warning: #8F5B00;
     --error: #BE364E;
+    --destructive: #BE364E;
     --desk: #DEE4E8;
     --shelf: #E9EDF0;
     --line-divider: rgba(83, 102, 114, 0.20);
@@ -157,6 +160,7 @@
   --success: #226D46;
   --warning: #8F5B00;
   --error: #BE364E;
+  --destructive: #BE364E;
   --desk: #DEE4E8;
   --shelf: #E9EDF0;
   --line-divider: rgba(83, 102, 114, 0.20);
@@ -204,6 +208,7 @@
   --success: #3DDC97;
   --warning: #FFC857;
   --error: #E8789B;
+  --destructive: #BE364E;
   --desk: #0B1116;
   --shelf: #11181E;
   --line-divider: #2A3843;

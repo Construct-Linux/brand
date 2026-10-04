@@ -17,7 +17,7 @@ arrives in upstream's color until it is recolored. Each fork's README says what 
 |---|---|
 | `brand` | the logo's cyan, ink (the wallpaper's) and paper; the boot's black, the ground under all that is not a window or the desktop |
 | `neutral` | the surfaces, a-h, on Orchis' scale: a-d light (a brightest), e-h dark (e darkest) |
-| `dark`, `light` | per mode: accent, the accent standing alone (`accent_text`), text on the accent, text, muted text, border, success, warning, error; light's desk (the desktop's ground) and shelf (the sidebar's pane) |
+| `dark`, `light` | per mode: accent, the accent standing alone (`accent_text`), text on the accent, text, muted text, border, success, warning, error, the destructive action's fill; light's desk (the desktop's ground) and shelf (the sidebar's pane) |
 | `tint` | per mode, the accent's alpha over a surface: rest, hover, active; selection; decoration (transient overlays); a switch's track |
 | `line.light` | light's lines: `light.muted` at an alpha, for dividers, borders and the window's ring |
 | `shape` | libadwaita's radius steps, the spacing grid, the bars' distance from the screen edge |
@@ -33,7 +33,7 @@ labels, which must read on white and on every tint. The logo's `#00E5FF` on whit
 
 `palette.py` fails when a pair the desktop draws one on the other is below WCAG 2.2 - 7:1 for
 body text, 4.5:1 for other text (links, muted, success, warning, error, text on the accent and on
-buttons filled with success, warning or error, labels on a tint), 3:1 for parts that are not text
+buttons filled with success, warning or the destructive red, labels on a tint), 3:1 for parts that are not text
 (the accent as a mark, on every surface) - when an edge is below the brand's minimum (below), when
 a pair that carries meaning falls below its perceptual tier ("Perception"), and when Orchis would
 choose a different text color on the accent than the palette's: Orchis picks the text on a fill

@@ -5,8 +5,8 @@ import palette
 # Fails when a fork writes a color that is not in palette.toml - a hex literal or an rgb()/rgba()
 # of numbers, in the files the image builds from - when its SCSS draws the accent at an alpha that
 # is not one of the scale's tokens (C7), when its SCSS rounds, spaces or shadows off THEMING.md's
-# shape and elevation tables (G7), and when a fork's copy of the palette is not what palette/
-# holds now. The exceptions are in lint-forks.toml, each with its reason: a file
+# shape and elevation tables (G7), when its GTK 4 SCSS draws a recolored image GTK 4 leaves
+# uncolored (RECOLOR_SCALED), and when a fork's copy of the palette is not what palette/ holds now. The exceptions are in lint-forks.toml, each with its reason: a file
 # that is not ours to color (apps' content palettes), or one value in one file. An exception
 # nothing matches any more fails too: left in, it would hide the next color written there.
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -60,6 +60,17 @@ TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-dec
 ALPHA = re.compile(rf"\b(?:rgba|alpha|gtkalpha)\(\s*{ACCENT}\s*,\s*([^)]*)\)")
 COLOR_MIX = re.compile(rf"color-mix\(\s*in\s+[\w-]+\s*,\s*{ACCENT}\s+([^,]+),")
 SHADE = re.compile(rf"\b(?:transparentize|lighten|darken)\(\s*{ACCENT}|(?<![\w-])mix\([^;]*?{ACCENT}")
+
+
+# GTK 4.24 does not recolor a -gtk-recolor() image inside -gtk-scaled(): it draws the SVG as it
+# is, black, and Orchis' checks and radios were black circles in GNOME 51 instead of the accent.
+# An SVG needs no @2 for a scale: one -gtk-recolor(url(...svg)). GTK 3 recolors it; its files are
+# not GTK 4's.
+RECOLOR_SCALED = re.compile(r"-gtk-scaled\(\s*-gtk-recolor\(")
+
+
+def gtk3(rel):
+    return "3.20" in rel or "3.0" in rel
 
 
 def accent_alphas(text):
@@ -275,6 +286,10 @@ def literals(forks, rules, allowed):
                         continue
                     line = text.count("\n", 0, pos) + 1
                     problems.append(f"{fork}/{rel}:{line}: {raw}: the accent's alpha is a token (C7)")
+                if not gtk3(rel):
+                    for m in RECOLOR_SCALED.finditer(text):
+                        line = text.count("\n", 0, m.start()) + 1
+                        problems.append(f"{fork}/{rel}:{line}: -gtk-recolor() inside -gtk-scaled(): GTK 4 draws it uncolored")
             if env is not None and path.endswith(".scss"):
                 for line, kind, raw in shape(text, env):
                     key = f"{rel} {kind}"
@@ -321,7 +336,7 @@ def main():
     problems = literals(forks, rules, set(colors_of(p))) + mirrors(forks, p)
     if problems:
         sys.exit("\n".join(problems) + f"\n{len(problems)} problem(s)")
-    print("forks: every color is the palette's, every radius, spacing and shadow the tables', every copy of it current")
+    print("forks: every color is the palette's, every radius, spacing and shadow the tables', every recolored image colored, every copy of it current")
 
 
 main()

@@ -193,8 +193,8 @@ def checks(p):
             for k, need in (("text", BODY), ("muted", TEXT), ("accent", TEXT), ("success", TEXT), ("warning", TEXT), ("error", TEXT)):
                 yield f"dark {k} on raised (shell menus)", m[k], n["h"], need
         # Buttons filled with a semantic color (destructive, success): Orchis puts black or white
-        # on them by brightness, as on the accent.
-        for k in ("success", "warning", "error"):
+        # on them by brightness, as on the accent. Error is never a fill: the destructive red is.
+        for k in ("success", "warning", "destructive"):
             yield f"{mode} text on {k} fill", ORCHIS_DARK_TEXT if orchis_on_dark(m[k]) else "#FFFFFF", m[k], TEXT
         # The accent as a mark - the focus ring, a switch, a slider, the dock's running dot - on
         # every surface the mode draws one on.
@@ -646,7 +646,7 @@ def scss(p):
              ""]
     lines += [f"$construct-bg-{k}: {v};" for k, v in n.items()]
     lines += ["", "// Border, semantic colors: dark and light variant"]
-    for k in ("border", "success", "warning", "error"):
+    for k in ("border", "success", "warning", "error", "destructive"):
         lines += [f"$construct-{k}-light: {d[k]};", f"$construct-{k}-dark: {l[k]};"]
     lines += ["", "// Text: the accent standing alone (labels on a tint, links), body, muted, on a fill of the accent"]
     for k in ("accent_text", "text", "muted", "on_accent"):
