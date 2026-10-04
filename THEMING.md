@@ -27,8 +27,9 @@ arrives in upstream's color until it is recolored. Each fork's README says what 
 | `type` | the wordmark's font; the interface's and apps' monospaced, GNOME's own (Adwaita Sans, regular; Adwaita Mono); the terminal's |
 | `ansi` | per mode, the terminal colors the other groups do not give: blue, magenta, the brights |
 
-Dark is the default. Light keeps the cyan's hue, darkened to `#007A85` so links and selected text
-read on white: the logo's `#00E5FF` on white is 1.5:1.
+Dark is the default. Light keeps the cyan's hue, darkened, as two colors: `#007A85` (`accent`)
+for fills and marks - the primary, indicators, focus - and `#00646D` (`accent_text`) for links and
+labels, which must read on white and on every tint. The logo's `#00E5FF` on white is 1.5:1.
 
 `palette.py` fails when a pair the desktop draws one on the other is below WCAG 2.2 - 7:1 for
 body text, 4.5:1 for other text (links, muted, success, warning, error, text on the accent and on
