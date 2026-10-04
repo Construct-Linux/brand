@@ -121,7 +121,7 @@ accent = "teal"
 wordmark = "Audiowide"
 ui = "Adwaita Sans"         # GNOME's own since 48, regular weight; the image sets no other
 mono = "Adwaita Mono"       # GNOME's monospaced, in apps' code and text editors
-terminal = "JetBrains Mono" # the terminal only: Ghostty's own default, built in
+terminal = "JetBrains Mono" # the terminal only: Ghostty's own, at 11 pt and without ligatures
 
 # The terminal's sixteen colors (Ghostty; VS Code's terminal), on the view surface: g in dark, a
 # in light. Red, green, yellow and cyan are the semantic colors and the accent, black and white
