@@ -16,11 +16,11 @@ $construct-bg-h: #1F2A33;
 $construct-border-light: #2A3843;
 $construct-border-dark: #C9D1D8;
 $construct-success-light: #3DDC97;
-$construct-success-dark: #1B7F4E;
+$construct-success-dark: #226D46;
 $construct-warning-light: #FFC857;
 $construct-warning-dark: #8F5B00;
-$construct-error-light: #FF7A90;
-$construct-error-dark: #C62840;
+$construct-error-light: #E8789B;
+$construct-error-dark: #BE364E;
 
 // Text: the accent standing alone (labels on a tint, links), body, muted, on a fill of the accent
 $construct-accent-text-light: #00E5FF;
@@ -28,7 +28,7 @@ $construct-accent-text-dark: #00646D;
 $construct-text-light: #E6EDF2;
 $construct-text-dark: #11181E;
 $construct-muted-light: #9FB3C0;
-$construct-muted-dark: #5F7380;
+$construct-muted-dark: #536672;
 $construct-on-accent-light: #0B1116;
 $construct-on-accent-dark: #FFFFFF;
 
@@ -37,10 +37,22 @@ $construct-boot: #000000;
 $construct-ink: #0B1116;
 
 // The accent's alpha over a surface: (rest, hover, active), and selection
-$construct-tint-light: (0.16, 0.22, 0.28);
-$construct-tint-dark: (0.10, 0.14, 0.18);
+$construct-tint-light: (0.18, 0.23, 0.28);
+$construct-tint-dark: (0.10, 0.17, 0.24);
 $construct-selection-light: 0.25;
 $construct-selection-dark: 0.20;
+
+// Transient overlays (rubberband, tile preview), with a 1px accent edge; a switch's track
+$construct-tint-decoration-light: 0.08;
+$construct-tint-decoration-dark: 0.05;
+$construct-tint-track-light: 0.50;
+$construct-tint-track-dark: 0.50;
+
+// The light variant only: the desktop's ground, the sidebar's pane, and its lines -
+// $construct-muted-dark at (divider, border, ring)
+$construct-desk: #DEE4E8;
+$construct-shelf: #E9EDF0;
+$construct-lines: (0.20, 0.30, 0.40);
 
 // libadwaita's radius steps; both bars' distance from the screen edge
 $construct-radius-control: 9px;

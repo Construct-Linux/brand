@@ -9,4 +9,28 @@
     <shade_type>solid</shade_type>
     <pcolor>#0B1116</pcolor>
   </wallpaper>
+  <wallpaper deleted="false">
+    <name>CONSTRUCT Quiet</name>
+    <filename>/usr/share/backgrounds/construct/construct-quiet-light.png</filename>
+    <filename-dark>/usr/share/backgrounds/construct/construct-quiet-dark.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0B1116</pcolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>CONSTRUCT Offset</name>
+    <filename>/usr/share/backgrounds/construct/construct-offset-light.png</filename>
+    <filename-dark>/usr/share/backgrounds/construct/construct-offset-dark.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0B1116</pcolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>CONSTRUCT Mark</name>
+    <filename>/usr/share/backgrounds/construct/construct-mark-light.png</filename>
+    <filename-dark>/usr/share/backgrounds/construct/construct-mark-dark.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0B1116</pcolor>
+  </wallpaper>
 </wallpapers>

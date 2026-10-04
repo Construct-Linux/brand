@@ -1,6 +1,8 @@
 <!doctype html>
 <!-- How the desktop looks with the palette: open after task palette wallpaper logo (task preview).
-     Every color comes from palette/construct.css; nothing here is a value of its own. -->
+     Every color comes from palette/construct.css; nothing here is a value of its own.
+     ?mode=light|dark, ?sim=protan|deutan|tritan|ips|dim|low|grey and ?wallpaper=quiet|offset|mark
+     pick the view from the URL, for screenshots and needles. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -14,35 +16,72 @@
   /* GNOME's own faces, as the desktop draws them: Adwaita Sans is variable, every weight in one file. */
   @font-face { font-family: "Adwaita Sans"; src: url("fonts/AdwaitaSans-Regular.ttf"); font-weight: 100 900; }
   @font-face { font-family: "Adwaita Mono"; src: url("fonts/AdwaitaMono-Regular.ttf"); }
-  /* What differs between the modes beyond the palette's own variables: GTK's suggested button is a
-     tint in dark and a fill in light, where the tint's #00646D label would be no better than white
-     on #007A85. Shadows are black, the boot's, at an alpha. */
-  :root { --sug-bg: color-mix(in srgb, var(--accent) var(--tint), var(--alt)); --sug-fg: var(--accent-text);
-          --shadow-1: color-mix(in srgb, var(--brand-boot) 35%, transparent);
-          --shadow-3: color-mix(in srgb, var(--brand-boot) 45%, transparent); }
-  @media (prefers-color-scheme: light) { :root:not([data-mode="dark"]) { --sug-bg: var(--accent); --sug-fg: var(--on-accent); } }
-  :root[data-mode="light"] { --sug-bg: var(--accent); --sug-fg: var(--on-accent); }
+  /* Shadows are black, the boot's, at an alpha: depth on paper, never the edge. Light's are
+     lighter, since there the ring makes the edge too. */
+  :root { --shadow-1: color-mix(in srgb, var(--brand-boot) 35%, transparent);
+          --shadow-3: color-mix(in srgb, var(--brand-boot) 45%, transparent);
+          --wp-dark: url("wallpapers/construct-dark.png"); --wp-light: url("wallpapers/construct-light.png"); }
+  [data-mode="light"] { --shadow-1: color-mix(in srgb, var(--brand-boot) 14%, transparent);
+                        --shadow-3: color-mix(in srgb, var(--brand-boot) 22%, transparent); }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font-ui); }
   main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
-  header.page { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; margin-bottom: 20px; }
-  .word { font-family: var(--font-wordmark); letter-spacing: .35em; font-size: 22px; color: var(--accent); display: flex; align-items: center; gap: 14px; }
+  header.page { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; justify-content: space-between; margin-bottom: 20px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+  .word { font-family: var(--font-wordmark); letter-spacing: .35em; font-size: 22px; color: var(--accent-text); display: flex; align-items: center; gap: 14px; }
   .word img { width: 40px; height: 40px; }
-  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 3px; background: var(--view); }
-  .seg button { font: inherit; border: 0; background: none; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
-  .seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text); }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 40px 0 12px; font-weight: 700; }
-  p.note { color: var(--muted); margin: 0 0 12px; max-width: 70ch; }
+  .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line-border); border-radius: 999px; padding: 3px; background: var(--view); }
+  .seg button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--muted); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text);
+                                      box-shadow: inset 0 0 0 1px var(--tint-edge); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 44px 0 12px; font-weight: 700; }
+  p.note { color: var(--muted); margin: 0 0 12px; max-width: 75ch; }
+
+  /* ---------- the components, once: each draws in the mode's variables; inside .sh the shell's ---------- */
+  /* The shell is Orchis' dark variant in both modes: a .sh block maps the mode's names to it. */
+  .sh { --accent: var(--shell-accent); --accent-text: var(--shell-accent-text); --on-accent: var(--shell-on-accent);
+        --view: var(--shell-surface); --text: var(--shell-text); --muted: var(--shell-muted); --border: var(--shell-border);
+        --line-border: var(--shell-border); --line-divider: var(--shell-border); --tint-edge: transparent;
+        --tint: var(--shell-tint); --tint-hover: var(--shell-tint-hover); --tint-active: var(--shell-tint-active);
+        --tint-deco: var(--shell-tint-deco); --tint-track: var(--shell-tint-track); color: var(--text); }
+  .btn { display: inline-block; padding: .45em 1em; border-radius: var(--radius-control); background: color-mix(in srgb, var(--text) 10%, transparent);
+         color: var(--text); font-weight: 700; font-size: .9em; white-space: nowrap; }
+  /* Level 2, the primary action: solid, one per view. Focus inside it is the label's color in
+     the shell (an accent ring would vanish on the accent), GTK's offset outline elsewhere. */
+  .btn.pri { background: var(--accent); color: var(--on-accent); }
+  .btn.pri.foc { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sh .btn.pri.foc { outline: 0; box-shadow: inset 0 0 0 2px var(--on-accent); }
+  .btn.des { color: var(--error); }
+  /* Level 3, selected or on: a tint and accent_text; light adds the neutral line inside it. */
+  .picked { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--tint-edge); }
+  /* Level 4, indicators: small and full. A switch's track is the accent at .50, the knob full. */
+  .switch { display: inline-block; flex: none; width: 2.6em; height: 1.4em; border-radius: 1em; position: relative; vertical-align: middle;
+            background: color-mix(in srgb, var(--accent) var(--tint-track), var(--view)); }
+  .switch::after { content: ""; position: absolute; right: .15em; top: .15em; width: 1.1em; height: 1.1em; border-radius: 50%; background: var(--accent); }
+  .switch.off { background: var(--line-border); }
+  .switch.off::after { left: .15em; right: auto; background: var(--view); box-shadow: 0 0 0 1px var(--line-border); }
+  .check { width: 1.2em; height: 1.2em; border-radius: .3em; background: var(--accent); color: var(--on-accent); display: inline-grid; place-items: center; font-size: .8em; font-weight: 700; flex: none; }
+  .bar { display: block; height: .4em; border-radius: 1em; background: var(--line-border); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
+  .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--accent); display: inline-block; flex: none; }
+  /* Level 5, focus: the 2px ring, and nothing else rings. */
+  .foc { box-shadow: inset 0 0 0 2px var(--accent); }
+  /* Level 6, links: accent_text, an underline in the accent. */
+  .link { color: var(--accent-text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: .15em; }
+  /* Level 7, decoration: a transient sub-tint with its 1px edge. */
+  .rb { display: inline-block; background: color-mix(in srgb, var(--accent) var(--tint-deco), transparent); border: 1px solid var(--accent); }
+  /* Status never by hue alone: each carries its glyph. */
+  .tags { display: flex; gap: .6em; font-size: .85em; flex-wrap: wrap; }
+  .tags span { padding: .15em .6em; border-radius: 1em; border: 1px solid currentColor; }
 
   /* ---------- the desktop ---------- */
   .desktop { position: relative; aspect-ratio: 16 / 9; width: 100%; border-radius: 12px; overflow: hidden;
-             background: var(--brand-ink) url("wallpapers/construct-dark.png") center / cover; border: 1px solid var(--border);
+             background: var(--desk) var(--wp-dark) center / cover; border: 1px solid var(--line-border);
              container-type: inline-size; font-size: clamp(9px, 1.15cqi, 15px); }
-  @media (prefers-color-scheme: light) { :root:not([data-mode="dark"]) .desktop:not(.ground) { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); } }
-  :root[data-mode="light"] .desktop:not(.ground) { background-image: url("wallpapers/construct-light.png"); background-color: var(--brand-paper); }
-  /* The shell is Orchis' dark variant in both modes (--shell-*). Its top bar and dash-to-panel's
-     dock are level 1: opaque g, ringed all round, var(--inset) from the screen's edge - never black
-     glass, which over ink has no edge (1.07:1) and over paper is a grey. */
+  [data-mode="light"] .desktop:not(.ground) { background-image: var(--wp-light); }
+  /* Its top bar and dash-to-panel's dock are level 1: opaque g, ringed all round, var(--inset)
+     from the screen's edge - never black glass, which over ink has no edge and over paper is a grey. */
   .topbar { position: absolute; inset: var(--inset) var(--inset) auto var(--inset); height: 2.5em; border-radius: 999px;
             background: var(--shell-chrome); border: 1px solid var(--shell-border); color: var(--shell-text);
             display: flex; align-items: center; justify-content: space-between; padding: 0 .5em; font-size: .95em; }
@@ -52,48 +91,44 @@
   .topbar .vitals { display: flex; gap: .9em; }
   .topbar .icons { display: flex; gap: .9em; padding: .3em .8em; border-radius: 999px; }
   .topbar .open { background: color-mix(in srgb, var(--shell-text) 12%, transparent); }
-  .dot { width: .55em; height: .55em; border-radius: 50%; background: var(--shell-accent); display: inline-block; }
+  .topbar .dot { background: var(--shell-accent); }
   .panel { position: absolute; bottom: var(--inset); left: 50%; transform: translateX(-50%); height: 3em; border-radius: var(--radius-surface);
            background: var(--shell-chrome); border: 1px solid var(--shell-border); display: flex; align-items: center; gap: .5em; padding: 0 .4em; }
   .panel .app { width: 2.85em; height: 2.85em; border-radius: var(--radius-control); background: var(--shell-surface); position: relative;
                 display: grid; place-items: center; color: var(--shell-text); font-size: .8em; }
   .panel .app.on::after { content: ""; position: absolute; bottom: -.3em; left: 40%; right: 40%; height: .18em; border-radius: 1em; background: var(--shell-accent); }
-  .panel .app.focus { background: color-mix(in srgb, var(--shell-accent) 14%, var(--shell-chrome)); color: var(--shell-accent-text); }
+  /* The focused app is selected: the rest tint (dash-to-panel's focus-highlight-opacity). */
+  .panel .app.focus { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-chrome)); color: var(--shell-accent-text); }
   .panel .start { background: none; font-size: 1.1em; }
 
-  /* A GTK window, level 1: its body f in dark (c in light), never the desktop's e; views and the
-     headerbar g (a); a 1px ring outside it, then the shadow. */
+  /* A GTK window, level 1: its body f in dark, c on the desk in light; views and the headerbar g
+     (a); the outer ring, then the shadow. The headerbar's rule is the line, in light always. */
   .win { position: absolute; background: var(--bg); color: var(--text); border-radius: var(--radius-surface); overflow: hidden;
-         box-shadow: 0 0 0 1px var(--border), 0 1.2em 3em var(--shadow-3); display: flex; flex-direction: column; }
-  .titlebar { height: 2.6em; display: flex; align-items: center; gap: .6em; padding: 0 .7em; background: var(--view); border-bottom: 1px solid var(--border); flex: none; }
+         box-shadow: 0 0 0 1px var(--line-ring), 0 1.2em 3em var(--shadow-3); display: flex; flex-direction: column; }
+  .titlebar { height: 2.6em; display: flex; align-items: center; gap: .6em; padding: 0 .7em; background: var(--view); box-shadow: inset 0 -1px var(--line-border); flex: none; }
+  [data-mode="light"] .titlebar { background: var(--bg); }
   .titlebar .t { flex: 1; text-align: center; font-weight: 700; }
   .wbtn { width: 1.1em; height: 1.1em; border-radius: 50%; background: color-mix(in srgb, var(--text) 10%, transparent); }
   .files { left: 4%; top: 10%; width: 54%; height: 70%; }
   .files .body { display: flex; flex: 1; min-height: 0; }
-  .side { width: 30%; background: var(--bg); padding: .6em; display: flex; flex-direction: column; gap: .15em; border-right: 1px solid var(--border); }
-  .side div { padding: .35em .6em; border-radius: var(--radius-control); color: var(--text); }
-  .side .sel { background: color-mix(in srgb, var(--accent) var(--tint), var(--bg)); color: var(--accent-text); }
+  /* The sidebar: f in dark, the shelf in light, one step below the content. */
+  .side { width: 30%; background: var(--shelf); padding: .6em; display: flex; flex-direction: column; gap: .15em; box-shadow: inset -1px 0 var(--line-border); }
+  .side div, .nav div { display: flex; align-items: center; gap: .6em; padding: .4em .6em; border-radius: var(--radius-control); color: var(--text); }
+  .side svg, .nav svg { flex: none; }
+  .side .sel, .nav .sel { background: color-mix(in srgb, var(--accent) var(--tint), var(--shelf)); color: var(--accent-text); }
+  /* Light's navigation selection is the sheet: white, the line, the label's weight, and the icon
+     the only cyan left - a 16px mark where dark draws a tint. */
+  [data-mode="light"] :is(.side, .nav) .sel { background: var(--neutral-a); box-shadow: inset 0 0 0 1px var(--line-border); color: var(--text); font-weight: 700; }
+  [data-mode="light"] :is(.side, .nav) .sel svg { color: var(--accent-text); }
+  .nav .hover { background: color-mix(in srgb, var(--neutral-a) 8%, transparent); }
+  [data-mode="light"] .nav .hover { background: color-mix(in srgb, var(--neutral-a) 50%, transparent); }
   .content { flex: 1; padding: .9em; display: flex; flex-direction: column; gap: .8em; overflow: hidden; background: var(--view); }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6em; }
   .fi { display: flex; flex-direction: column; align-items: center; gap: .25em; padding: .4em; border-radius: var(--radius-control); font-size: .85em; }
-  .fi.sel { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text); outline: 2px solid var(--accent); }
   .fi svg { width: 3.4em; height: 3.4em; }
   .row { display: flex; gap: .6em; align-items: center; flex-wrap: wrap; }
-  .btn { padding: .45em 1em; border-radius: var(--radius-control); background: color-mix(in srgb, var(--text) 10%, transparent); color: var(--text); font-weight: 700; font-size: .9em; }
-  .btn.sug { background: var(--sug-bg); color: var(--sug-fg); }
-  .btn.des { color: var(--error); }
   .entry { flex: 1; min-width: 8em; padding: .45em .7em; border-radius: var(--radius-control); background: color-mix(in srgb, var(--text) 6%, var(--view)); border: 0; outline: 2px solid var(--accent); color: var(--text); font: inherit; font-size: .9em; }
   .entry::selection, .term .sel { background: color-mix(in srgb, var(--accent) var(--selection), var(--view)); }
-  .switch { width: 2.6em; height: 1.4em; border-radius: 1em; background: var(--accent); position: relative; }
-  .switch::after { content: ""; position: absolute; right: .15em; top: .15em; width: 1.1em; height: 1.1em; border-radius: 50%; background: var(--on-accent); }
-  .switch.off { background: var(--border); }
-  .switch.off::after { left: .15em; right: auto; background: var(--view); }
-  .check { width: 1.2em; height: 1.2em; border-radius: .3em; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: .8em; font-weight: 700; }
-  .link { color: var(--accent-text); text-decoration: underline; text-decoration-color: var(--accent); }
-  .tags { display: flex; gap: .6em; font-size: .85em; flex-wrap: wrap; }
-  .tags span { padding: .15em .6em; border-radius: 1em; border: 1px solid currentColor; }
-  .bar { height: .4em; border-radius: 1em; background: var(--border); overflow: hidden; }
-  .bar i { display: block; height: 100%; width: 62%; background: var(--accent); }
 
   /* Ghostty with Construct Dark or Light: the terminal is the view, g or a, as Orchis' headerbar
      is, so the window is one surface. */
@@ -107,11 +142,10 @@
   .c5 { color: var(--term-5); } .c6 { color: var(--term-6); } .c8 { color: var(--term-8); }
 
   /* GNOME Shell's menus - quick settings, the calendar, a notification, a tooltip - are level 2: h,
-     the ring, a shadow for depth only; black on ink does not show, the ring makes the edge. OSDs and
-     dialogs are level 3, a deeper shadow. */
+     the ring, a shadow for depth only. OSDs and dialogs are level 3, a deeper shadow. */
   .menu { position: absolute; background: var(--shell-surface); color: var(--shell-text); border-radius: var(--radius-surface);
-          border: 1px solid var(--shell-border); box-shadow: 0 4px 12px var(--shadow-1); }
-  .menu.l3 { box-shadow: 0 12px 28px var(--shadow-3); }
+          border: 1px solid var(--shell-border); box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-boot) 35%, transparent); }
+  .menu.l3 { box-shadow: 0 12px 28px color-mix(in srgb, var(--brand-boot) 45%, transparent); }
   .fill { background: var(--shell-fill); }
   .tooltip { left: 50%; bottom: 3.9em; transform: translateX(-50%); padding: .3em .7em; border-radius: var(--radius-control); font-size: .85em; }
   /* Quick settings, concentric: its pill toggles (radius 22) plus its 18px padding make 40. */
@@ -123,11 +157,15 @@
   .qs .slider i { flex: 1; height: .25em; border-radius: 1em; background: linear-gradient(to right, var(--shell-accent) 42%, var(--shell-border) 42%); position: relative; }
   .qs .slider i::after { content: ""; position: absolute; left: 42%; top: 50%; width: 1em; height: 1em; border-radius: 50%; background: var(--shell-text); transform: translate(-50%, -50%); }
   .qs .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; }
-  .qs .toggles div { border-radius: 999px; padding: .65em 1em; line-height: 1.2; font-weight: 700; }
-  .qs .toggles small { display: block; font-weight: 400; font-size: .8em; color: var(--shell-muted); }
-  .qs .toggles .on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
-  .qs .toggles .on small { color: var(--shell-text); }
-  .qs .toggles .focus { box-shadow: inset 0 0 0 2px var(--shell-accent); }
+  .tg { display: flex; align-items: center; gap: .55em; border-radius: 999px; padding: .5em 1em .5em .5em; line-height: 1.2; font-weight: 700; background: var(--shell-fill); color: var(--shell-text); }
+  .tg small { display: block; font-weight: 400; font-size: .8em; color: var(--shell-muted); }
+  .tg .ic { width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  /* On: the tint and its label, and the icon on a 24px accent disc - on and off are 1.18:1 at
+     30% backlight and the label alone is a hue step protans barely see. */
+  .tg.on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  .tg.on small { color: var(--shell-text); }
+  .tg.on .ic { background: var(--shell-accent); color: var(--shell-on-accent); }
+  .tg.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal { left: 30%; top: 3.3em; width: 56%; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius-sheet); }
   .cal .msgs { padding: 1em; display: flex; flex-direction: column; gap: .6em; border-right: 1px solid var(--shell-border); }
   .cal .note { border-radius: var(--radius-control); padding: .7em .9em; font-size: .9em; }
@@ -135,86 +173,158 @@
   .cal .note span { color: var(--shell-muted); }
   .cal .clear { margin-top: auto; align-self: flex-start; padding: .3em .9em; border-radius: 999px; }
   .cal .when { padding: 1em; display: flex; flex-direction: column; gap: .6em; }
-  .cal .day { color: var(--shell-muted); font-size: 1.1em; }
+  .cal .day-name { color: var(--shell-muted); font-size: 1.1em; }
   .cal .date { font-size: 1.4em; margin-top: -.4em; }
   .cal .month { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: .85em; row-gap: .3em; }
-  .cal .month span { justify-self: center; width: 2.1em; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; }
-  .cal .month .h { color: var(--shell-muted); }
-  .cal .month .o { color: var(--shell-muted); }
-  .cal .month .t { box-shadow: inset 0 0 0 2px var(--shell-accent); color: var(--shell-accent-text); }
-  .cal .month .s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  .cal .month span { justify-self: center; }
+  .day { width: 2.1em; aspect-ratio: 1; display: inline-grid; place-items: center; border-radius: 50%; }
+  .day.h, .day.o { color: var(--shell-muted); }
+  /* Today is a label, not a ring: accent_text at 700. The ring is focus. */
+  .day.t { color: var(--shell-accent-text); font-weight: 700; }
+  .day.s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  .day.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal .box { border-radius: var(--radius-control); padding: .5em .8em; font-size: .9em; }
   .cal .box b { display: block; }
   .cal .box i { color: var(--shell-muted); }
   .osd { left: 50%; bottom: 5em; transform: translateX(-50%); padding: .7em 1.1em; display: flex; align-items: center; gap: .8em; width: 22%; border-radius: 999px; }
   .osd i { flex: 1; height: .3em; border-radius: 1em; background: linear-gradient(to right, var(--shell-accent) 70%, var(--shell-border) 70%); }
-  svg.i { width: 1.1em; height: 1.1em; vertical-align: -.15em; color: inherit; }
+  /* A level-3 prompt: the one primary, solid, its focus the label's color inside it. */
+  .auth { left: 9%; top: 34%; width: 34%; border-radius: var(--radius-sheet); padding: 1.4em 1.4em 1em; text-align: center; }
+  .auth b { display: block; font-size: 1.15em; }
+  .auth p { color: var(--shell-muted); margin: .4em 0 1em; font-size: .9em; }
+  .auth .pw { border-radius: 999px; padding: .5em 1em; text-align: left; letter-spacing: .3em; box-shadow: inset 0 0 0 2px var(--shell-accent); margin-bottom: 1em; }
+  .auth .btns { display: grid; grid-template-columns: 1fr 1fr; gap: .6em; }
+  .auth .btns .btn { border-radius: 999px; text-align: center; padding: .6em; }
+  svg.i { width: 1.1em; height: 1.1em; vertical-align: -.15em; color: inherit; flex: none; }
   .cursor { position: absolute; left: 47%; top: 60%; width: 1.6em; filter: drop-shadow(0 .1em .15em var(--shadow-3)); }
 
-  /* The overview: the ground is the boot's black, and the workspace - the desktop, ink - a card on it. */
+  /* The overview: the ground is the boot's black, and the workspace - the desktop - a card on it. */
   .desktop.ground { background: var(--brand-boot); }
   .search { position: absolute; left: 50%; top: 4.2em; transform: translateX(-50%); width: 30%; height: 2.4em; border-radius: 999px;
             background: var(--shell-surface); border: 1px solid var(--shell-border); color: var(--shell-muted);
             display: flex; align-items: center; gap: .6em; padding: 0 1em; font-size: .95em; }
   .workspace { position: absolute; left: 50%; top: 8.6em; transform: translateX(-50%); width: 62%; aspect-ratio: 16 / 10;
-               border-radius: var(--radius-sheet); background: var(--brand-ink) url("wallpapers/construct-dark.png") center / cover; overflow: hidden; }
+               border-radius: var(--radius-sheet); background: var(--desk) var(--wp-dark) center / cover; overflow: hidden; }
+  [data-mode="light"] .workspace { background-image: var(--wp-light); }
 
-  /* ---------- the rules, one strip each ---------- */
-  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-  .lvl { border-radius: 12px; padding: 14px; min-height: 92px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; color: var(--shell-text); }
-  .lvl b { font-weight: 700; } .lvl span { color: var(--shell-muted); }
-  .marks { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
-  .chip { border-radius: var(--radius-control); padding: 10px 14px; font-size: 13px; background: var(--shell-surface); color: var(--shell-text); border: 1px solid var(--shell-border); }
-  .chip.t1 { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
-  .chip.t2 { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-hover), var(--shell-surface)); color: var(--shell-accent-text); }
-  .chip.t3 { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-active), var(--shell-surface)); color: var(--shell-accent-text); }
-  .chip.m1 { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text); border-color: var(--border); }
-  .chip.m2 { background: color-mix(in srgb, var(--accent) var(--tint-hover), var(--view)); color: var(--accent-text); border-color: var(--border); }
-  .chip.m3 { background: color-mix(in srgb, var(--accent) var(--tint-active), var(--view)); color: var(--accent-text); border-color: var(--border); }
-  .chip.sel { background: color-mix(in srgb, var(--accent) var(--selection), var(--view)); color: var(--text); border-color: var(--border); }
-  .chip.focus { box-shadow: inset 0 0 0 2px var(--shell-accent); }
+  /* ---------- the accent's scale ---------- */
+  .scale { display: grid; gap: 10px; }
+  .lv { display: grid; grid-template-columns: 170px 1fr 1fr; gap: 10px; align-items: stretch; }
+  .lv > div:first-child { display: flex; flex-direction: column; justify-content: center; font-size: 14px; }
+  .lv > div:first-child span { color: var(--muted); font-size: 13px; }
+  .demo { border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-height: 64px; font-size: 14px; }
+  .demo.sh { background: var(--shell-surface); border: 1px solid var(--shell-border); }
+  .demo.md { background: var(--view); border: 1px solid var(--line-border); }
+  .demo.wp { background: var(--desk) var(--wp-dark) center / contain no-repeat; border: 1px solid var(--line-border); }
+  [data-mode="light"] .demo.wp { background-image: var(--wp-light); }
+  .demo .tg { font-size: 14px; }
+  .demo .rowx { padding: .4em .7em; border-radius: var(--radius-control); }
+  .thumb { width: 92px; aspect-ratio: 16 / 10; border-radius: 8px; background: var(--desk) var(--wp-dark) center / cover; position: relative; }
+  [data-mode="light"] .thumb { background-image: var(--wp-light); }
+  /* Selected on imagery: a 2px frame in the text color and the accent's check badge - no accent
+     ring, which would read as focus. */
+  .thumb.picked-img { box-shadow: 0 0 0 2px var(--text); }
+  .thumb .badge { position: absolute; right: -6px; top: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+                  display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .lineup { margin-top: 10px; justify-content: space-between; }
+  @media (max-width: 640px) { .lv { grid-template-columns: 1fr; } }
+
+  /* ---------- light: ink on paper ---------- */
+  .settings { left: 7%; top: 10%; width: 72%; height: 80%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
+  .settings .pane { background: var(--shelf); box-shadow: inset -1px 0 var(--line-border); display: flex; flex-direction: column; min-width: 0; }
+  /* Both headerbars one height, so their rules run as one line across the window. */
+  .hb { height: 3em; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 -1px var(--line-border); flex: none; line-height: 1.2; position: relative; }
+  .hb b { font-weight: 700; }
+  .hb small { color: var(--muted); font-size: .82em; }
+  .hb .mb { position: absolute; right: .7em; top: 50%; transform: translateY(-50%); width: 1.9em; height: 1.9em; border-radius: var(--radius-control); display: grid; place-items: center;
+            background: color-mix(in srgb, var(--text) 8%, transparent); }
+  .nav { padding: .5em; display: flex; flex-direction: column; gap: .15em; }
+  .nav .cap { font-size: .82em; font-weight: 700; color: var(--muted); padding: .9em .6em .3em; }
+  .page { background: var(--bg); display: flex; flex-direction: column; min-width: 0; position: relative; }
+  .page .body { padding: 1.6em 2em; display: flex; flex-direction: column; gap: 1.6em; width: 100%; max-width: 40em; margin: 0 auto; overflow: hidden; }
+  .group h4 { margin: 0; font-size: 1em; font-weight: 700; }
+  .group > p { margin: .2em 0 0; color: var(--muted); font-size: .82em; }
+  .list { margin-top: .8em; background: var(--view); border-radius: 12px; box-shadow: 0 0 0 1px var(--line-border); overflow: hidden; }
+  .list > div { display: flex; align-items: center; gap: .8em; padding: .7em 1em; }
+  .list > div + div { box-shadow: inset 0 1px var(--line-divider); }
+  .list .tx { flex: 1; min-width: 0; }
+  .list .tx small { display: block; color: var(--muted); font-size: .82em; margin-top: .2em; }
+  .list .val { color: var(--muted); }
+  .page .foot { display: flex; justify-content: flex-end; gap: .6em; }
+  .pop { position: absolute; right: .6em; top: 3.4em; background: var(--view); border-radius: var(--radius-surface); padding: .4em; min-width: 11em;
+         box-shadow: 0 0 0 1px var(--line-border), 0 .2em .6em var(--shadow-1); font-size: .95em; z-index: 1; }
+  .pop div { padding: .45em .8em; border-radius: var(--radius-control); }
+  .pop .h { background: color-mix(in srgb, var(--text) 6%, transparent); }
+  .pop hr { border: 0; height: 1px; background: var(--line-divider); margin: .3em .4em; }
+  .lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+  .lines > div { background: var(--neutral-a); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 13px; }
+  .lines .sample { height: 56px; border-radius: 10px; margin: 10px 0 6px; background: var(--neutral-a); }
+  .types { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 28px; padding: 16px 20px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-border); margin-top: 12px; }
+  .types span { white-space: nowrap; }
+  .types small { color: var(--muted); font-size: 9pt; font-weight: 400; margin-left: .4em; }
+
+  /* ---------- elevation, shape, swatches, identity ---------- */
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; padding: 12px; border-radius: 12px; }
+  .lvl { border-radius: 12px; padding: 14px; min-height: 92px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; color: var(--text); }
+  .lvl b { font-weight: 700; } .lvl span { color: var(--muted); }
   .shape { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
-  .shape div { background: var(--view); border: 1px solid var(--border); color: var(--muted); font-size: 12px; display: grid; place-items: center; text-align: center; }
+  .shape div { background: var(--view); border: 1px solid var(--line-border); color: var(--muted); font-size: 12px; display: grid; place-items: center; text-align: center; }
   .shape .r1 { width: 90px; height: 40px; border-radius: var(--radius-control); }
   .shape .r2 { width: 130px; height: 90px; border-radius: var(--radius-surface); }
   .shape .r3 { width: 170px; height: 120px; border-radius: var(--radius-sheet); }
   .shape .r4 { width: 120px; height: 36px; border-radius: 999px; }
   .shape .qsr { width: 200px; height: 120px; border-radius: calc(22px + 18px); padding: 18px; background: var(--shell-surface); border-color: var(--shell-border); }
   .shape .qsr i { display: grid; place-items: center; width: 100%; height: 44px; border-radius: 999px; background: var(--shell-fill); color: var(--shell-text); font-style: normal; }
-
-  /* ---------- swatches ---------- */
   .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .s { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--view); }
+  .s { border: 1px solid var(--line-border); border-radius: 10px; overflow: hidden; background: var(--view); }
   .s i { display: block; height: 56px; }
   .s div { padding: 8px 10px; font-size: 13px; }
   .s code { font: 12px var(--font-mono); color: var(--muted); display: block; }
   .ident { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
-  .card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--view); }
+  .card { border: 1px solid var(--line-border); border-radius: 12px; overflow: hidden; background: var(--view); }
   .card .img { aspect-ratio: 16 / 10; display: grid; place-items: center; position: relative; }
   .card .img img { max-width: 70%; max-height: 80%; }
+  .card .pair { display: grid; grid-template-columns: 1fr 1fr; }
+  .card .pair img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
   /* Plymouth's frame placed as the theme places it: the mark's centre (0.4329 of the frame,
      sequence.json) at 0.4222 of the screen's height, where the wallpaper draws it. */
   .card .img img.boot { position: absolute; height: 80%; max-height: none; left: 50%; top: calc(42.22% - 80% * .4329); transform: translateX(-50%); }
   .card div.c { padding: 10px 12px; font-size: 13px; color: var(--muted); }
   .card div.c b { color: var(--text); display: block; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  td, th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td, th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line-divider); vertical-align: top; }
   th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
-  td code { font: 13px var(--font-mono); color: var(--accent-text); }
+  td code { font: 13px var(--font-mono); color: var(--text); }
   .scroll { overflow-x: auto; }
-  @media (max-width: 640px) { .term, .qs, .cal, .workspace { display: none; } .files { width: 88%; } .search { width: 70%; } }
+  /* The perception table: every pair task palette holds, its worst view marked. */
+  #perception { max-height: 560px; overflow: auto; border: 1px solid var(--line-border); border-radius: 12px; background: var(--view); }
+  #perception table { font-size: 13px; }
+  #perception th { position: sticky; top: 0; background: var(--view); box-shadow: inset 0 -1px var(--line-border); }
+  #perception td { padding: 6px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  #perception td.n { text-align: right; color: var(--muted); }
+  #perception td.w { color: var(--text); font-weight: 700; }
+  #perception .pair { display: inline-flex; vertical-align: middle; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px var(--line-border); margin-right: 8px; }
+  #perception .pair i { width: 18px; height: 18px; }
+  #perception .ok { color: var(--success); } #perception .low { color: var(--error); font-weight: 700; }
+  @media (max-width: 640px) { .term, .qs, .cal, .workspace, .pop { display: none; } .files { width: 88%; } .search { width: 70%; } .settings { width: 92%; left: 4%; } }
 </style>
 </head>
 <body>
 <main>
   <header class="page">
     <div class="word"><img src="logos/construct.svg" alt="">CONSTRUCT</div>
-    <div class="seg" role="group" aria-label="Mode">
-      <button data-set="">System</button><button data-set="dark">Dark</button><button data-set="light">Light</button>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Mode" id="mode">
+        <button data-v="">System</button><button data-v="dark">Dark</button><button data-v="light">Light</button>
+      </div>
+      <div class="seg" role="group" aria-label="See as" id="sim"><button data-v="">As drawn</button></div>
+      <div class="seg" role="group" aria-label="Wallpaper" id="wallpaper">
+        <button data-v="">Default</button><button data-v="quiet">Quiet</button><button data-v="offset">Offset</button><button data-v="mark">Mark</button>
+      </div>
     </div>
   </header>
 
-  <div class="desktop" aria-label="The desktop with the palette">
+  <div class="desktop sim" aria-label="The desktop with the palette">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -228,19 +338,22 @@
     <div class="win files">
       <div class="titlebar"><span class="wbtn"></span><span class="t">Projects</span><span class="wbtn"></span><span class="wbtn"></span></div>
       <div class="body">
-        <div class="side"><div>Home</div><div class="sel">Projects</div><div>Downloads</div><div>Pictures</div><div>Trash</div></div>
+        <div class="side">
+          <div><svg class="i"><use href="#i-home"/></svg>Home</div><div class="sel"><svg class="i"><use href="#i-dir"/></svg>Projects</div>
+          <div><svg class="i"><use href="#i-dir"/></svg>Downloads</div><div><svg class="i"><use href="#i-dir"/></svg>Pictures</div><div><svg class="i"><use href="#i-trash"/></svg>Trash</div>
+        </div>
         <div class="content">
           <div class="grid">
             <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>os</div>
-            <div class="fi sel"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>brand</div>
+            <div class="fi picked"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>brand</div>
             <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>Orchis-theme</div>
             <div class="fi"><svg viewBox="0 0 64 64"><use href="#folder"/></svg>tilingshell</div>
           </div>
-          <div class="row"><input class="entry" value="palette.toml" aria-label="Search"><span class="btn">Cancel</span><span class="btn sug">Open</span><span class="btn des">Delete</span></div>
+          <div class="row"><input class="entry" value="palette.toml" aria-label="Search"><span class="btn">Cancel</span><span class="btn pri">Open</span><span class="btn des">Delete</span></div>
           <div class="row"><span class="switch"></span> Show hidden files <span class="switch off"></span> Thumbnails <span class="check">✓</span> Sort folders first</div>
           <div class="bar"><i></i></div>
           <div class="row" style="font-size:.9em">Copying 12 of 19 files · <span class="link">Show details</span></div>
-          <div class="tags"><span style="color:var(--success)">Verified</span><span style="color:var(--warning)">Update pending</span><span style="color:var(--error)">Rollback</span></div>
+          <div class="tags"><span style="color:var(--success)">✓ Verified</span><span style="color:var(--warning)">! Update pending</span><span style="color:var(--error)">↺ Rollback</span></div>
         </div>
       </div>
     </div>
@@ -252,8 +365,8 @@
   13.94  <span class="c2">ok</span>  dark text on view
    7.52  <span class="c2">ok</span>  <span class="sel">dark text on selection</span>
 <span class="c6">~/construct</span> $ git log --oneline -2
-<span class="c3">375a6b8</span> <span class="c4">(HEAD -&gt; main)</span> Name the fonts
-<span class="c3">72028c9</span> <span class="c5">Lift</span> the shell's menus <span class="c1">off</span> the ink
+<span class="c3">19bf42d</span> <span class="c4">(HEAD -&gt; main)</span> Give the palette elevation
+<span class="c3">375a6b8</span> <span class="c5">Name</span> the fonts <span class="c1">the desktop</span> draws with
 <span class="c6">~/construct</span> $ <span class="caret"> </span></pre>
       <div class="ansi" aria-label="The sixteen colors">
         <i style="background:var(--term-0)"></i><i style="background:var(--term-1)"></i><i style="background:var(--term-2)"></i><i style="background:var(--term-3)"></i>
@@ -271,11 +384,11 @@
       <div class="app on focus">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
     </div>
   </div>
-  <p class="note" style="margin-top:10px">Files on the left and Ghostty on the right; the top bar and the dock are GNOME Shell with Orchis, dash-to-panel and Vitals: opaque, ringed, 6px from the edge, dark in both modes. The windows follow the mode: the body one step above the desktop, the headerbar and views one more, a 1px ring outside. The dock's label is a menu, level 2. The cursor is the Bibata shape in the cursor colors; the folders are Tela's in the folder color.</p>
+  <p class="note" style="margin-top:10px">Files on the left and Ghostty on the right; the top bar and the dock are GNOME Shell with Orchis, dash-to-panel and Vitals: opaque, ringed, 6px from the edge, dark in both modes. The windows follow the mode. Dark: the body one step above the desktop, views one more, a 1px ring outside. Light: the window on the desk with its ring in the ink's hue, the sidebar a shelf below it, the selected place a white sheet. The selected folder is a tint, Open the one solid button, the entry the one ring.</p>
 
   <h2>The shell's menus</h2>
-  <p class="note">Quick settings and the calendar open, and the volume OSD: on the raised surface, ringed in the border colour, one step above the bar they hang from. Toggles that are on and the selected day are tints, labelled in the accent; today is a ring; the focused toggle carries the focus ring.</p>
-  <div class="desktop" aria-label="Quick settings open">
+  <p class="note">Quick settings open with a password prompt, then the calendar. Toggles that are on are a tint with their icon on an accent disc; the focused toggle and the focused day carry the ring; today is accent text in bold, never a ring; the selected day is a tint. The prompt's Authenticate is the solid primary.</p>
+  <div class="desktop sim" aria-label="Quick settings open, and a prompt">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -289,10 +402,19 @@
       <div class="top"><span class="fill"><svg class="i"><use href="#i-shot"/></svg></span><span class="fill"><svg class="i"><use href="#i-gear"/></svg></span><span class="gap"></span><span class="fill"><svg class="i"><use href="#i-lock"/></svg></span><span class="fill"><svg class="i"><use href="#i-power"/></svg></span></div>
       <div class="slider"><svg class="i"><use href="#i-vol"/></svg><i></i></div>
       <div class="toggles">
-        <div class="on">Wired<small>Connected</small></div><div class="fill">Power Mode<small>Balanced</small></div>
-        <div class="fill focus">Night Light</div><div class="on">Dark Style</div>
-        <div class="fill">Do Not Disturb</div><div class="fill">Caffeine</div>
+        <div class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span><span>Wired<small>Connected</small></span></div>
+        <div class="tg"><span class="ic"><svg class="i"><use href="#i-gauge"/></svg></span><span>Power Mode<small>Balanced</small></span></div>
+        <div class="tg foc"><span class="ic"><svg class="i"><use href="#i-sun"/></svg></span>Night Light</div>
+        <div class="tg on"><span class="ic"><svg class="i"><use href="#i-moon"/></svg></span>Dark Style</div>
+        <div class="tg"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</div>
+        <div class="tg"><span class="ic"><svg class="i"><use href="#i-cup"/></svg></span>Caffeine</div>
       </div>
+    </div>
+    <div class="menu l3 auth sh">
+      <b>Authentication Required</b>
+      <p>Authentication is needed to change the system's update channel.</p>
+      <div class="pw fill">••••••••</div>
+      <div class="btns"><span class="btn">Cancel</span><span class="btn pri">Authenticate</span></div>
     </div>
     <div class="panel">
       <div class="app start">⠿</div>
@@ -300,7 +422,7 @@
     </div>
   </div>
 
-  <div class="desktop" aria-label="The calendar open" style="margin-top:16px">
+  <div class="desktop sim" aria-label="The calendar open" style="margin-top:16px">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -317,18 +439,16 @@
         <span class="clear fill">Clear</span>
       </div>
       <div class="when">
-        <span class="day">Saturday</span><span class="date">October 3 2026</span>
+        <span class="day-name">Saturday</span><span class="date">October 3 2026</span>
         <div class="month">
-          <span class="h">S</span><span class="h">M</span><span class="h">T</span><span class="h">W</span><span class="h">T</span><span class="h">F</span><span class="h">S</span>
-          <span class="o">27</span><span class="o">28</span><span class="o">29</span><span class="o">30</span><span>01</span><span>02</span><span class="t">03</span>
-          <span>04</span><span>05</span><span>06</span><span>07</span><span class="s">08</span><span>09</span><span>10</span>
-          <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+          <span class="day h">S</span><span class="day h">M</span><span class="day h">T</span><span class="day h">W</span><span class="day h">T</span><span class="day h">F</span><span class="day h">S</span>
+          <span class="day o">27</span><span class="day o">28</span><span class="day o">29</span><span class="day o">30</span><span class="day">01</span><span class="day">02</span><span class="day t">03</span>
+          <span class="day">04</span><span class="day">05</span><span class="day">06</span><span class="day">07</span><span class="day s">08</span><span class="day">09</span><span class="day">10</span>
+          <span class="day">11</span><span class="day">12</span><span class="day">13</span><span class="day foc">14</span><span class="day">15</span><span class="day">16</span><span class="day">17</span>
         </div>
         <div class="box fill"><b>Thursday</b><i>No Events</i></div>
-        <div class="box fill">Add World Clocks…</div>
       </div>
     </div>
-    <div class="menu osd l3"><svg class="i"><use href="#i-vol"/></svg><i></i></div>
     <div class="panel">
       <div class="app start">⠿</div>
       <div class="app on">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
@@ -336,8 +456,8 @@
   </div>
 
   <h2>The overview</h2>
-  <p class="note">The ground is the boot's black, in both modes; the workspace, the desktop's ink, is a card on it, lighter than what it stands on. The search entry is a menu surface: h and the ring.</p>
-  <div class="desktop ground" aria-label="The overview">
+  <p class="note">The ground is the boot's black, in both modes; the workspace, the desktop, is a card on it, lighter than what it stands on. The search entry is a menu surface: h and the ring.</p>
+  <div class="desktop ground sim" aria-label="The overview">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right"><span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span><span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span></div>
@@ -350,26 +470,132 @@
     </div>
   </div>
 
-  <h2>Elevation</h2>
-  <p class="note">Each level one step lighter on the ink scale; in dark the 1px ring makes the edge, since black shadows do not show on ink.</p>
-  <div class="strip" style="background:var(--brand-boot);padding:12px;border-radius:12px">
-    <div class="lvl" style="background:var(--brand-boot);border:1px dashed var(--shell-border)"><b>ground</b><span>boot · Plymouth, overview, lock</span></div>
-    <div class="lvl" style="background:var(--neutral-e)"><b>0 · e</b><span>the desktop, the wallpaper</span></div>
-    <div class="lvl" style="background:var(--neutral-f);box-shadow:0 0 0 1px var(--shell-border)"><b>1 · f</b><span>a GTK window's body, ring</span></div>
-    <div class="lvl" style="background:var(--shell-chrome);border:1px solid var(--shell-border)"><b>1 · g</b><span>top bar, dock, headerbar, views</span></div>
-    <div class="lvl" style="background:var(--shell-surface);border:1px solid var(--shell-border);box-shadow:0 4px 12px var(--shadow-1)"><b>2 · h</b><span>menus, popovers, tooltips</span></div>
-    <div class="lvl" style="background:var(--shell-surface);border:1px solid var(--shell-border);box-shadow:0 12px 28px var(--shadow-3)"><b>3 · h</b><span>dialogs, OSDs</span></div>
+  <h2>Accent: one scale</h2>
+  <p class="note">Seven levels, strongest first. Each owns one channel no other uses: the mark's shape, a solid fill, a small full mark, a ring, an underline, a tint with no edge, a transient sub-tint. The left column is the shell, dark in both modes; the right is GTK in this mode. "See as" at the top shows the page as protanopia, deuteranopia and tritanopia see it (Machado 2009), on an IPS panel, on an OLED at 30%, at 30% backlight in a lit room, and in grey.</p>
+  <div class="scale sim" id="scale">
+    <div class="lv"><div><b>1 Brand</b><span>the mark, boot, wallpaper; never chrome</span></div>
+      <div class="demo" style="background:var(--brand-ink);border:1px solid var(--shell-border)"><img src="logos/construct.svg" alt="" style="height:44px"><span style="font-family:var(--font-wordmark);letter-spacing:.35em;color:var(--brand-cyan)">CONSTRUCT</span></div>
+      <div class="demo wp"></div></div>
+    <div class="lv"><div><b>2 Primary</b><span>one per view, solid; focus inside it</span></div>
+      <div class="demo sh"><span class="btn">Cancel</span><span class="btn pri">Authenticate</span><span class="btn pri foc">Focused</span></div>
+      <div class="demo md"><span class="btn">Cancel</span><span class="btn pri">Open</span><span class="btn pri foc">Focused</span></div></div>
+    <div class="lv"><div><b>3 Selected, on</b><span>a tint, no edge; light adds its line</span></div>
+      <div class="demo sh"><span class="tg"><span class="ic"><svg class="i"><use href="#i-sun"/></svg></span>Night Light</span><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="day s">08</span></div>
+      <div class="demo md"><span class="rowx picked">Projects</span><span class="rowx">Downloads</span><span class="btn picked" style="font-weight:700">Month</span><span class="btn">Week</span></div></div>
+    <div class="lv"><div><b>3a Text selection</b><span>one alpha; the text keeps its color</span></div>
+      <div class="demo sh"><span>Search <span style="background:color-mix(in srgb,var(--shell-accent) var(--shell-selection),var(--shell-surface))">palette</span> files</span></div>
+      <div class="demo md"><span>Search <span style="background:color-mix(in srgb,var(--accent) var(--selection),var(--view))">palette</span> files</span></div></div>
+    <div class="lv"><div><b>3b Selected on imagery</b><span>a text frame and a badge, no ring</span></div>
+      <div class="demo sh"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div>
+      <div class="demo md"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div></div>
+    <div class="lv"><div><b>4 Indicator</b><span>small, full accent</span></div>
+      <div class="demo sh"><span class="switch"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div>
+      <div class="demo md"><span class="switch"></span><span class="switch off"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div></div>
+    <div class="lv"><div><b>5 Focus</b><span>a 2px ring; nothing else rings</span></div>
+      <div class="demo sh"><span class="tg foc"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</span><span class="tg on foc"><span class="ic"><svg class="i"><use href="#i-moon"/></svg></span>Dark Style</span><span class="day foc">14</span><span class="day t" title="Today: accent text, bold">03</span></div>
+      <div class="demo md"><span class="rowx foc">Downloads</span><span class="rowx picked foc">Projects</span><span class="btn" style="outline:2px solid var(--accent);outline-offset:2px">Cancel</span></div></div>
+    <div class="lv"><div><b>6 Link</b><span>accent text, underlined</span></div>
+      <div class="demo sh"><span class="link">Show details</span></div>
+      <div class="demo md"><span class="link">Show details</span></div></div>
+    <div class="lv"><div><b>7 Decoration</b><span>transient overlays, the wallpaper</span></div>
+      <div class="demo sh" style="background:var(--shell-bg)"><span class="rb" style="width:140px;height:56px"></span></div>
+      <div class="demo md"><span class="rb" style="width:140px;height:56px"></span></div></div>
+  </div>
+  <div class="lineup demo sh sim" aria-label="Every level side by side on h">
+    <img src="logos/construct.svg" alt="" style="height:28px"><span class="btn pri">Authenticate</span>
+    <span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span>
+    <span class="switch"></span><span class="tg foc"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</span>
+    <span class="link">Show details</span><span class="rb" style="width:64px;height:32px"></span>
   </div>
 
-  <h2>Accent: marks and tints</h2>
-  <p class="note">The full accent only on marks; anything larger is the accent at an alpha over its surface, labelled in the accent's text color - rest, hover, active - and selection at one alpha. Muted text never goes on a tint.</p>
-  <div class="marks">
-    <span class="chip" style="display:flex;gap:10px;align-items:center"><span class="switch" style="font-size:12px"></span><span class="bar" style="width:70px"><i style="background:var(--shell-accent)"></i></span><span class="dot"></span>marks</span>
-    <span class="chip focus">focus ring</span>
-    <span class="chip t1">shell rest</span><span class="chip t2">hover</span><span class="chip t3">active</span>
-    <span class="chip m1">this mode rest</span><span class="chip m2">hover</span><span class="chip m3">active</span>
-    <span class="chip sel">selected text</span>
+  <h2>Light: ink on paper</h2>
+  <p class="note">Dark is the wireframe glowing on ink; light is the same room as a technical drawing, with no more cyan. The window stands on the desk with a ring in the ink's hue, the sidebar is a shelf below it, every line is the muted ink at an alpha, the headerbars' rules run as one line, and the selected place is a white sheet with its label in bold and only its icon in the accent. Drawn light whatever the mode.</p>
+  <div data-mode="light" style="background:none">
+    <div class="desktop sim" aria-label="Settings in light mode">
+      <div class="topbar">
+        <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
+        <div class="right"><span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span><span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span></div>
+      </div>
+      <div class="win settings">
+        <div class="pane">
+          <div class="hb"><b>Settings</b></div>
+          <div class="nav">
+            <div><svg class="i"><use href="#i-wifi"/></svg>Wi-Fi</div>
+            <div><svg class="i"><use href="#i-net"/></svg>Network</div>
+            <div class="hover"><svg class="i"><use href="#i-bt"/></svg>Bluetooth</div>
+            <span class="cap">Devices</span>
+            <div class="sel"><svg class="i"><use href="#i-display"/></svg>Displays</div>
+            <div><svg class="i"><use href="#i-vol"/></svg>Sound</div>
+            <div><svg class="i"><use href="#i-power"/></svg>Power</div>
+          </div>
+        </div>
+        <div class="page">
+          <div class="hb"><b>Displays</b><small>Built-in display</small><span class="mb"><svg class="i"><use href="#i-menu"/></svg></span></div>
+          <div class="pop"><div>Identify Displays</div><div class="h">Night Light…</div><hr><div>Help</div></div>
+          <div class="body">
+            <div class="group">
+              <h4>Display</h4>
+              <p>The built-in panel, 2880 × 1800</p>
+              <div class="list">
+                <div><span class="tx">Scale<small>Text and windows</small></span><span class="val">150%</span></div>
+                <div><span class="tx">Refresh Rate</span><span class="val">120 Hz</span></div>
+                <div><span class="tx">Variable Refresh Rate<small>Matches the panel to the content</small></span><span class="switch"></span></div>
+              </div>
+            </div>
+            <div class="group">
+              <h4>Night Light</h4>
+              <div class="list">
+                <div><span class="tx">Night Light<small>Sunset to sunrise</small></span><span class="switch off"></span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="btn">Cancel</span><span class="btn pri">Apply</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="app start">⠿</div>
+        <div class="app on focus"><svg class="i"><use href="#i-gear"/></svg></div><div class="app on">Files</div><div class="app">Code</div><div class="app">Web</div>
+      </div>
+    </div>
+    <div class="lines sim">
+      <div><b>GNOME's line</b>: black at 12%, no hue<div class="sample" style="box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-boot) 12%,transparent)"></div></div>
+      <div><b>CONSTRUCT's line</b>: the muted ink at 30%<div class="sample" style="box-shadow:0 0 0 1px var(--line-border)"></div></div>
+      <div><b>Divider and ring</b>: 20% inside a list, 40% around a window<div class="sample" style="box-shadow:0 0 0 1px var(--line-ring),inset 0 -28px 0 -27px var(--line-divider)"></div></div>
+    </div>
   </div>
+  <div class="types" aria-label="Type, libadwaita's sizes in Adwaita Sans">
+    <span style="font-size:24pt;font-weight:400">Large title<small>24 / 400</small></span>
+    <span style="font-size:20pt;font-weight:700">Title 1<small>20 / 700</small></span>
+    <span style="font-size:15pt;font-weight:700">Title 2, 3<small>15 / 700</small></span>
+    <span style="font-size:11pt;font-weight:700">Heading<small>11 / 700</small></span>
+    <span style="font-size:11pt">Body<small>11 / 400</small></span>
+    <span style="font-size:9pt;color:var(--muted)">Caption, subtitle<small>9 / 400</small></span>
+    <span style="font-size:11pt;font-variant-numeric:tabular-nums">12:05 · 3.1 GB<small>numeric</small></span>
+  </div>
+
+  <h2>Elevation</h2>
+  <p class="note">Each level one step lighter on the ink scale; in dark the 1px ring makes the edge, since black shadows do not show on ink. In light the desk is the ground, the window and the sidebar step up from it with their lines, and the shadow is only depth.</p>
+  <div class="strip sim" style="background:var(--brand-boot)">
+    <div class="lvl" style="background:var(--brand-boot);border:1px dashed var(--shell-border);color:var(--shell-text)"><b>ground</b><span style="color:var(--shell-muted)">boot · Plymouth, overview, lock</span></div>
+    <div class="lvl sh" style="background:var(--neutral-e)"><b>0 · e</b><span>the desktop, the wallpaper</span></div>
+    <div class="lvl sh" style="background:var(--neutral-f);box-shadow:0 0 0 1px var(--shell-border)"><b>1 · f</b><span>a GTK window's body, ring</span></div>
+    <div class="lvl sh" style="background:var(--shell-chrome);border:1px solid var(--shell-border)"><b>1 · g</b><span>top bar, dock, headerbar, views</span></div>
+    <div class="lvl sh" style="background:var(--shell-surface);border:1px solid var(--shell-border);box-shadow:0 4px 12px color-mix(in srgb,var(--brand-boot) 35%,transparent)"><b>2 · h</b><span>menus, popovers, tooltips</span></div>
+    <div class="lvl sh" style="background:var(--shell-surface);border:1px solid var(--shell-border);box-shadow:0 12px 28px color-mix(in srgb,var(--brand-boot) 45%,transparent)"><b>3 · h</b><span>dialogs, OSDs</span></div>
+  </div>
+  <div data-mode="light" style="margin-top:10px">
+    <div class="strip sim" style="background:var(--desk)">
+      <div class="lvl" style="background:var(--desk);border:1px dashed var(--line-ring)"><b>0 · desk</b><span>the desktop, the wallpaper's ground</span></div>
+      <div class="lvl" style="background:var(--bg);box-shadow:0 0 0 1px var(--line-ring),0 6px 16px var(--shadow-3)"><b>1 · c</b><span>a window, ringed at 40%</span></div>
+      <div class="lvl" style="background:var(--shelf);box-shadow:0 0 0 1px var(--line-border)"><b>1 · shelf</b><span>the sidebar, a step below</span></div>
+      <div class="lvl" style="background:var(--view);box-shadow:0 0 0 1px var(--line-border)"><b>1 · a</b><span>views, cards, lists: the line, no shadow</span></div>
+      <div class="lvl" style="background:var(--view);box-shadow:0 0 0 1px var(--line-border),0 .2em .6em var(--shadow-1)"><b>2 · a</b><span>popovers, menus: the line and a shadow</span></div>
+    </div>
+  </div>
+
+  <h2>Perception</h2>
+  <p class="note">Every pair task palette holds beyond contrast: CIEDE2000 as drawn and in eight views - an IPS panel, an OLED and an IPS at 30%, the three dichromacies, protan and deutan on IPS - against the floor of its tier. E: surfaces at an edge (3 / 2); R: a 1px line (6 / 4); S1: a state that persists (10 / 6); S2: a step under the pointer (3 / 2); K: hue that carries meaning (20 / 10, tritan 6); P: the primary against a selected item (30 / 24); D: an overlay quieter than a selection. A pair below its tier passes only through the line drawn between it. The worst view is in bold.</p>
+  <div id="perception"></div>
 
   <h2>Shape</h2>
   <p class="note">libadwaita's steps - control, surface, sheet, pill - and concentric corners: quick settings is its toggles' 22 plus its 18 of padding, 40.</p>
@@ -379,37 +605,44 @@
   </div>
 
   <h2>Accent and text, this mode</h2>
-  <div class="sw" id="mode-sw"></div>
+  <div class="sw sim" id="mode-sw"></div>
 
   <h2>Surfaces (Orchis' scale)</h2>
-  <div class="sw" id="neutral-sw"></div>
+  <div class="sw sim" id="neutral-sw"></div>
+
+  <h2>Wallpapers</h2>
+  <p class="note">The default is the boot's last frame held still, and stays. Three calmer pairs for long sessions, each failing task wallpaper unless it is calmer than the default of its mode: quiet is the same drawing at a third of the level and without the glow; offset leaves the window area empty; mark is only the brand mark, low in the corner. Light draws the room in the ink's hue on the desk; only the mark keeps the accent.</p>
+  <div class="ident sim">
+    <div class="card"><div class="pair"><img src="wallpapers/construct-dark.png" alt="Default, dark"><img src="wallpapers/construct-light.png" alt="Default, light"></div><div class="c"><b>CONSTRUCT</b>construct-dark.png, construct-light.png: the boot's drawing, the mark at 0.4222 of the height</div></div>
+    <div class="card"><div class="pair"><img src="wallpapers/construct-quiet-dark.png" alt="Quiet, dark"><img src="wallpapers/construct-quiet-light.png" alt="Quiet, light"></div><div class="c"><b>CONSTRUCT Quiet</b>construct-quiet-*.png: the outline at most ΔE00 15 from the ink, the grid 6</div></div>
+    <div class="card"><div class="pair"><img src="wallpapers/construct-offset-dark.png" alt="Offset, dark"><img src="wallpapers/construct-offset-light.png" alt="Offset, light"></div><div class="c"><b>CONSTRUCT Offset</b>construct-offset-*.png: the room at 0.62, low on the right third</div></div>
+    <div class="card"><div class="pair"><img src="wallpapers/construct-mark-dark.png" alt="Mark, dark"><img src="wallpapers/construct-mark-light.png" alt="Mark, light"></div><div class="c"><b>CONSTRUCT Mark</b>construct-mark-*.png: the outline alone, 201px from the corner, clear of a 16:9 or 3:2 crop</div></div>
+  </div>
 
   <h2>Identity</h2>
   <div class="ident">
     <div class="card"><div class="img" style="background:var(--brand-boot)"><img class="boot" src="plymouth/frame-0011.png" alt="The last boot frame"></div><div class="c"><b>Boot</b>Plymouth's last frame on black, the mark's centre at 42.2% of the height, where the wallpaper draws it</div></div>
-    <div class="card"><div class="img" style="background:var(--brand-ink)"><img src="wallpapers/construct-dark.png" alt="Dark wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, dark</b>wallpapers/construct-dark.png</div></div>
-    <div class="card"><div class="img" style="background:var(--brand-paper)"><img src="wallpapers/construct-light.png" alt="Light wallpaper" style="max-width:100%;max-height:100%"></div><div class="c"><b>Wallpaper, light</b>wallpapers/construct-light.png</div></div>
-    <div class="card"><div class="img" style="background:var(--shell-chrome)"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg</div></div>
+    <div class="card"><div class="img" style="background:var(--shell-chrome)"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg: white, never the accent</div></div>
     <div class="card"><div class="img" style="background:var(--bg)"><img src="logos/io.github.construct_linux.Installer.svg" alt="Installer icon" style="width:96px"></div><div class="c"><b>Install Construct</b>logos/io.github.construct_linux.Installer.svg, in Tela's geometry</div></div>
   </div>
 
   <h2>Where each piece goes</h2>
   <div class="scroll"><table>
     <tr><th>Repository</th><th>Takes</th><th>From</th></tr>
-    <tr><td>Orchis-theme</td><td>accent, its text, text, border and semantic colors per variant, the background scale, tints, radii; the shell's levels (bars <code>g</code>, menus <code>h</code>, the ring); Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
+    <tr><td>Orchis-theme</td><td>accent, its text, text, border and semantic colors per variant, the background scale, tints (rest, hover, active, decoration, track), selection, light's desk, shelf and lines, radii; the shell's levels (bars <code>g</code>, menus <code>h</code>, the ring); Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
     <tr><td>Tela-icon-theme</td><td>folder and glyph color; the <code>#549bff</code> software family recolored</td><td><code>palette.toml</code> (<code>icons</code>), recolored in the sources</td></tr>
     <tr><td>Bibata_Cursor</td><td>Bibata-Modern-Construct and -Right</td><td><code>palette.toml</code> (<code>cursor</code>), <code>build.py</code>'s <code>COLORS</code></td></tr>
-    <tr><td>dash-to-panel, tilingshell</td><td>the dock: <code>#panel</code>'s color and the running dot from the shell theme; its focus highlight (accent, 14%) and tilingshell's <code>window-border-color</code> (accent)</td><td>Orchis; dconf keys in the image's <code>00-construct</code></td></tr>
+    <tr><td>dash-to-panel, tilingshell</td><td>the dock: <code>#panel</code>'s color and the running dot from the shell theme; its focus highlight (the rest tint, 18%) and tilingshell's <code>window-border-color</code> (the accent: focus)</td><td>Orchis; dconf keys in the image's <code>00-construct</code></td></tr>
     <tr><td>Vitals, caffeine, clipboard-indicator, appindicator, gsconnect</td><td>nothing of their own: the shell theme draws them</td><td>-</td></tr>
     <tr><td>Ghostty</td><td>Construct Dark and Light</td><td><code>palette/ghostty/</code>, seeded once by <code>construct theme</code></td></tr>
     <tr><td>VS Code</td><td>the built-in <code>construct-theme</code> extension</td><td><code>palette/vscode/</code></td></tr>
-    <tr><td>The image</td><td>Plymouth's prompt and the mark's place, the harness's checks</td><td><code>palette/construct.json</code>, <code>plymouth/sequence.json</code></td></tr>
+    <tr><td>The image</td><td>Plymouth's prompt and the mark's place, the harness's checks, the four wallpaper pairs</td><td><code>palette/construct.json</code>, <code>plymouth/sequence.json</code>, <code>wallpapers/</code></td></tr>
     <tr><td>libadwaita apps</td><td>the nearest fixed accent, for the portal and Settings' swatches</td><td><code>gnome.accent</code> = teal</td></tr>
   </table></div>
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <!-- The shell's symbolic icons, roughly: drawn in currentColor. -->
+  <!-- The shell's and GTK's symbolic icons, roughly: drawn in currentColor. -->
   <symbol id="i-vol" viewBox="0 0 16 16"><path d="M2 6h3l4-3v10l-4-3H2z M11 5.5a3.5 3.5 0 0 1 0 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
   <symbol id="i-net" viewBox="0 0 16 16"><path d="M2 3h12v8H2z M6 13h4" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
   <symbol id="i-power" viewBox="0 0 16 16"><path d="M8 2v6 M4.5 4.5a5 5 0 1 0 7 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
@@ -417,6 +650,18 @@
   <symbol id="i-find" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.2 10.2l3.6 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v2 M8 12.5v2 M1.5 8h2 M12.5 8h2 M3.4 3.4l1.4 1.4 M11.2 11.2l1.4 1.4 M3.4 12.6l1.4-1.4 M11.2 4.8l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
   <symbol id="i-shot" viewBox="0 0 16 16"><path d="M2 5V2h3 M11 2h3v3 M14 11v3h-3 M5 14H2v-3" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" fill="currentColor"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 16 16"><path d="M12.5 10A5.5 5.5 0 1 1 6 3.5a4.5 4.5 0 0 0 6.5 6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.6" fill="currentColor"/><path d="M8 1.5v1.8 M8 12.7v1.8 M1.5 8h1.8 M12.7 8h1.8 M3.4 3.4l1.3 1.3 M11.3 11.3l1.3 1.3 M3.4 12.6l1.3-1.3 M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 16 16"><path d="M4 11V7.5a4 4 0 0 1 8 0V11l1.2 1.5H2.8z M6.5 14h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cup" viewBox="0 0 16 16"><path d="M3 5.5h8v3.5a4 4 0 0 1-8 0z M11 6.5h1.3a1.6 1.6 0 0 1 0 3.2H11" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 16 16"><path d="M2.5 11.5a5.5 5.5 0 1 1 11 0 M8 11.5l3-3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 16 16"><path d="M2.5 8 8 3l5.5 5 M4 7v6.5h8V7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-dir" viewBox="0 0 16 16"><path d="M2 4h4l1.5 1.5H14v7H2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 16 16"><path d="M3 4.5h10 M6 4.5V3h4v1.5 M4.5 4.5l.7 9h5.6l.7-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 16 16"><path d="M1.8 6.2a9 9 0 0 1 12.4 0 M4 8.6a6 6 0 0 1 8 0 M6.2 11a3 3 0 0 1 3.6 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="13" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-bt" viewBox="0 0 16 16"><path d="M4.5 5l7 6-3.5 3V2l3.5 3-7 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-display" viewBox="0 0 16 16"><path d="M2 3h12v8H2z M5.5 14h5 M8 11v3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 16 16"><path d="M3 4.5h10 M3 8h10 M3 11.5h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
   <symbol id="folder" viewBox="0 0 64 64">
     <path d="M6 14 a4 4 0 0 1 4 -4 h14 l5 5 h25 a4 4 0 0 1 4 4 v31 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)"/>
     <path d="M6 22 h52 v28 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4 z" fill="var(--icons-folder)" style="filter:brightness(1.12)"/>
@@ -424,19 +669,43 @@
   </symbol>
 </svg>
 
+<script src="palette/simulate.js"></script>
+<script src="palette/perception.js"></script>
 <script>
   const root = document.documentElement;
-  const buttons = document.querySelectorAll(".seg button");
-  function setMode(m) {
-    if (m) root.dataset.mode = m; else delete root.dataset.mode;
-    buttons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.set === m)));
-    try { localStorage.setItem("construct-mode", m); } catch (e) {}
-    swatches();
+  const params = new URLSearchParams(location.search);
+  const load = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  // One segmented control: its buttons carry data-v, the pressed one is the value.
+  function seg(id, value, onChange) {
+    const buttons = document.querySelectorAll(`#${id} button`);
+    const set = v => { buttons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v))); onChange(v); store("construct-" + id, v); };
+    buttons.forEach(b => b.addEventListener("click", () => set(b.dataset.v)));
+    set(params.get(id) ?? load("construct-" + id) ?? value);
   }
-  buttons.forEach(b => b.addEventListener("click", () => setMode(b.dataset.set)));
+
+  // Mode: System follows the browser; the page always carries the mode it draws in, so a block
+  // marked data-mode="light" and the page itself use the same rules.
+  const light = matchMedia("(prefers-color-scheme: light)");
+  let mode = "";
+  function applyMode() { root.dataset.mode = mode || (light.matches ? "light" : "dark"); swatches(); }
+  light.addEventListener("change", applyMode);
+
+  // See as: the drawings, not the controls, go through the filter, so the page stays usable.
+  const simCss = document.head.appendChild(document.createElement("style"));
+  const simSeg = document.getElementById("sim");
+  for (const [k, label] of window.SIMULATIONS || []) simSeg.insertAdjacentHTML("beforeend", `<button data-v="${k}">${label}</button>`);
+
+  // The wallpaper under the desktops: each pair's dark and light file.
+  function wallpaper(v) {
+    const file = v ? `construct-${v}` : "construct";
+    root.style.setProperty("--wp-dark", `url("wallpapers/${file}-dark.png")`);
+    root.style.setProperty("--wp-light", `url("wallpapers/${file}-light.png")`);
+  }
 
   const MODE = [["accent", "Accent"], ["accent-text", "Accent as text"], ["on-accent", "Text on accent"], ["text", "Text"],
-                ["muted", "Muted"], ["border", "Border"], ["success", "Success"], ["warning", "Warning"], ["error", "Error"]];
+                ["muted", "Muted"], ["border", "Border"], ["success", "Success"], ["warning", "Warning"], ["error", "Error"],
+                ["desk", "Desk"], ["shelf", "Shelf"]];
   const NEUTRAL = "abcdefgh".split("").map(k => ["neutral-" + k, k + (k < "e" ? " (light)" : " (dark)")]);
   function fill(id, rows) {
     const css = getComputedStyle(root);
@@ -446,10 +715,25 @@
     }).join("");
   }
   function swatches() { fill("mode-sw", MODE); fill("neutral-sw", NEUTRAL); }
-  let saved = new URLSearchParams(location.search).get("mode");  // ?mode=light, ?mode=dark
-  if (saved === null) try { saved = localStorage.getItem("construct-mode") || ""; } catch (e) { saved = ""; }
-  setMode(saved);
-  matchMedia("(prefers-color-scheme: light)").addEventListener("change", swatches);
+
+  function perceptionTable() {
+    const P = window.PERCEPTION;
+    if (!P) return;
+    const head = ["Tier", "Pair", "As drawn", ...P.views, "Verdict"];
+    const rows = P.pairs.map(r => {
+      const cells = P.views.map(v => `<td class="n${r.views[v] === r.worst ? " w" : ""}">${r.views[v].toFixed(2)}</td>`).join("");
+      const verdict = r.verdict === "LOW" ? `<span class="low">LOW</span>` : r.verdict === "report" ? "report" : `<span class="ok">${r.verdict}</span>`;
+      const ring = r.ring ? `<i style="background:${r.ring}"></i>` : "";
+      return `<tr><td>${r.tier || "-"}</td><td><span class="pair"><i style="background:${r.a}"></i>${ring}<i style="background:${r.b}"></i></span>${r.name}</td>`
+           + `<td class="n">${r.ref.toFixed(2)}</td>${cells}<td title="${r.need || ""}${r.via ? "; " + r.via : ""}">${verdict}</td></tr>`;
+    }).join("");
+    document.getElementById("perception").innerHTML = `<table><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows}</table>`;
+  }
+
+  seg("mode", "", v => { mode = v; applyMode(); });
+  seg("sim", "", v => { simCss.textContent = v ? `.sim { filter: url(#sim-${v}); }` : ""; });
+  seg("wallpaper", "", wallpaper);
+  perceptionTable();
 </script>
 </body>
 </html>

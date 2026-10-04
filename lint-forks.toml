@@ -9,6 +9,9 @@ files = ["src/_sass/**/*.scss", "src/gnome-shell/**/*.svg", "src/gtk/assets.svg"
 "src/_sass/gtk/_colors-public.scss" = "elementary/Pantheon's public named colors, API apps read"
 "src/_sass/gtk/apps/_libadwaita.scss" = "libadwaita's color-picker swatches: content, not chrome"
 [fork.Orchis-theme.allow]
+# The accent at an alpha or a shade that is not a token of the scale (lint.py C7): none yet. The
+# one expected is a swatch that shows a color rather than a level, as Settings' accent buttons.
+[fork.Orchis-theme.accent]
 
 [fork.dash-to-panel]
 files = ["src/stylesheet.css"]

@@ -3,8 +3,9 @@ import palette
 
 # usage: lint.py <forks_dir> [lint-forks.toml]
 # Fails when a fork writes a color that is not in palette.toml - a hex literal or an rgb()/rgba()
-# of numbers, in the files the image builds from - and when a fork's copy of the palette is not
-# what palette/ holds now. The exceptions are in lint-forks.toml, each with its reason: a file
+# of numbers, in the files the image builds from - when its SCSS draws the accent at an alpha that
+# is not one of the scale's tokens (C7), and when a fork's copy of the palette is not what
+# palette/ holds now. The exceptions are in lint-forks.toml, each with its reason: a file
 # that is not ours to color (apps' content palettes), or one value in one file. An exception
 # nothing matches any more fails too: left in, it would hide the next color written there.
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -48,6 +49,31 @@ def colors(text):
         yield m.start(), m.group(0) + "...)", "#%02X%02X%02X" % (r, g, b)
 
 
+# C7: the accent's alpha is a token. A level of the accent scale (THEMING.md) is an alpha
+# palette.toml names - Orchis' $tint, $tint-hover, $tint-active, $selection-alpha,
+# $tint-decoration, $tint-track - never a number written where it is used, nor a shade
+# lighten() or darken() makes: a number chosen at each place of use is how a scale drifts into
+# twenty alphas no one can tell apart. Exceptions are lint-forks.toml's [fork.<name>.accent], each with its reason.
+ACCENT = r"\$(?:primary|suggested|link)\b"
+TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-decoration", "$tint-track"}
+ALPHA = re.compile(rf"\b(?:rgba|alpha|gtkalpha)\(\s*{ACCENT}\s*,\s*([^)]*)\)")
+COLOR_MIX = re.compile(rf"color-mix\(\s*in\s+[\w-]+\s*,\s*{ACCENT}\s+([^,]+),")
+SHADE = re.compile(rf"\b(?:transparentize|lighten|darken)\(\s*{ACCENT}|(?<![\w-])mix\([^;]*?{ACCENT}")
+
+
+def accent_alphas(text):
+    """Every use of the accent at an alpha or a shade that is not one of the scale's tokens."""
+    for m in ALPHA.finditer(text):
+        if m.group(1).strip() not in TOKENS:
+            yield m.start(), m.group(0)
+    for m in COLOR_MIX.finditer(text):
+        token = re.fullmatch(r"#\{\s*(\$[\w-]+)\s*\*\s*100%\s*\}", m.group(1).strip())
+        if not token or token.group(1) not in TOKENS:
+            yield m.start(), m.group(0)
+    for m in SHADE.finditer(text):
+        yield m.start(), m.group(0)
+
+
 def literals(forks, rules, allowed):
     problems, used = [], set()
     for fork, r in rules["fork"].items():
@@ -72,7 +98,15 @@ def literals(forks, rules, allowed):
                     continue
                 line = text.count("\n", 0, pos) + 1
                 problems.append(f"{fork}/{rel}:{line}: {raw} ({hexv}) is not in palette.toml")
-        for kind in ("skip", "allow"):
+            if path.endswith(".scss"):
+                for pos, raw in accent_alphas(text):
+                    key = f"{rel} {raw}"
+                    if key in r.get("accent", {}):
+                        used.add((fork, "accent", key))
+                        continue
+                    line = text.count("\n", 0, pos) + 1
+                    problems.append(f"{fork}/{rel}:{line}: {raw}: the accent's alpha is a token (C7)")
+        for kind in ("skip", "allow", "accent"):
             for k in r.get(kind, {}):
                 if (fork, kind, k) not in used:
                     problems.append(f"{fork}: lint-forks.toml {kind} '{k}' matches nothing: remove it")

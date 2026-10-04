@@ -56,11 +56,11 @@ same images on any machine. `task image` builds it; every task that needs it bui
 | `task sprite` | Builds `sprite.png`: an 8×6 grid of the 48 numbered frames |
 | `task plymouth` | Transparent PNGs for Plymouth in `plymouth/`, each picture once and compressed with pngquant, and the order they play in |
 | `task logo` | The logo in `logos/`: SVG in color, GNOME symbolic and Orchis' Activities button, PNG from 16 to 64 px, and the installer's app tile |
-| `task palette` | Checks `palette.toml`'s contrast and edges and writes it into `palette/`: for the theme forks, the image, Ghostty and VS Code ([THEMING.md](THEMING.md)) |
-| `task wallpaper` | The desktop backgrounds, dark and light, at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/` |
+| `task palette` | Checks `palette.toml`'s contrast, edges and perceptual separation (CIEDE2000 under colour-vision deficiencies, IPS and dimmed panels) and writes it into `palette/`: for the theme forks, the image, Ghostty, VS Code and the preview ([THEMING.md](THEMING.md)) |
+| `task wallpaper` | The desktop backgrounds - default, quiet, offset and mark, each dark and light - at 2880×1800 (16:10), and `construct.xml`, which offers them in Settings, into `wallpapers/`; fails unless each variant is calmer than the default |
 | `task preview` | Opens `preview.html`: the desktop with the palette, in dark and light; GitHub Pages publishes it from `main` |
 | `task compress` | Runs pngquant over `plymouth/*.png` again, replacing the files |
-| `task lint` | Fails if a fork checked out beside brand (`FORKS=..`) writes a color `palette.toml` does not, or holds a stale copy of the palette (`lint-forks.toml`) |
+| `task lint` | Fails if a fork checked out beside brand (`FORKS=..`) writes a color `palette.toml` does not, draws the accent at an alpha that is not a token, or holds a stale copy of the palette (`lint-forks.toml`) |
 | `task check` | Fails if the committed `plymouth/`, `logos/`, `wallpapers/` and `palette/` are not what the sources make |
 | `task clean` | Removes `frames/`, `construct.mp4` and `sprite.png` |
 
@@ -96,10 +96,12 @@ task plymouth QUALITY=65-85              # more aggressive pngquant
 - `sprite.py [dir] [out.png] [columns] [px]`: puts every frame into one image (8 columns and
   270 px thumbnails by default).
 - `logo.py [out_dir]`: the logo files.
-- `palette.py [out_dir]`: checks the palette's contrast and edges and writes it out (CSS, SCSS,
-  JSON, Ghostty, VS Code); `palette.load()` is what the other generators read the colors from.
-- `wallpaper.py [out_dir] [width] [height]`: the dark and light desktop backgrounds and their
-  `gnome-background-properties` entry.
+- `palette.py [out_dir]`: checks the palette's contrast, edges and perceptual separation and
+  writes it out (CSS, SCSS, JSON, Ghostty, VS Code, the preview's perception table and
+  simulation filters); `palette.load()` is what the other generators read the colors from.
+- `wallpaper.py [out_dir] [width] [height]`: the desktop backgrounds - the default, the boot's
+  drawing, and its quiet, offset and mark variants, each dark and light - and their
+  `gnome-background-properties` entries; it fails unless every variant is calmer than the default.
 - `room.py`: the room, its camera and its lines, which `video.py`, `wallpaper.py` and `logo.py`
   all draw.
 - `check.py <committed_dir> <regenerated_dir>`: compares a committed directory with a regenerated

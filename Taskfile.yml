@@ -103,7 +103,7 @@ tasks:
       - '{{.RUN}} python logo.py {{.LOGO_DIR}}'
 
   palette:
-    desc: Check the palette's contrast and write it out into palette/ - CSS for preview.html, SCSS for Orchis, JSON for the image, Ghostty's and VS Code's themes
+    desc: Check the palette's contrast and perceptual separation and write it out into palette/ - CSS and the perception table and filters for preview.html, SCSS for Orchis, JSON for the image, Ghostty's and VS Code's themes
     label: palette-{{.PALETTE_DIR}}
     deps: [image]
     vars:
@@ -114,7 +114,7 @@ tasks:
       - '{{.RUN}} python palette.py {{.PALETTE_DIR}}'
 
   wallpaper:
-    desc: The desktop backgrounds, dark and light, at 2880x1800, and Settings' construct.xml into wallpapers/
+    desc: The desktop backgrounds - default, quiet, offset, mark - dark and light, at 2880x1800, and Settings' construct.xml into wallpapers/
     label: wallpaper-{{.WALLPAPER_DIR}}
     deps: [image]
     vars:
@@ -131,7 +131,7 @@ tasks:
       - if command -v xdg-open >/dev/null; then xdg-open preview.html; else open preview.html; fi
 
   lint:
-    desc: Fail if a fork in {{.FORKS}} writes a color palette.toml does not, or holds a stale copy of the palette (lint-forks.toml says which files and why)
+    desc: Fail if a fork in {{.FORKS}} writes a color palette.toml does not, draws the accent at an alpha that is not a token, or holds a stale copy of the palette (lint-forks.toml says which files and why)
     deps: [image]
     vars:
       FORKS: '{{.FORKS | default ".."}}'  # the forks checked out beside brand, as Construct-Linux's are
