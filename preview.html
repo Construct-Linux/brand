@@ -227,7 +227,17 @@
   .thumb .badge { position: absolute; right: -6px; top: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
                   display: grid; place-items: center; font-size: 12px; font-weight: 700; }
   .lineup { margin-top: 10px; justify-content: space-between; }
-  @media (max-width: 640px) { .lv { grid-template-columns: 1fr; } }
+  /* The open comparison of the primary's rendering: the label column, then the shell, dark GTK
+     and light GTK, each beside the selected state it must stay apart from. */
+  .cmp { display: grid; grid-template-columns: 170px repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .cmp > div:first-child, .cmp .lead { display: flex; flex-direction: column; justify-content: center; font-size: 14px; }
+  .cmp .lead span, .cmp small { color: var(--muted); font-size: 12px; }
+  .cmp .demo { flex-direction: column; align-items: flex-start; color: var(--text); }
+  .cmp .demo > div { display: flex; gap: 10px; align-items: center; }
+  .cmp .head { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .btn.tint28 { background: color-mix(in srgb, var(--accent) 28%, var(--view)); color: var(--accent-text); }
+  .btn.tint36 { background: color-mix(in srgb, var(--accent) 36%, var(--view)); color: var(--accent-text); }
+  @media (max-width: 640px) { .lv, .cmp { grid-template-columns: 1fr; } }
 
   /* ---------- light: ink on paper ---------- */
   .settings { left: 7%; top: 10%; width: 72%; height: 80%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
@@ -506,6 +516,24 @@
     <span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span>
     <span class="switch"></span><span class="tg foc"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</span>
     <span class="link">Show details</span><span class="rb" style="width:64px;height:32px"></span>
+  </div>
+
+  <h2>Open comparison: the primary as a fill or a tint</h2>
+  <p class="note">Not a rule: level 2 stays the solid accent (THEMING.md, "Primary is solid, in dark too"). Three renderings of the primary, each beside the selected state it must be told from, so the choice can be judged by eye. Under each: its label's contrast (4.5:1 is the floor) and its ΔE00 from the selected item (the P tier asks 30), as palette.py's contrast() and de00() give them for the palette of 2026-10-04; they are not recomputed when the palette changes.</p>
+  <div class="cmp sim" aria-label="The primary as a solid fill, a 28% tint and a 36% tint, beside the selected state">
+    <div></div><div class="head">Shell, on h (both modes)</div><div class="head">GTK dark, on g</div><div class="head">GTK light, on a</div>
+    <div class="lead"><b>A Solid</b><span>the accent, label on_accent: today's rule</span></div>
+    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn pri">Authenticate</span></div><small>label 12.34:1 · ΔE00 51.3</small></div>
+    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 12.34:1 · ΔE00 56.2</small></div>
+    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 5.09:1 · ΔE00 40.3</small></div>
+    <div class="lead"><b>B 28% tint</b><span>label accent_text</span></div>
+    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint28">Authenticate</span></div><small>label 4.79:1 · ΔE00 6.1: dark's active tint, a pressed selected item</small></div>
+    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 5.31:1 · ΔE00 6.8: dark's active tint</small></div>
+    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 4.64:1 · ΔE00 9.4</small></div>
+    <div class="lead"><b>C 36% tint</b><span>label accent_text</span></div>
+    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small>label 3.89:1, below 4.5 · ΔE00 11.3</small></div>
+    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small>label 4.24:1, below 4.5 · ΔE00 12.1</small></div>
+    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small>label 4.08:1, below 4.5 · ΔE00 13.2</small></div>
   </div>
 
   <h2>Light: ink on paper</h2>
