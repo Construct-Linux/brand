@@ -328,7 +328,8 @@ from `h`, so a menu's edge never merges with a line under it.
 ## App icons
 
 Every app the desktop shows resolves its icon in Tela or in a brand tile installed in hicolor
-(`logos/io.github.construct_linux.Installer.svg`, drawn in Tela's geometry); no `Icon=` names a
+(`logos/io.github.construct_linux.Installer.svg` and `.Construct.svg`, the installer's and the
+Construct app's, drawn in Tela's geometry); no `Icon=` names a
 path. An unofficial build that carries no brand of its own (Firefox's) takes `web-browser`. Tela's
 `#549bff` family (its software and store icons) is recolored to `icons.folder` with the folders.
 

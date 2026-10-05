@@ -134,7 +134,10 @@ SVGS = {
 SIZES = [64, 48, 32, 24, 16]  # above 64 px the SVG is the icon
 for variant, spec in SVGS.items():
     open(f"{OUT}/{NAME}{variant}.svg", "w").write(svg(LINES, *spec))
-open(f"{OUT}/io.github.construct_linux.Installer.svg", "w").write(tile(LINES))
+# The same tile is the installer's and the Construct app's: one is on the live stick, the other on
+# the machine it installed.
+for app in ("Installer", "Construct"):
+    open(f"{OUT}/io.github.construct_linux.{app}.svg", "w").write(tile(LINES))
 for s in SIZES:
     cv2.imwrite(f"{OUT}/{NAME}-{s}.png", render(LINES, s, CYAN))
-print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}; the installer's tile")
+print(f"{OUT}/: {NAME} -> svg, symbolic and activities svg, png {SIZES}; the installer's and the app's tile")
