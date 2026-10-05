@@ -57,7 +57,9 @@ the edge: a black shadow does not show on ink, so a shadow only adds depth, neve
 | 3 | the shell's modal and app-folder dialogs, OSDs | `h` | `h` | 1px | `0 12px 28px` black at 45% |
 
 The overview's workspace card is `e` on the black ground: 1.11:1, lighter than what it stands on,
-as a card should be. The top bar and the dock are opaque `g` with the ring; never black glass:
+as a card should be, and with no shadow, which on black would not show. Its corners are GNOME
+Shell's 30, not a token: workspace.js clips the wallpaper at that radius, and a card drawn at any
+other would part from its picture at the corners. The top bar and the dock are opaque `g` with the ring; never black glass:
 over ink it is 1.07:1, no edge at all, and over paper it is a grey without the ink's hue.
 In dark, no window is `e`: that is the desktop's own color, and a window on it has no edge.
 

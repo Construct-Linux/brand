@@ -206,7 +206,8 @@
             background: var(--shell-surface); border: 1px solid var(--shell-border); color: var(--shell-muted);
             display: flex; align-items: center; gap: .6em; padding: 0 1em; font-size: .95em; }
   .workspace { position: absolute; left: 50%; top: 8.6em; transform: translateX(-50%); width: 62%; aspect-ratio: 16 / 10;
-               border-radius: var(--radius-sheet); background: var(--desk) var(--wp-dark) center / cover; overflow: hidden; }
+               /* GNOME Shell's 30 (workspace.js clips the wallpaper at it), not a token. */
+               border-radius: 30px; background: var(--desk) var(--wp-dark) center / cover; overflow: hidden; }
   [data-mode="light"] .workspace { background-image: var(--wp-light); }
 
   /* ---------- the accent's scale ---------- */
