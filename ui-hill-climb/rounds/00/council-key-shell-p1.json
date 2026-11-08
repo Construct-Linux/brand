@@ -1,0 +1,15 @@
+{
+ "pairs": {},
+ "control": {
+  "c01": "desktop",
+  "c02": "desktop-light",
+  "c03": "desktop-scale-150",
+  "c04": "shell-overview",
+  "c05": "shell-app-grid",
+  "c06": "shell-quick-settings",
+  "c07": "shell-calendar",
+  "c08": "shell-notifications",
+  "c09": "shell-lock-screen",
+  "c10": "shell-lock-prompt"
+ }
+}

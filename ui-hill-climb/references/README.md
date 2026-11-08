@@ -1,0 +1,10 @@
+# References (the bar for a 10; never copied)
+
+- ref-gnome-overview.png — https://www.gnome.org/img/laptop-dark.webp — dark GNOME Activities overview: one search field, windows as the content and a quiet dock, so the hierarchy comes from space and not from chrome.
+- ref-gnome-files.png — https://release.gnome.org/47/nautilus-network-l-screenshot.webp — Files (GNOME 47, light): a sidebar plus content split with flat rows and almost no borders, showing how dense content can sit in a calm layout.
+- ref-elementary-desktop.jpg — https://elementary.io/images/screenshots/desktop.jpg — elementary OS 8 desktop: a thin top panel and a small dock leave the wallpaper and windows to carry the screen.
+- ref-elementary-files.png — https://elementary.io/images/screenshots/files.png — Files: consistent icon sizing, an even rhythm and a single accent colour used only for the selection.
+- ref-elementary-shortcuts.png — https://elementary.io/images/screenshots/shortcut-overlay.png — keyboard shortcut overlay: a dense reference grouped by task and set in clear type, which matters on a keyboard-driven developer desktop.
+- ref-cosmic-settings.png — https://system76.com/cosmic (cdn11.bigcommerce.com/.../custom-uxr3-min.png) — COSMIC dark Settings over a workspace view: grouped cards with label-left and control-right rows and a restrained teal accent, the closest analogue to CONSTRUCT.
+- ref-macos-quick-settings.jpg — https://www.apple.com/newsroom/images/2025/06/macos-tahoe-26-makes-the-mac-more-capable-productive-and-intelligent-than-ever/article/Apple-WWDC25-macOS-Tahoe-26-Control-Center-250609_big.jpg.large_2x.jpg — Control Center: modules of mixed size on one grid, with primary toggles larger than secondary ones, for a scannable quick-settings menu.
+- ref-macos-lock.jpg — https://www.apple.com/newsroom/images/2025/06/macos-tahoe-26-makes-the-mac-more-capable-productive-and-intelligent-than-ever/article/Apple-WWDC25-macOS-Tahoe-26-Lock-Screen-250609_big.jpg.large_2x.jpg — lock screen: a large clock, one avatar and nothing else, a typographic hierarchy with only a single action.

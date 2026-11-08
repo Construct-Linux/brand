@@ -1,0 +1,14 @@
+{
+ "pairs": {},
+ "control": {
+  "c01": "org.gnome.Nautilus",
+  "c02": "org.gnome.Settings",
+  "c03": "panel-network",
+  "c04": "gtk-dialog",
+  "c05": "gtk-dialog-light",
+  "c06": "com.mitchellh.ghostty",
+  "c07": "org.gnome.SystemMonitor",
+  "c08": "installer",
+  "c09": "io.github.construct_linux.Construct"
+ }
+}

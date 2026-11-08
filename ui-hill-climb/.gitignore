@@ -1,0 +1,12 @@
+# Third parties' screenshots, the bar the reviewers compare against: kept where they were fetched,
+# not redistributed (references/README.md lists their sources).
+references/*.png
+references/*.jpg
+# Each round's images: the baseline is the needles at the commit screens.json names, a candidate
+# the harness's capture of its branch; both are made again rather than carried.
+rounds/*/shots/
+rounds/*/council-*/
+__pycache__/
+# Each reviewer's raw answer and log: run metadata (session ids, usage); ledger.jsonl holds what
+# they said, un-blinded.
+rounds/*/review-*
