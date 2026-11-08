@@ -20,3 +20,8 @@
   2.0 noise), 56% of pairs. Files won 3/3 now that every sidebar shares its edge; the Construct
   app, System Monitor (2/3), installer, app grid, notifications won; quick settings lost 2/3 and
   the lock screen split, both unchanged since round 1 - the reviewers trade taste on the on tint.
+- **4** Orchis: an insensitive Clear drawn transparent; a floating sheet's dimming at half in dark.
+  Median 7 (+1.0, inside the 3.0 noise), 60% of pairs, no screen lost by a majority. The calendar
+  won 3/3 (no dead Clear, the smaller bell); quick settings 2/3 this time. The dialog's dimming
+  changed nothing on screen: Text Editor's preferences are not a floating sheet, and all three
+  call gtk-dialog identical. Budget of four councils spent; the desktop stops here.
