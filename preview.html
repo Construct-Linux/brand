@@ -53,11 +53,11 @@
            padding: 6px 12px; width: 100%; }
   .hero { padding-bottom: 8px; }
   .hero h1 { font-size: 40px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; margin: 0 0 16px; }
-  .hero .lead { font-size: 18px; line-height: 1.55; color: var(--text); margin: 0 0 16px; max-width: 62ch; }
+  .hero .lead { font-size: 17px; line-height: 1.55; color: var(--text); margin: 0 0 16px; max-width: 78ch; }
   .hero .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 48px; }
   .hero .tagline { color: var(--muted); margin: 0; font-size: 15px; }
   .hero .links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; font-size: 15px; }
-  #desktop { padding-top: 40px; }
+  #desktop { padding-top: 28px; }
   section { padding: 56px 0 8px; scroll-margin-top: 8px; }
   section + section { border-top: 1px solid var(--line-divider); margin-top: 32px; }
   h2 { font-size: 26px; line-height: 1.2; font-weight: 700; color: var(--text); margin: 0 0 12px; }
@@ -204,7 +204,7 @@
   .fill { background: var(--shell-fill); }
   .tooltip { left: 50%; bottom: 3.9em; transform: translateX(-50%); padding: .3em .7em; border-radius: var(--radius-control); font-size: .85em; }
   /* Quick settings, concentric: its pill toggles (radius 22) plus its 18px padding make 40. */
-  .qs { right: var(--inset); top: 3.3em; width: 30%; padding: 18px; border-radius: calc(22px + 18px); display: flex; flex-direction: column; gap: .9em; }
+  .qs { right: var(--inset); top: 3.3em; width: 33%; padding: 18px; border-radius: calc(22px + 18px); display: flex; flex-direction: column; gap: .9em; }
   .qs .top { display: flex; gap: .6em; }
   .qs .top span { width: 2.4em; height: 2.4em; border-radius: 50%; display: grid; place-items: center; }
   .qs .top .gap { flex: 1; background: none; }
@@ -296,7 +296,7 @@
   @media (max-width: 640px) { .lv, .cmp { grid-template-columns: 1fr; } }
 
   /* ---------- light: ink on paper ---------- */
-  .settings { left: 7%; top: 10%; width: 72%; max-height: 80%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
+  .settings { left: 7%; top: 10%; width: 72%; max-height: 76%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
   .settings .pane { background: var(--shelf); box-shadow: inset -1px 0 var(--line-border); display: flex; flex-direction: column; min-width: 0; }
   /* Both headerbars one height, so their rules run as one line across the window. */
   .hb { height: 3em; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 -1px var(--line-border); flex: none; line-height: 1.2; position: relative; }
@@ -344,6 +344,7 @@
   .sw { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
   .sw + .sw { margin-top: 10px; }
   #neutral-sw { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  #status-sw .s:nth-child(4) { grid-column: 5; }
   .s { border: 1px solid var(--line-border); border-radius: 10px; overflow: hidden; background: var(--view); }
   .s i { display: block; height: 56px; box-shadow: inset 0 -1px var(--line-border); }
   .s div { padding: 8px 10px; font-size: 13px; }
@@ -367,16 +368,18 @@
   /* The perception table: every pair task palette holds, its worst view marked. */
   #perception { border: 1px solid var(--line-border); border-radius: 12px; background: var(--view); }
   #perception table { font-size: 13px; }
-  #perception th { position: sticky; top: 0; z-index: 1; background: var(--view); box-shadow: inset 0 -1px var(--line-border); }
+  #perception th { position: sticky; top: 0; z-index: 1; background: var(--view); box-shadow: inset 0 -1px var(--line-border); white-space: normal; vertical-align: bottom; }
+  #perception td:nth-child(2) { white-space: normal; min-width: 18em; }
   #perception td { padding: 6px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   @media (max-width: 640px) {
     #perception, #perception table, #perception tbody { display: block; }
     #perception tr:first-child { display: none; }
-    #perception tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 8px; padding: 12px; border-bottom: 1px solid var(--line-divider); }
+    #perception tr { display: flex; flex-wrap: wrap; gap: 6px 8px; padding: 12px; border-bottom: 1px solid var(--line-divider); }
+    #perception td { flex: 0 0 calc(25% - 6px); }
     #perception td { display: block; padding: 0; border: 0; text-align: left; }
     #perception tr td.n { text-align: left; }
-    #perception td:nth-child(1) { grid-column: 1; font-weight: 700; }
-    #perception td:nth-child(2) { grid-column: 2 / -1; min-width: 0; }
+    #perception td:nth-child(1) { flex: none; font-weight: 700; min-width: 2em; }
+    #perception td:nth-child(2) { flex: 1 1 calc(100% - 3em); min-width: 0; margin-bottom: 4px; }
     #perception td[data-label]:not(:nth-child(-n+2))::before { content: attr(data-label); display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
   }
   #perception td.n { text-align: right; color: var(--muted); }
@@ -385,8 +388,6 @@
   #perception .pair { display: inline-flex; flex: none; vertical-align: middle; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px var(--line-border); margin-right: 8px; }
   #perception .pair i { width: 18px; height: 18px; }
   #perception .ok { color: var(--success); } #perception .low { color: var(--error); font-weight: 700; }
-  #perception th { white-space: normal; vertical-align: bottom; }
-  #perception td:nth-child(2) { white-space: normal; min-width: 18em; }
   .scale .colhead { display: grid; grid-template-columns: 170px 1fr 1fr; gap: 10px; font-size: 12px; font-weight: 700; color: var(--muted); }
   /* On a phone the columns stack, so each demo says which column it was. */
   @media (max-width: 640px) {
@@ -421,6 +422,8 @@
     .tg { min-width: 0; padding-right: .6em; }
     .hero .sub { flex-direction: column; align-items: flex-start; }
     .ident.wps { grid-template-columns: 1fr; }
+    .ident:not(.wps) .card .img { aspect-ratio: 2 / 1; }
+    #status-sw .s:nth-child(4) { grid-column: auto; }
   }</style>
 </head>
 <body>
@@ -464,8 +467,7 @@
     <p class="links"><a class="link" href="https://github.com/Construct-Linux/brand">Source and assets</a><a class="link" href="https://github.com/Construct-Linux/brand/blob/main/THEMING.md">The theming rules</a></p></div>
   </header>
 
-  <section id="desktop" aria-labelledby="desktop-h">
-  <h2 id="desktop-h">The desktop</h2>
+  <section id="desktop" aria-label="The desktop">
   <div class="desktop sim" role="figure" aria-label="The desktop with the palette: Files and Ghostty open">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
@@ -807,10 +809,10 @@
   <h2 id="wallpapers-h">Wallpapers</h2>
   <p class="note">Each pair is for one thing. The default is the identity: the boot's last frame held still. Quiet and mark are its calm forms, for long sessions: quiet the same drawing at a third of the level and without the glow, mark only the brand mark, low in the corner. Offset is functional: the room moved out of the window area, so windows stand on an empty field. Each of the three fails task wallpaper unless it is calmer than the default of its mode. Light draws the room in the ink's hue on the desk; only the mark keeps the accent.</p>
   <div class="ident wps sim">
-    <div class="card"><div class="pair"><a href="wallpapers/construct-dark.png"><img src="wallpapers/construct-dark.png" alt="Default, dark"></a><a href="wallpapers/construct-light.png"><img src="wallpapers/construct-light.png" alt="Default, light"></a></div><div class="c"><b>CONSTRUCT</b><code>construct-dark.png</code>, <code>construct-light.png</code>: the boot's drawing, the mark at 0.4222 of the height</div></div>
-    <div class="card"><div class="pair"><a href="wallpapers/construct-quiet-dark.png"><img src="wallpapers/construct-quiet-dark.png" alt="Quiet, dark"></a><a href="wallpapers/construct-quiet-light.png"><img src="wallpapers/construct-quiet-light.png" alt="Quiet, light"></a></div><div class="c"><b>CONSTRUCT Quiet</b><code>construct-quiet-*.png</code>: the outline at most ΔE00 15 from the ink, the grid 6</div></div>
-    <div class="card"><div class="pair"><a href="wallpapers/construct-offset-dark.png"><img src="wallpapers/construct-offset-dark.png" alt="Offset, dark"></a><a href="wallpapers/construct-offset-light.png"><img src="wallpapers/construct-offset-light.png" alt="Offset, light"></a></div><div class="c"><b>CONSTRUCT Offset</b><code>construct-offset-*.png</code>: the room at 0.62, low on the right third</div></div>
-    <div class="card"><div class="pair"><a href="wallpapers/construct-mark-dark.png"><img src="wallpapers/construct-mark-dark.png" alt="Mark, dark"></a><a href="wallpapers/construct-mark-light.png"><img src="wallpapers/construct-mark-light.png" alt="Mark, light"></a></div><div class="c"><b>CONSTRUCT Mark</b><code>construct-mark-*.png</code>: the outline alone, 201px from the corner, clear of a 16:9 or 3:2 crop</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-dark.png"><img src="wallpapers/construct-dark.png" alt="Default, dark"></a><a href="wallpapers/construct-light.png"><img src="wallpapers/construct-light.png" alt="Default, light"></a></div><div class="c"><b>CONSTRUCT</b><a class="link" href="wallpapers/construct-dark.png"><code>construct-dark.png</code></a>, <a class="link" href="wallpapers/construct-light.png"><code>construct-light.png</code></a>: the boot's drawing, the mark at 0.4222 of the height</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-quiet-dark.png"><img src="wallpapers/construct-quiet-dark.png" alt="Quiet, dark"></a><a href="wallpapers/construct-quiet-light.png"><img src="wallpapers/construct-quiet-light.png" alt="Quiet, light"></a></div><div class="c"><b>CONSTRUCT Quiet</b><a class="link" href="wallpapers/construct-quiet-dark.png"><code>construct-quiet-dark.png</code></a>, <a class="link" href="wallpapers/construct-quiet-light.png"><code>construct-quiet-light.png</code></a>: the outline at most ΔE00 15 from the ink, the grid 6</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-offset-dark.png"><img src="wallpapers/construct-offset-dark.png" alt="Offset, dark"></a><a href="wallpapers/construct-offset-light.png"><img src="wallpapers/construct-offset-light.png" alt="Offset, light"></a></div><div class="c"><b>CONSTRUCT Offset</b><a class="link" href="wallpapers/construct-offset-dark.png"><code>construct-offset-dark.png</code></a>, <a class="link" href="wallpapers/construct-offset-light.png"><code>construct-offset-light.png</code></a>: the room at 0.62, low on the right third</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-mark-dark.png"><img src="wallpapers/construct-mark-dark.png" alt="Mark, dark"></a><a href="wallpapers/construct-mark-light.png"><img src="wallpapers/construct-mark-light.png" alt="Mark, light"></a></div><div class="c"><b>CONSTRUCT Mark</b><a class="link" href="wallpapers/construct-mark-dark.png"><code>construct-mark-dark.png</code></a>, <a class="link" href="wallpapers/construct-mark-light.png"><code>construct-mark-light.png</code></a>: the outline alone, 201px from the corner, clear of a 16:9 or 3:2 crop</div></div>
   </div>
 
   </section>
