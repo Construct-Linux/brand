@@ -12,3 +12,11 @@
   widths), menus desktop, perception (both), wallpapers, identity, accent mobile. Lost 2-3/3: the
   three mobile drawings, cropped by the scroller; Codex alone preferred the wider column of the
   baseline on most desktop sections.
+- **2** On a phone each drawing a square with its windows recomposed (no scroller); the first
+  drawing's caption under it; swatches by role, six levels of elevation in one row; the line
+  samples given a divider; the perception pair's label beside its chip. Median 7 (+1.0, inside
+  the 1.5 noise), 91% of pairs, no screen lost by a majority. The three mobile drawings now win
+  3/3; Codex alone still prefers the baseline's wider column on two desktop drawings and the
+  eyebrow labels on two mobile sections. Still raised: the first drawing below the fold at
+  1440x900, the perception tier alone in its column on a phone, tall identity cards on a phone,
+  wallpaper file names that are not links while identity's are.
