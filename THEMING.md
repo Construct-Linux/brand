@@ -218,6 +218,7 @@ deficiencies.
 | S2 | a step under the pointer: rest, hover, active | 3 | 2 |
 | K | hue that carries meaning: status colors, the terminal's | 20 | 10; tritan 6 |
 | P | the primary against a selected item | 30 | 24 |
+| C | two chart series, thin lines that cross | 20 | 10 |
 | D | a transient overlay: shows (3), and stays under 0.6 of a selected tint's ΔE00 | | its edge |
 
 A pair below its tier passes only through the line drawn between the two, held to R: the dark

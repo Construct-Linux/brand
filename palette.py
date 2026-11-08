@@ -292,7 +292,8 @@ def shape_problems(shape):
 #       deutans, 8% of men; 6 for tritans, about 0.01%.
 #   P   the primary action against a selected item: the solid fill against the tint, the one
 #       channel that tells them apart.
-TIERS = {"E": (3, 2), "R": (6, 4), "S1": (10, 6), "S2": (3, 2), "K": (20, 10), "P": (30, 24)}
+#   C   two chart series: thin lines that cross, told apart by hue alone, in every view.
+TIERS = {"E": (3, 2), "R": (6, 4), "S1": (10, 6), "S2": (3, 2), "K": (20, 10), "P": (30, 24), "C": (20, 10)}
 K_TRITAN = 6
 # D, a transient overlay (the rubberband, the tile preview): it shows (E's 3 as drawn) and stays
 # quieter than a selected item on the same surface, at most this share of the selected tint's ΔE.
@@ -366,6 +367,11 @@ def perceptual_checks(p):
                 yield "K", f"{mode} {x} / {y}", m[x], m[y], None
         yield "K", f"{mode} terminal blue / cyan", a["blue"], m["accent"], None
         yield "K", f"{mode} terminal magenta / blue", a["magenta"], a["blue"], None
+    # Chart series, one set for both modes, against each other.
+    ser = list(p["series"].items())
+    for i, (x, cx) in enumerate(ser):
+        for y, cy in ser[i + 1:]:
+            yield "C", f"series {x} / {y}", cx, cy, None
 
 
 def judge(tier, a, b, ring):

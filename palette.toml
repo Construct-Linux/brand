@@ -105,10 +105,13 @@ ring = 0.40       # a window's outer ring on the desk
 # alone; a first CPU in red read as an alarm (round 0's council, all three reviewers). Each is
 # 3:1 as a mark on dark's window (f) and light's (c), and none is a status colour.
 [series]
+# Four hues apart, not four steps of one: the cool set before (teal, steel, violet, slate) ran
+# together where CPU lines cross, by deuteranopes at 3 (tier C holds them). Each stays 3:1 on both
+# windows and away from success, warning and error.
 one = "#1597A5"    # the accent's hue, darkened to read on light too: the first series
-two = "#5B8DB8"    # steel: the second (sent, written, a second CPU)
-three = "#8A7DC8"  # slate violet: the third (swap)
-four = "#6A7F8F"   # the ink's hue: the fourth
+two = "#8C5E75"    # mauve: the second (sent, written, a second CPU)
+three = "#7252D5"  # violet: the third (swap)
+four = "#798C59"   # olive: the fourth
 
 # libadwaita's steps, so the shell and the apps match; a container takes its child's radius plus
 # its padding (THEMING.md).
