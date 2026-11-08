@@ -1,0 +1,12 @@
+# Third parties' screenshots, the bar the reviewers compare against: fetched again from the sources
+# references/README.md lists, not redistributed.
+references/*.png
+# Each round's capture and its blind sets: made again from the commit, never carried.
+rounds/*/shots/
+rounds/*/council-*/
+!rounds/*/council-key-*.json
+# Each reviewer's raw answer and log: run metadata (session ids, usage); ledger.jsonl holds what
+# they said, un-blinded.
+rounds/*/review-*
+# The capture's log: the report.json beside the shots says the same.
+rounds/*/capture.log

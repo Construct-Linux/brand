@@ -5,14 +5,16 @@ record.py ROUND BATCH [--kind full|single]
 
 Each reviewer's answer: Codex writes the schema's JSON itself; Claude and Antigravity put it in
 the result's structured_output. Pair winners become baseline/candidate through the batch's key,
-screen ids become screen names. A reviewer whose answer does not parse is reported and left out.
+screen ids become screen names. A reviewer whose answer does not parse is reported and left out. HILL_ROOT names
+another review's directory, as for council.py.
 """
 import argparse
+import os
 import json
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
+HERE = Path(os.environ.get("HILL_ROOT") or Path(__file__).resolve().parent).resolve()
 
 
 def answer(path: Path):

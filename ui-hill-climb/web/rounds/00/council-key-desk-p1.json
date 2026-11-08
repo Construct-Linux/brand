@@ -1,0 +1,16 @@
+{
+ "pairs": {},
+ "control": {
+  "c01": "top.desktop.dark",
+  "c02": "menus.desktop.dark",
+  "c03": "overview.desktop.light",
+  "c04": "accent.desktop.dark",
+  "c05": "compare.desktop.light",
+  "c06": "light.desktop.dark",
+  "c07": "elevation.desktop.dark",
+  "c08": "perception.desktop.light",
+  "c09": "swatches.desktop.dark",
+  "c10": "wallpapers.desktop.light",
+  "c11": "identity.desktop.light"
+ }
+}

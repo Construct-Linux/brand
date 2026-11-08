@@ -5,12 +5,14 @@ council.py ROUND BATCH --screens id,id,... [--candidate DIR] [--control id,id,..
 
 Without --candidate (round 0), every screen is a single cNN image to score. With it, each screen
 is a pair sNN-a/sNN-b of round 00 and the candidate, sides at random, and --control's screens are
-round 00's images again as cNN. Images are halved to 1440x900: the reviewers judge layout and
-colour, and the full 2880x1800 costs four times the tokens for detail the harness's lf measures.
+round 00's images again as cNN. Images wider than 1440 are scaled to 1440 wide: the reviewers judge
+layout and colour, and the full 2880x1800 costs four times the tokens for detail the harness's lf
+measures. HILL_ROOT names another review's directory (web/ for the site) with the same layout.
 The key (which image is which) goes to rounds/ROUND/council-key-BATCH.json, outside the
 directory the reviewers read. References are copied as they are named.
 """
 import argparse
+import os
 import json
 import random
 import shutil
@@ -18,11 +20,14 @@ from pathlib import Path
 
 from PIL import Image
 
-HERE = Path(__file__).resolve().parent
+HERE = Path(os.environ.get("HILL_ROOT") or Path(__file__).resolve().parent).resolve()
 
 
 def half(src: Path, dst: Path) -> None:
-    Image.open(src).convert("RGB").resize((1440, 900), Image.LANCZOS).save(dst, optimize=True)
+    im = Image.open(src).convert("RGB")
+    if im.width > 1440:
+        im = im.resize((1440, round(im.height * 1440 / im.width)), Image.LANCZOS)
+    im.save(dst, optimize=True)
 
 
 def main() -> None:
