@@ -118,7 +118,7 @@ level. Strongest first:
 |---|---|---|---|---|
 | 1 | **Brand** | the mark and the wordmark, Plymouth, the wallpaper, About, the installer. Never chrome: the Activities glyph is white | `brand.cyan` on ink or black only; a glow where the boot draws one | the mono mark, or the room in the light accent on the desk (the mark wallpaper); no cyan chrome |
 | 2 | **Primary action** | one per view: GTK's `suggested-action`; the shell dialog's default (prompt, polkit, unlock); a banner's or an infobar's button | **solid accent**, label `on_accent` at 700 (12.34:1). Hover and active: `on_accent` at 8% and 16% over the fill; disabled: opacity 0.5. Focus: in the shell an inset 2px ring in `on_accent` inside the fill; in GTK the 2px accent outline, 2px offset | solid `#007A85`, white label at 700 (5.09:1); the same states; focus an inset 2px white or the offset outline |
-| 3 | **Selected, on** | quick toggles on and their arrow, selected rows, the sidebar, the selected day, view-switcher and stack-switcher tabs, checked toggle buttons, the Alt+Tab item, the IBus candidate, the dock's focused app | the tint, rest / hover / active, label `accent_text`, a second line `text`, **no edge**. A quick toggle that is on also draws its icon on a 24px accent disc with an `on_accent` glyph | the tint with the **border line inside it** (`inset 0 0 0 1px`, neutral); the navigation sidebar is the sheet instead (below) |
+| 3 | **Selected, on** | quick toggles on and their arrow, selected rows, the sidebar, the selected day, view-switcher and stack-switcher tabs, checked toggle buttons, the Alt+Tab item, the IBus candidate, the dock's focused app | the tint, rest / hover / active, label `accent_text`, a second line `text`, **no edge**. In the shell, on is stronger than selected: a quick toggle that is on, and today when the calendar opens on it, take the on tint with `text` as the label (4.99:1, hover 4.54:1), and the toggle draws its icon on a 24px accent disc with an `on_accent` glyph | the tint with the **border line inside it** (`inset 0 0 0 1px`, neutral); the navigation sidebar is the sheet instead (below) |
 | 3a | Text selection | entries, text views, terminals, VS Code | the selection alpha, 25%; the text keeps `text` | 20% |
 | 3b | Selected on imagery | window thumbnails (the screenshot UI, the workspace thumbnails), Settings' style previews | a 2px frame in `text` plus the accent's check badge; no accent ring | the same |
 | 4 | **Indicator** | switch, checkbox, radio, slider fill, progress, the OSD's level, levelbar, badges, the dock's running dot, the workspace dot, the caret, the tab indicator, Calendar's now-strip | full accent, mark-sized. A switch's track is the accent at 50% (3.48:1 on `h`), its knob the full accent; the slider's knob stays `text` | `#007A85`; the track 50% (2.12:1: the knob carries the state) |
@@ -128,7 +128,7 @@ level. Strongest first:
 
 **Today** in a calendar is `accent_text` at 700 - no ring, no tint: ΔE00 22.4 from a day's text in
 dark, 27.3 in light (2.59:1, plus the weight). GtkCalendar's today is not selected, so it draws no
-tint. The ring is free for focus, and calendar days lose their exemption from F1; popup-menu items
+tint; the shell's calendar opens on today, which is then on: the on tint with `text` at 700. The ring is free for focus, and calendar days lose their exemption from F1; popup-menu items
 keep theirs (hover is focus there).
 
 **Primary is solid, in dark too.** It is the only rendering that tells the primary from a selected
@@ -138,10 +138,10 @@ over `g` (light 38.6 over `c`), 49 or more in every view. The cost is one button
 they stay a tint. The alternative, the tint with a 1px accent ring at 50%, measures 3.04:1 against
 the tint, 2.32 at low brightness, and reads as half focused.
 
-| Tint | Rest | Hover | Active | Selection | Decoration | Track |
-|---|---|---|---|---|---|---|
-| dark | 18% | 23% | 28% | 25% | 8% | 50% |
-| light | 10% | 17% | 24% | 20% | 5% | 50% |
+| Tint | Rest | Hover | Active | Selection | Decoration | Track | On | On, hover and active |
+|---|---|---|---|---|---|---|---|---|
+| dark | 18% | 23% | 28% | 25% | 8% | 50% | 36% | 40% |
+| light | 10% | 17% | 24% | 20% | 5% | 50% | 30% | 36% |
 
 28% is the dark ceiling: at 32% over `h`, `accent_text` falls to 4.29:1. Dark's rest is 18% so an
 on quick toggle stays ΔE00 6.5 from an off one for deutans on an IPS panel (at 16%, 5.6). Light's
