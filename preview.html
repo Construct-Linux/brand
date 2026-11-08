@@ -216,9 +216,12 @@
   .tg .ic { width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; flex: none; }
   /* On: the tint and its label, and the icon on a 24px accent disc - on and off are 1.18:1 at
      30% backlight and the label alone is a hue step protans barely see. */
-  .tg.on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  /* On is stronger than selected: the on tint with text (THEMING row 3). The comparison below
+     measures the primary against the selected tint, so it draws a selected toggle (.sel). */
+  .tg.on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-on), var(--shell-surface)); color: var(--shell-text); }
+  .tg.sel { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
   .tg.on small { color: var(--shell-text); }
-  .tg.on .ic { background: var(--shell-accent); color: var(--shell-on-accent); }
+  :is(.tg.on, .tg.sel) .ic { background: var(--shell-accent); color: var(--shell-on-accent); }
   .tg.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal { left: 30%; top: 3.3em; width: 56%; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius-sheet); }
   .cal .msgs { padding: 1em; display: flex; flex-direction: column; gap: .6em; border-right: 1px solid var(--shell-border); }
@@ -235,7 +238,7 @@
   .day.h, .day.o { color: var(--shell-muted); }
   /* Today is a label, not a ring: accent_text at 700. The ring is focus. */
   .day.t { color: var(--shell-accent-text); font-weight: 700; }
-  .day.s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  .day.s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-on), var(--shell-surface)); color: var(--shell-text); }
   .day.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal .box { border-radius: var(--radius-control); padding: .5em .8em; font-size: .9em; }
   .cal .box b { display: block; }
@@ -671,15 +674,15 @@
   <div class="cmp sim" aria-label="The primary as a solid fill, a 28% tint and a 36% tint, beside the selected state">
     <div aria-hidden="true"></div><div class="head">Shell, on h (both modes)</div><div class="head">GTK dark, on g</div><div class="head">GTK light, on a</div>
     <div class="lead"><b>A Solid</b><span>the accent, label on_accent: today's rule</span></div>
-    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn pri">Authenticate</span></div><small>label 12.34:1 · ΔE00 51.3</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn pri">Authenticate</span></div><small>label 12.34:1 · ΔE00 51.3</small></div>
     <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 12.34:1 · ΔE00 56.2</small></div>
     <div class="demo md" data-mode="light" data-col="GTK light, on a"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 5.09:1 · ΔE00 40.3</small></div>
     <div class="lead"><b>B 28% tint</b><span>label accent_text</span></div>
-    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint28">Authenticate</span></div><small>label 4.79:1 · ΔE00 6.1: dark's active tint, a pressed selected item</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint28">Authenticate</span></div><small>label 4.79:1 · ΔE00 6.1: dark's active tint, a pressed selected item</small></div>
     <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 5.31:1 · ΔE00 6.8: dark's active tint</small></div>
     <div class="demo md" data-mode="light" data-col="GTK light, on a"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 4.64:1 · ΔE00 9.4</small></div>
     <div class="lead"><b>C 36% tint</b><span>label accent_text</span></div>
-    <div class="demo sh" data-col="Shell, on h (both modes)"><div role="img" aria-label="Wired on, and Authenticate as a 36% tint: its label below 4.5:1"><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small><span class="fail">label 3.89:1, below 4.5</span> · ΔE00 11.3</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div role="img" aria-label="Wired selected, and Authenticate as a 36% tint: its label below 4.5:1"><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small><span class="fail">label 3.89:1, below 4.5</span> · ΔE00 11.3</small></div>
     <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.24:1, below 4.5</span> · ΔE00 12.1</small></div>
     <div class="demo md" data-mode="light" data-col="GTK light, on a"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.08:1, below 4.5</span> · ΔE00 13.2</small></div>
   </div>

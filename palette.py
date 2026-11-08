@@ -630,6 +630,7 @@ def css(p):
                        "fill": mix(n["a"], n["h"], SHELL_FILL),
                        "tint": pct(td["rest"]), "tint-hover": pct(td["hover"]), "tint-active": pct(td["active"]),
                        "selection": pct(td["selection"]), "tint-deco": pct(td["decoration"]), "tint-track": pct(td["track"]),
+                       "tint-on": pct(td["on"]), "tint-on-hover": pct(td["on_hover"]),
                        **{k.replace("_", "-"): v for k, v in p["dark"].items()}}.items())
     brand = "\n".join(f"  --{k}: {v};" for k, v in flat({g: p[g] for g in ("brand", "neutral", "icons", "cursor")}).items())
     shape = "\n".join(f"  --{k.replace('_', '-')}: {sh[k]}px;" for k in ("radius_control", "radius_surface", "radius_sheet", "inset"))
