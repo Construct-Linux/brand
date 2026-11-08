@@ -14,3 +14,9 @@
   Won 3/3: installer, the Construct app, app grid, notifications, desktop-light, System Monitor;
   shell-calendar split 1/1/1 (the disc no longer loses); Files lost 2/3 - two reviewers want the
   inset pill, the third the consistency with Settings and Construct.
+- **3** brand: chart series four hues apart (tier C); Orchis: an off switch's knob that reads on a
+  dark row, GNOME's bell size for an empty list (the Clear rule used opacity, which St ignores:
+  still drawn, fixed for 4); os: the Construct app's titles said once. Median 7 (+1.0, inside the
+  2.0 noise), 56% of pairs. Files won 3/3 now that every sidebar shares its edge; the Construct
+  app, System Monitor (2/3), installer, app grid, notifications won; quick settings lost 2/3 and
+  the lock screen split, both unchanged since round 1 - the reviewers trade taste on the on tint.
