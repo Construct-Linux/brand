@@ -38,6 +38,8 @@
   --shell-selection: 25%;
   --shell-tint-deco: 8%;
   --shell-tint-track: 50%;
+  --shell-tint-on: 36%;
+  --shell-tint-on-hover: 40%;
   --shell-accent: #00E5FF;
   --shell-accent-text: #00E5FF;
   --shell-on-accent: #0B1116;

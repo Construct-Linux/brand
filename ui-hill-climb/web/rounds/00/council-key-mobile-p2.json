@@ -1,0 +1,16 @@
+{
+ "pairs": {},
+ "control": {
+  "c01": "top.mobile.dark",
+  "c02": "menus.mobile.light",
+  "c03": "overview.mobile.dark",
+  "c04": "accent.mobile.dark",
+  "c05": "compare.mobile.light",
+  "c06": "light.mobile.light",
+  "c07": "elevation.mobile.dark",
+  "c08": "perception.mobile.dark",
+  "c09": "wallpapers.mobile.light",
+  "c10": "identity.mobile.dark",
+  "c11": "top.desktop.light"
+ }
+}

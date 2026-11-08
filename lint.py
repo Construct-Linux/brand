@@ -52,11 +52,13 @@ def colors(text):
 
 # C7: the accent's alpha is a token. A level of the accent scale (THEMING.md) is an alpha
 # palette.toml names - Orchis' $tint, $tint-hover, $tint-active, $selection-alpha,
-# $tint-decoration, $tint-track - never a number written where it is used, nor a shade
+# $tint-decoration, $tint-track, $tint-on and $tint-on-hover (a shell toggle that is on) - never
+# a number written where it is used, nor a shade
 # lighten() or darken() makes: a number chosen at each place of use is how a scale drifts into
 # twenty alphas no one can tell apart. Exceptions are lint-forks.toml's [fork.<name>.accent], each with its reason.
 ACCENT = r"\$(?:primary|suggested|link)\b"
-TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-decoration", "$tint-track"}
+TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-decoration", "$tint-track",
+          "$tint-on", "$tint-on-hover"}
 ALPHA = re.compile(rf"\b(?:rgba|alpha|gtkalpha)\(\s*{ACCENT}\s*,\s*([^)]*)\)")
 COLOR_MIX = re.compile(rf"color-mix\(\s*in\s+[\w-]+\s*,\s*{ACCENT}\s+([^,]+),")
 SHADE = re.compile(rf"\b(?:transparentize|lighten|darken)\(\s*{ACCENT}|(?<![\w-])mix\([^;]*?{ACCENT}")
@@ -309,22 +311,19 @@ def literals(forks, rules, allowed):
 
 
 def mirrors(forks, p):
-    """The forks that hold a copy of the palette rather than reading it: Orchis' SCSS, copied
-    under a two-line header, and Bibata's color table, written by hand."""
+    """The forks that hold a copy of the palette rather than reading it, against palette/ now:
+    Orchis' SCSS under its two-line header and Bibata's JSON, which os's task fork:brand writes
+    from a pinned commit (and fork:check holds to it). Here they are held to this checkout, so a
+    palette changed and not yet copied shows before it is pinned."""
     problems = []
-    orchis = os.path.join(forks, "Orchis-theme/src/_sass/_construct-palette.scss")
-    ours = open(os.path.join(HERE, "palette/construct.scss")).read()
-    if not os.path.isfile(orchis):
-        problems.append(f"{orchis}: missing")
-    elif "".join(open(orchis).read().splitlines(keepends=True)[2:]) != ours:
-        problems.append("Orchis-theme/src/_sass/_construct-palette.scss: not palette/construct.scss under its "
-                        "two-line header: copy it again")
-    bibata = os.path.join(forks, "Bibata_Cursor/build.py")
-    want = [p["cursor"][k].upper() for k in ("fill", "outline", "watch")]
-    table = re.search(r"^COLORS = \{(.*?)^\}", open(bibata).read(), re.S | re.M) if os.path.isfile(bibata) else None
-    have = [v.upper() for v in re.findall(r'"#[0-9a-fA-F]{6}"\s*:\s*"(#[0-9a-fA-F]{6})"', table.group(1))] if table else None
-    if have != want:
-        problems.append(f"Bibata_Cursor/build.py: COLORS is {have}, palette.toml's cursor is {want} (fill, outline, watch)")
+    for rel, ours, skip in (("Orchis-theme/src/_sass/_construct-palette.scss", "palette/construct.scss", 2),
+                            ("Bibata_Cursor/construct-palette.json", "palette/construct.json", 0)):
+        path = os.path.join(forks, rel)
+        want = open(os.path.join(HERE, ours)).read()
+        if not os.path.isfile(path):
+            problems.append(f"{rel}: missing")
+        elif "".join(open(path).read().splitlines(keepends=True)[skip:]) != want:
+            problems.append(f"{rel}: not {ours}: os's task fork:brand copies it from the pinned brand")
     return problems
 
 

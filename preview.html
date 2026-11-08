@@ -24,19 +24,71 @@
   [data-mode="light"] { --shadow-1: color-mix(in srgb, var(--brand-boot) 14%, transparent);
                         --shadow-3: color-mix(in srgb, var(--brand-boot) 22%, transparent); }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font-ui); }
-  main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
-  header.page { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; justify-content: space-between; margin-bottom: 20px; }
-  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
-  .word { font-family: var(--font-wordmark); letter-spacing: .35em; font-size: 22px; color: var(--accent-text); display: flex; align-items: center; gap: 14px; }
-  .word img { width: 40px; height: 40px; }
-  .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line-border); border-radius: 999px; padding: 3px; background: var(--view); }
-  .seg button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--muted); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font-ui); }
+  /* The page is a GNOME window: the sidebar a shelf (f in dark), its selected place the desktop's
+     own selection, the content beside it. Below 1100px the sidebar becomes the page's head. */
+  .layout { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+  aside.side-nav { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--shelf); box-shadow: inset -1px 0 var(--line-border);
+                   padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+  main { min-width: 0; max-width: 1144px; padding: 40px 32px 0; }
+  .word { font-family: var(--font-wordmark); letter-spacing: .35em; color: var(--accent-text); display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  aside .word { font-size: 17px; padding: 0 8px; }
+  .word .mark { width: 32px; height: 32px; flex: none; background: var(--accent-text); mask: url("logos/construct.svg") center / contain no-repeat; }
+  aside .tagline { margin: -12px 0 0; padding: 0 8px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .toc { display: flex; flex-direction: column; gap: 2px; }
+  .toc a { display: block; padding: 6px 10px; border-radius: var(--radius-control); color: var(--text); text-decoration: none; font-size: 14px; }
+  .toc a:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+  .toc a[aria-current="true"] { background: color-mix(in srgb, var(--accent) var(--tint), var(--shelf)); color: var(--accent-text); }
+  [data-mode="light"] .toc a[aria-current="true"] { background: var(--neutral-a); box-shadow: inset 0 0 0 1px var(--line-border); color: var(--text); font-weight: 700; }
+  .toc a:focus-visible, .link:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cap-label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); padding: 0 8px; margin-bottom: 6px; }
+  .controls { display: flex; flex-direction: column; gap: 16px; }
+  .seg { display: inline-flex; border: 1px solid var(--line-border); border-radius: 999px; padding: 3px; background: var(--view); }
+  .seg button { font: inherit; font-size: 13px; border: 0; background: none; color: var(--muted); padding: 5px 11px; border-radius: 999px; cursor: pointer; flex: 1; white-space: nowrap; }
   .seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) var(--tint), var(--view)); color: var(--accent-text);
                                       box-shadow: inset 0 0 0 1px var(--tint-edge); }
   .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 44px 0 12px; font-weight: 700; }
-  p.note { color: var(--muted); margin: 0 0 12px; max-width: 75ch; }
+  aside .seg { display: flex; }
+  aside .seg button { padding: 5px 6px; }
+  select { font: inherit; font-size: 13px; color: var(--text); background: var(--view); border: 1px solid var(--line-border); border-radius: 999px;
+           padding: 6px 12px; width: 100%; }
+  .hero { padding-bottom: 8px; }
+  .hero h1 { font-size: 40px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; margin: 0 0 16px; }
+  .hero .lead { font-size: 17px; line-height: 1.55; color: var(--text); margin: 0 0 16px; max-width: 78ch; }
+  .hero .links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; font-size: 15px; }
+  #desktop { padding-top: 28px; }
+  section { padding: 56px 0 8px; scroll-margin-top: 8px; }
+  section + section { border-top: 1px solid var(--line-divider); margin-top: 32px; }
+  h2 { font-size: 26px; line-height: 1.2; font-weight: 700; color: var(--text); margin: 0 0 12px; }
+  h3 { font-size: 15px; font-weight: 700; margin: 24px 0 8px; }
+  p.note { color: var(--muted); margin: 0 0 20px; max-width: 70ch; line-height: 1.6; }
+  /* The first drawing leads its section, so the page shows the desktop before it explains it. */
+  p.note.caption { margin: 16px 0 0; }
+  code { font-family: var(--font-mono); font-size: .9em; }
+  .lv .num { display: inline-block; min-width: 1.6em; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .cmp small { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .cmp .demo .fail { color: var(--error); }
+  .cmp .demo.sh .fail { color: var(--shell-error); }
+  .ident.wps { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
+  .wps .pair a { display: block; }
+  .ident .card div.c :not(a) > code { color: var(--text); }
+  footer.page { margin-top: 72px; padding: 24px 0 40px; border-top: 1px solid var(--line-divider); color: var(--muted); font-size: 14px;
+                display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  footer.page p { margin: 0; max-width: 70ch; }
+  @media (max-width: 1099px) {
+    .layout { display: block; }
+    aside.side-nav { position: static; height: auto; overflow: visible; box-shadow: inset 0 -1px var(--line-border); padding: 16px; gap: 16px; }
+    main { padding: 32px 16px 0; margin: 0 auto; }
+    .controls { flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; }
+    .controls > div { min-width: 0; }
+    aside .seg { display: inline-flex; }
+    select { width: auto; }
+    .toc { flex-direction: row; overflow-x: auto; gap: 4px; margin: 0 -16px; padding: 0 16px 2px; scrollbar-width: none;
+           mask-image: linear-gradient(to right, var(--text) calc(100% - 48px), transparent); }  /* only its alpha counts */
+    .toc a { white-space: nowrap; border: 1px solid var(--line-border); border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+    .toc .cap-label { display: none; }
+  }
+
 
   /* ---------- the components, once: each draws in the mode's variables; inside .sh the shell's ---------- */
   /* The shell is Orchis' dark variant in both modes: a .sh block maps the mode's names to it. */
@@ -151,7 +203,7 @@
   .fill { background: var(--shell-fill); }
   .tooltip { left: 50%; bottom: 3.9em; transform: translateX(-50%); padding: .3em .7em; border-radius: var(--radius-control); font-size: .85em; }
   /* Quick settings, concentric: its pill toggles (radius 22) plus its 18px padding make 40. */
-  .qs { right: var(--inset); top: 3.3em; width: 30%; padding: 18px; border-radius: calc(22px + 18px); display: flex; flex-direction: column; gap: .9em; }
+  .qs { right: var(--inset); top: 3.3em; width: 33%; padding: 18px; border-radius: calc(22px + 18px); display: flex; flex-direction: column; gap: .9em; }
   .qs .top { display: flex; gap: .6em; }
   .qs .top span { width: 2.4em; height: 2.4em; border-radius: 50%; display: grid; place-items: center; }
   .qs .top .gap { flex: 1; background: none; }
@@ -164,9 +216,12 @@
   .tg .ic { width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; flex: none; }
   /* On: the tint and its label, and the icon on a 24px accent disc - on and off are 1.18:1 at
      30% backlight and the label alone is a hue step protans barely see. */
-  .tg.on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  /* On is stronger than selected: the on tint with text (THEMING row 3). The comparison below
+     measures the primary against the selected tint, so it draws a selected toggle (.sel). */
+  .tg.on { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-on), var(--shell-surface)); color: var(--shell-text); }
+  .tg.sel { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
   .tg.on small { color: var(--shell-text); }
-  .tg.on .ic { background: var(--shell-accent); color: var(--shell-on-accent); }
+  :is(.tg.on, .tg.sel) .ic { background: var(--shell-accent); color: var(--shell-on-accent); }
   .tg.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal { left: 30%; top: 3.3em; width: 56%; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius-sheet); }
   .cal .msgs { padding: 1em; display: flex; flex-direction: column; gap: .6em; border-right: 1px solid var(--shell-border); }
@@ -183,7 +238,7 @@
   .day.h, .day.o { color: var(--shell-muted); }
   /* Today is a label, not a ring: accent_text at 700. The ring is focus. */
   .day.t { color: var(--shell-accent-text); font-weight: 700; }
-  .day.s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint), var(--shell-surface)); color: var(--shell-accent-text); }
+  .day.s { background: color-mix(in srgb, var(--shell-accent) var(--shell-tint-on), var(--shell-surface)); color: var(--shell-text); }
   .day.foc { box-shadow: inset 0 0 0 2px var(--shell-accent); }
   .cal .box { border-radius: var(--radius-control); padding: .5em .8em; font-size: .9em; }
   .cal .box b { display: block; }
@@ -218,7 +273,7 @@
   .demo { border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-height: 64px; font-size: 14px; }
   .demo.sh { background: var(--shell-surface); border: 1px solid var(--shell-border); }
   .demo.md { background: var(--view); border: 1px solid var(--line-border); }
-  .demo.wp { background: var(--desk) var(--wp-dark) center / contain no-repeat; border: 1px solid var(--line-border); }
+  .demo.wp { background: var(--desk) var(--wp-dark) center / cover no-repeat; border: 1px solid var(--line-border); }
   [data-mode="light"] .demo.wp { background-image: var(--wp-light); }
   .demo .tg { font-size: 14px; }
   .demo .rowx { padding: .4em .7em; border-radius: var(--radius-control); }
@@ -243,7 +298,7 @@
   @media (max-width: 640px) { .lv, .cmp { grid-template-columns: 1fr; } }
 
   /* ---------- light: ink on paper ---------- */
-  .settings { left: 7%; top: 10%; width: 72%; height: 80%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
+  .settings { left: 7%; top: 7.5%; width: 72%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
   .settings .pane { background: var(--shelf); box-shadow: inset -1px 0 var(--line-border); display: flex; flex-direction: column; min-width: 0; }
   /* Both headerbars one height, so their rules run as one line across the window. */
   .hb { height: 3em; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 -1px var(--line-border); flex: none; line-height: 1.2; position: relative; }
@@ -254,8 +309,8 @@
   .nav { padding: .5em; display: flex; flex-direction: column; gap: .15em; }
   .nav .cap { font-size: .82em; font-weight: 700; color: var(--muted); padding: .9em .6em .3em; }
   .page { background: var(--bg); display: flex; flex-direction: column; min-width: 0; position: relative; }
-  .page .body { padding: 1.6em 2em; display: flex; flex-direction: column; gap: 1.6em; width: 100%; max-width: 40em; margin: 0 auto; overflow: hidden; }
-  .group h4 { margin: 0; font-size: 1em; font-weight: 700; }
+  .page .body { padding: 1.4em 2em; display: flex; flex-direction: column; gap: 1.3em; width: 100%; max-width: 40em; margin: 0 auto; overflow: hidden; }
+  .group .h4 { margin: 0; font-size: 1em; font-weight: 700; }
   .group > p { margin: .2em 0 0; color: var(--muted); font-size: .82em; }
   .list { margin-top: .8em; background: var(--view); border-radius: 12px; box-shadow: 0 0 0 1px var(--line-border); overflow: hidden; }
   .list > div { display: flex; align-items: center; gap: .8em; padding: .7em 1em; }
@@ -270,14 +325,16 @@
   .pop .h { background: color-mix(in srgb, var(--text) 6%, transparent); }
   .pop hr { border: 0; height: 1px; background: var(--line-divider); margin: .3em .4em; }
   .lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
-  .lines > div { background: var(--neutral-a); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 13px; }
-  .lines .sample { height: 56px; border-radius: 10px; margin: 10px 0 6px; background: var(--neutral-a); }
+  .lines > div { background: var(--bg); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 13px; box-shadow: 0 0 0 1px var(--line-border); }
+  /* A boxed list of two rows, so each line is seen doing its job: the edge and the divider. */
+  .lines .sample { height: 56px; border-radius: 10px; margin: 10px 0 6px; background: var(--neutral-a); display: grid; grid-template-rows: 1fr 1fr; }
+  .lines .sample span { display: flex; align-items: center; padding: 0 12px; }
   .types { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 28px; padding: 16px 20px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-border); margin-top: 12px; }
   .types span { white-space: nowrap; }
   .types small { color: var(--muted); font-size: 9pt; font-weight: 400; margin-left: .4em; }
 
   /* ---------- elevation, shape, swatches, identity ---------- */
-  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; padding: 12px; border-radius: 12px; }
+  .strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; padding: 12px; border-radius: 12px; }
   .lvl { border-radius: 12px; padding: 14px; min-height: 92px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; color: var(--text); }
   .lvl b { font-weight: 700; } .lvl span { color: var(--muted); }
   .shape { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
@@ -288,11 +345,14 @@
   .shape .r4 { width: 120px; height: 36px; border-radius: 999px; }
   .shape .qsr { width: 200px; height: 120px; border-radius: calc(22px + 18px); padding: 18px; background: var(--shell-surface); border-color: var(--shell-border); }
   .shape .qsr i { display: grid; place-items: center; width: 100%; height: 44px; border-radius: 999px; background: var(--shell-fill); color: var(--shell-text); font-style: normal; }
-  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .sw { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .sw + .sw { margin-top: 10px; }
+  #neutral-sw { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  #status-sw .s:nth-child(4) { grid-column: 5; }
   .s { border: 1px solid var(--line-border); border-radius: 10px; overflow: hidden; background: var(--view); }
-  .s i { display: block; height: 56px; }
+  .s i { display: block; height: 56px; box-shadow: inset 0 -1px var(--line-border); }
   .s div { padding: 8px 10px; font-size: 13px; }
-  .s code { font: 12px var(--font-mono); color: var(--muted); display: block; }
+  .s code { font: 12px var(--font-mono); color: var(--muted); display: block; overflow-wrap: anywhere; }
   .ident { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
   .card { border: 1px solid var(--line-border); border-radius: 12px; overflow: hidden; background: var(--view); }
   .card .img { aspect-ratio: 16 / 10; display: grid; place-items: center; position: relative; }
@@ -310,34 +370,108 @@
   td code { font: 13px var(--font-mono); color: var(--text); }
   .scroll { overflow-x: auto; }
   /* The perception table: every pair task palette holds, its worst view marked. */
-  #perception { max-height: 560px; overflow: auto; border: 1px solid var(--line-border); border-radius: 12px; background: var(--view); }
+  #perception { border: 1px solid var(--line-border); border-radius: 12px; background: var(--view); }
   #perception table { font-size: 13px; }
-  #perception th { position: sticky; top: 0; background: var(--view); box-shadow: inset 0 -1px var(--line-border); }
+  #perception th { position: sticky; top: 0; z-index: 1; background: var(--view); box-shadow: inset 0 -1px var(--line-border); white-space: normal; vertical-align: bottom; }
+  #perception td:nth-child(2) { white-space: normal; min-width: 18em; }
   #perception td { padding: 6px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  @media (max-width: 640px) {
+    #perception, #perception table, #perception tbody { display: block; }
+    #perception tr:first-child { display: none; }
+    #perception tr { display: flex; flex-wrap: wrap; gap: 6px 8px; padding: 12px; border-bottom: 1px solid var(--line-divider); }
+    #perception td { flex: 0 0 calc(25% - 6px); }
+    #perception td { display: block; padding: 0; border: 0; text-align: left; }
+    #perception tr td.n { text-align: left; }
+    #perception td:nth-child(1) { flex: none; font-weight: 700; min-width: 2em; }
+    #perception td:nth-child(2) { flex: 1 1 calc(100% - 3em); min-width: 0; margin-bottom: 4px; }
+    #perception td[data-label]:not(:nth-child(-n+2))::before { content: attr(data-label); display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+  }
   #perception td.n { text-align: right; color: var(--muted); }
   #perception td.w { color: var(--text); font-weight: 700; }
-  #perception .pair { display: inline-flex; vertical-align: middle; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px var(--line-border); margin-right: 8px; }
+  #perception .pn { display: flex; align-items: flex-start; }
+  #perception .pair { display: inline-flex; flex: none; vertical-align: middle; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px var(--line-border); margin-right: 8px; }
   #perception .pair i { width: 18px; height: 18px; }
   #perception .ok { color: var(--success); } #perception .low { color: var(--error); font-weight: 700; }
-  @media (max-width: 640px) { .term, .qs, .cal, .workspace, .pop { display: none; } .files { width: 88%; } .search { width: 70%; } .settings { width: 92%; left: 4%; } }
-</style>
+  .scale .colhead { display: grid; grid-template-columns: 170px 1fr 1fr; gap: 10px; font-size: 12px; font-weight: 700; color: var(--muted); }
+  /* On a phone the columns stack, so each demo says which column it was. */
+  @media (max-width: 640px) {
+    .scale .colhead, .cmp > .head, .cmp > div:first-child:empty { display: none; }
+    :is(.lv, .cmp) .demo[data-col]::before { content: attr(data-col); display: block; width: 100%; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .lv .demo.sh[data-col]::before, .cmp .demo.sh[data-col]::before { color: var(--shell-muted); }
+    .lv { gap: 6px; margin-bottom: 10px; }
+  }
+  /* Last, so a phone's layout overrides the rules above it. */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 30px; }
+    .hero .lead { font-size: 16px; }
+    h2 { font-size: 22px; }
+    section { padding-top: 40px; margin-top: 24px; }
+    /* A drawing on a phone is a square, its windows recomposed to fit it: the whole scene at
+       a readable size, rather than a 16:9 thumbnail or a crop. */
+    .desktop { aspect-ratio: 1 / 1; }
+    .files { left: 4%; top: 11%; width: 92%; height: 46%; }
+    .term { left: 4%; right: auto; top: 60%; width: 92%; height: 27%; }
+    .term .ansi { display: none; }
+    .qs { width: 78%; }
+    .auth { left: 4%; top: 58%; width: 66%; }
+    .cal { left: 4%; width: 92%; }
+    .workspace { width: 86%; }
+    .search { width: 70%; }
+    .settings { left: 4%; width: 92%; }
+    .pop, .tooltip, .cursor { display: none; }
+    .lvl { min-height: 0; }
+    .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sw, #neutral-sw { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .qs .toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tg { min-width: 0; padding-right: .6em; }
+    .ident.wps { grid-template-columns: 1fr; }
+    .ident:not(.wps) .card .img { aspect-ratio: 2 / 1; }
+    #status-sw .s:nth-child(4) { grid-column: auto; }
+  }</style>
 </head>
 <body>
-<main>
-  <header class="page">
-    <div class="word"><img src="logos/construct.svg" alt="">CONSTRUCT</div>
-    <div class="controls">
-      <div class="seg" role="group" aria-label="Mode" id="mode">
+<div class="layout">
+<aside class="side-nav">
+  <a class="word" href="#top" aria-label="CONSTRUCT, to the top"><span class="mark" aria-hidden="true"></span>CONSTRUCT</a>
+  <p class="tagline">the workspace.<br>the image, verified.</p>
+  <div class="controls">
+    <div><span class="cap-label" id="mode-label">Mode</span>
+      <div class="seg" role="group" aria-labelledby="mode-label" id="mode">
         <button data-v="">System</button><button data-v="dark">Dark</button><button data-v="light">Light</button>
-      </div>
-      <div class="seg" role="group" aria-label="See as" id="sim"><button data-v="">As drawn</button></div>
-      <div class="seg" role="group" aria-label="Wallpaper" id="wallpaper">
+      </div></div>
+    <div><label class="cap-label" for="sim">See as</label>
+      <select id="sim"><option value="">As drawn</option></select></div>
+    <div><span class="cap-label" id="wallpaper-label">Wallpaper</span>
+      <div class="seg" role="group" aria-labelledby="wallpaper-label" id="wallpaper">
         <button data-v="">Default</button><button data-v="quiet">Quiet</button><button data-v="offset">Offset</button><button data-v="mark">Mark</button>
-      </div>
-    </div>
+      </div></div>
+  </div>
+  <nav class="toc" aria-label="Sections">
+    <span class="cap-label">On this page</span>
+    <a href="#desktop">The desktop</a>
+    <a href="#menus">The shell's menus</a>
+    <a href="#overview">The overview</a>
+    <a href="#accent">Accent: one scale</a>
+    <a href="#comparison">Open comparison</a>
+    <a href="#light">Light: ink on paper</a>
+    <a href="#elevation">Elevation</a>
+    <a href="#perception-section">Perception</a>
+    <a href="#shape">Shape</a>
+    <a href="#swatches">Swatches</a>
+    <a href="#wallpapers">Wallpapers</a>
+    <a href="#identity">Identity</a>
+    <a href="#where">Where each piece goes</a>
+  </nav>
+</aside>
+<main id="top">
+  <header class="hero">
+    <h1>The desktop, drawn with its palette</h1>
+    <p class="lead">CONSTRUCT is a Linux desktop for developers built on Wolfi: a read-only, verified base image with A/B updates and automatic rollback, and GNOME on top. This page draws it with its palette, in dark and light, and shows the rules every colour follows.</p>
+    <p class="links"><a class="link" href="https://github.com/Construct-Linux/brand">Source and assets</a><a class="link" href="https://github.com/Construct-Linux/brand/blob/main/THEMING.md">The theming rules</a></p>
   </header>
 
-  <div class="desktop sim" aria-label="The desktop with the palette">
+  <section id="desktop" aria-label="The desktop">
+  <div class="desktop sim" role="figure" aria-label="The desktop with the palette: Files and Ghostty open">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -381,7 +515,7 @@
 <span class="c3">19bf42d</span> <span class="c4">(HEAD -&gt; main)</span> Give the palette elevation
 <span class="c3">375a6b8</span> <span class="c5">Name</span> the fonts <span class="c1">the desktop</span> draws with
 <span class="c6">~/construct</span> $ <span class="caret"> </span></pre>
-      <div class="ansi" aria-label="The sixteen colors">
+      <div class="ansi" role="img" aria-label="The sixteen colors">
         <i style="background:var(--term-0)"></i><i style="background:var(--term-1)"></i><i style="background:var(--term-2)"></i><i style="background:var(--term-3)"></i>
         <i style="background:var(--term-4)"></i><i style="background:var(--term-5)"></i><i style="background:var(--term-6)"></i><i style="background:var(--term-7)"></i>
         <i style="background:var(--term-8)"></i><i style="background:var(--term-9)"></i><i style="background:var(--term-10)"></i><i style="background:var(--term-11)"></i>
@@ -397,11 +531,14 @@
       <div class="app on focus">Files</div><div class="app on">Term</div><div class="app">Code</div><div class="app">Web</div>
     </div>
   </div>
-  <p class="note" style="margin-top:10px">Files on the left and Ghostty on the right; the top bar and the dock are GNOME Shell with Orchis, dash-to-panel and Vitals: opaque, ringed, 6px from the edge, dark in both modes. The windows follow the mode. Dark: the body one step above the desktop, views one more, a 1px ring outside. Light: the window on the desk with its ring in the ink's hue, the sidebar a shelf below it, the selected place a white sheet. The selected folder is a tint, Open the one solid button, the entry the one ring.</p>
+  <p class="note caption">Files on the left and Ghostty on the right; the top bar and the dock are GNOME Shell with Orchis, dash-to-panel and Vitals: opaque, ringed, 6px from the edge, dark in both modes. The windows follow the mode. Dark: the body one step above the desktop, views one more, a 1px ring outside. Light: the window on the desk with its ring in the ink's hue, the sidebar a shelf below it, the selected place a white sheet. The selected folder is a tint, Open the one solid button, the entry the one ring.</p>
+  </section>
 
-  <h2>The shell's menus</h2>
+  <section id="menus" aria-labelledby="menus-h">
+  <h2 id="menus-h">The shell's menus</h2>
   <p class="note">Quick settings open with a password prompt, then the calendar. Toggles that are on are a tint with their icon on an accent disc; the focused toggle and the focused day carry the ring; today is accent text in bold, never a ring; the selected day is a tint. The prompt's Authenticate is the solid primary.</p>
-  <div class="desktop sim" aria-label="Quick settings open, and a prompt">
+  <h3>Quick settings and a password prompt</h3>
+  <div class="desktop sim" role="figure" aria-label="Quick settings open, and a prompt">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -435,7 +572,8 @@
     </div>
   </div>
 
-  <div class="desktop sim" aria-label="The calendar open" style="margin-top:16px">
+  <h3>The calendar</h3>
+  <div class="desktop sim" role="figure" aria-label="The calendar open">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right">
@@ -468,9 +606,12 @@
     </div>
   </div>
 
-  <h2>The overview</h2>
+  </section>
+
+  <section id="overview" aria-labelledby="overview-h">
+  <h2 id="overview-h">The overview</h2>
   <p class="note">The ground is the boot's black, in both modes; the workspace, the desktop, is a card on it, lighter than what it stands on. The search entry is a menu surface: h and the ring.</p>
-  <div class="desktop ground sim" aria-label="The overview">
+  <div class="desktop ground sim" role="figure" aria-label="The overview">
     <div class="topbar">
       <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
       <div class="right"><span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span><span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span></div>
@@ -483,36 +624,40 @@
     </div>
   </div>
 
-  <h2>Accent: one scale</h2>
+  </section>
+
+  <section id="accent" aria-labelledby="accent-h">
+  <h2 id="accent-h">Accent: one scale</h2>
   <p class="note">Seven levels, strongest first. Each owns one channel no other uses: the mark's shape, a solid fill, a small full mark, a ring, an underline, a tint with no edge, a transient sub-tint. The left column is the shell, dark in both modes; the right is GTK in this mode. "See as" at the top shows the page as protanopia, deuteranopia and tritanopia see it (Machado 2009), on an IPS panel, on an OLED at 30%, at 30% backlight in a lit room, and in grey.</p>
   <div class="scale sim" id="scale">
-    <div class="lv"><div><b>1 Brand</b><span>the mark, boot, wallpaper; never chrome</span></div>
-      <div class="demo" style="background:var(--brand-ink);border:1px solid var(--shell-border)"><img src="logos/construct.svg" alt="" style="height:44px"><span style="font-family:var(--font-wordmark);letter-spacing:.35em;color:var(--brand-cyan)">CONSTRUCT</span></div>
-      <div class="demo wp"></div></div>
-    <div class="lv"><div><b>2 Primary</b><span>one per view, solid; focus inside it</span></div>
-      <div class="demo sh"><span class="btn">Cancel</span><span class="btn pri">Authenticate</span><span class="btn pri foc">Focused</span></div>
-      <div class="demo md"><span class="btn">Cancel</span><span class="btn pri">Open</span><span class="btn pri foc">Focused</span></div></div>
-    <div class="lv"><div><b>3 Selected, on</b><span>a tint, no edge; light adds its line</span></div>
-      <div class="demo sh"><span class="tg"><span class="ic"><svg class="i"><use href="#i-sun"/></svg></span>Night Light</span><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="day s">08</span></div>
-      <div class="demo md"><span class="rowx picked">Projects</span><span class="rowx">Downloads</span><span class="btn picked" style="font-weight:700">Month</span><span class="btn">Week</span></div></div>
-    <div class="lv"><div><b>3a Text selection</b><span>one alpha; the text keeps its color</span></div>
-      <div class="demo sh"><span>Search <span style="background:color-mix(in srgb,var(--shell-accent) var(--shell-selection),var(--shell-surface))">palette</span> files</span></div>
-      <div class="demo md"><span>Search <span style="background:color-mix(in srgb,var(--accent) var(--selection),var(--view))">palette</span> files</span></div></div>
-    <div class="lv"><div><b>3b Selected on imagery</b><span>a text frame and a badge, no ring</span></div>
-      <div class="demo sh"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div>
-      <div class="demo md"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div></div>
-    <div class="lv"><div><b>4 Indicator</b><span>small, full accent</span></div>
-      <div class="demo sh"><span class="switch"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div>
-      <div class="demo md"><span class="switch"></span><span class="switch off"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div></div>
-    <div class="lv"><div><b>5 Focus</b><span>a 2px ring; nothing else rings</span></div>
-      <div class="demo sh"><span class="tg foc"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</span><span class="tg on foc"><span class="ic"><svg class="i"><use href="#i-moon"/></svg></span>Dark Style</span><span class="day foc">14</span><span class="day t" title="Today: accent text, bold">03</span></div>
-      <div class="demo md"><span class="rowx foc">Downloads</span><span class="rowx picked foc">Projects</span><span class="btn" style="outline:2px solid var(--accent);outline-offset:2px">Cancel</span></div></div>
-    <div class="lv"><div><b>6 Link</b><span>accent text, underlined</span></div>
-      <div class="demo sh"><span class="link">Show details</span></div>
-      <div class="demo md"><span class="link">Show details</span></div></div>
-    <div class="lv"><div><b>7 Decoration</b><span>transient overlays, the wallpaper</span></div>
-      <div class="demo sh" style="background:var(--shell-bg)"><span class="rb" style="width:140px;height:56px"></span></div>
-      <div class="demo md"><span class="rb" style="width:140px;height:56px"></span></div></div>
+    <div class="colhead" aria-hidden="true"><span></span><span>The shell, dark in both modes</span><span>GTK, this mode</span></div>
+    <div class="lv"><div><b><span class="num">1</span>Brand</b><span>the mark, boot, wallpaper; never chrome</span></div>
+      <div class="demo" data-col="The shell" style="background:var(--brand-ink);border:1px solid var(--shell-border)"><img src="logos/construct.svg" alt="" style="height:44px"><span style="font-family:var(--font-wordmark);letter-spacing:.35em;color:var(--brand-cyan)">CONSTRUCT</span></div>
+      <div class="demo wp" data-col="GTK, this mode"></div></div>
+    <div class="lv"><div><b><span class="num">2</span>Primary</b><span>one per view, solid; focus inside it</span></div>
+      <div class="demo sh" data-col="The shell"><span class="btn">Cancel</span><span class="btn pri">Authenticate</span><span class="btn pri foc">Focused</span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="btn">Cancel</span><span class="btn pri">Open</span><span class="btn pri foc">Focused</span></div></div>
+    <div class="lv"><div><b><span class="num">3</span>Selected, on</b><span>a tint, no edge; light adds its line</span></div>
+      <div class="demo sh" data-col="The shell"><span class="tg"><span class="ic"><svg class="i"><use href="#i-sun"/></svg></span>Night Light</span><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="day s">08</span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="rowx picked">Projects</span><span class="rowx">Downloads</span><span class="btn picked" style="font-weight:700">Month</span><span class="btn">Week</span></div></div>
+    <div class="lv"><div><b><span class="num">3a</span>Text selection</b><span>one alpha; the text keeps its color</span></div>
+      <div class="demo sh" data-col="The shell"><span>Search <span style="background:color-mix(in srgb,var(--shell-accent) var(--shell-selection),var(--shell-surface))">palette</span> files</span></div>
+      <div class="demo md" data-col="GTK, this mode"><span>Search <span style="background:color-mix(in srgb,var(--accent) var(--selection),var(--view))">palette</span> files</span></div></div>
+    <div class="lv"><div><b><span class="num">3b</span>Selected on imagery</b><span>a text frame and a badge, no ring</span></div>
+      <div class="demo sh" data-col="The shell"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="thumb"></span><span class="thumb picked-img"><span class="badge">✓</span></span></div></div>
+    <div class="lv"><div><b><span class="num">4</span>Indicator</b><span>small, full accent</span></div>
+      <div class="demo sh" data-col="The shell"><span class="switch"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="switch"></span><span class="switch off"></span><span class="check">✓</span><span class="bar" style="width:80px"><i></i></span><span class="dot"></span></div></div>
+    <div class="lv"><div><b><span class="num">5</span>Focus</b><span>a 2px ring; nothing else rings</span></div>
+      <div class="demo sh" data-col="The shell"><span class="tg foc"><span class="ic"><svg class="i"><use href="#i-bell"/></svg></span>Do Not Disturb</span><span class="tg on foc"><span class="ic"><svg class="i"><use href="#i-moon"/></svg></span>Dark Style</span><span class="day foc">14</span><span class="day t" title="Today: accent text, bold">03</span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="rowx foc">Downloads</span><span class="rowx picked foc">Projects</span><span class="btn" style="outline:2px solid var(--accent);outline-offset:2px">Cancel</span></div></div>
+    <div class="lv"><div><b><span class="num">6</span>Link</b><span>accent text, underlined</span></div>
+      <div class="demo sh" data-col="The shell"><span class="link">Show details</span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="link">Show details</span></div></div>
+    <div class="lv"><div><b><span class="num">7</span>Decoration</b><span>transient overlays, the wallpaper</span></div>
+      <div class="demo sh" data-col="The shell" style="background:var(--shell-bg)"><span class="rb" style="width:140px;height:56px"></span></div>
+      <div class="demo md" data-col="GTK, this mode"><span class="rb" style="width:140px;height:56px"></span></div></div>
   </div>
   <div class="lineup demo sh sim" aria-label="Every level side by side on h">
     <img src="logos/construct.svg" alt="" style="height:28px"><span class="btn pri">Authenticate</span>
@@ -521,28 +666,34 @@
     <span class="link">Show details</span><span class="rb" style="width:64px;height:32px"></span>
   </div>
 
-  <h2>Open comparison: the primary as a fill or a tint</h2>
+  </section>
+
+  <section id="comparison" aria-labelledby="comparison-h">
+  <h2 id="comparison-h">Open comparison: the primary as a fill or a tint</h2>
   <p class="note">Not a rule: level 2 stays the solid accent (THEMING.md, "Primary is solid, in dark too"). Three renderings of the primary, each beside the selected state it must be told from, so the choice can be judged by eye. Under each: its label's contrast (4.5:1 is the floor) and its ΔE00 from the selected item (the P tier asks 30), as palette.py's contrast() and de00() give them for the palette of 2026-10-04; they are not recomputed when the palette changes.</p>
   <div class="cmp sim" aria-label="The primary as a solid fill, a 28% tint and a 36% tint, beside the selected state">
-    <div></div><div class="head">Shell, on h (both modes)</div><div class="head">GTK dark, on g</div><div class="head">GTK light, on a</div>
+    <div aria-hidden="true"></div><div class="head">Shell, on h (both modes)</div><div class="head">GTK dark, on g</div><div class="head">GTK light, on a</div>
     <div class="lead"><b>A Solid</b><span>the accent, label on_accent: today's rule</span></div>
-    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn pri">Authenticate</span></div><small>label 12.34:1 · ΔE00 51.3</small></div>
-    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 12.34:1 · ΔE00 56.2</small></div>
-    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 5.09:1 · ΔE00 40.3</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn pri">Authenticate</span></div><small>label 12.34:1 · ΔE00 51.3</small></div>
+    <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 12.34:1 · ΔE00 56.2</small></div>
+    <div class="demo md" data-mode="light" data-col="GTK light, on a"><div><span class="rowx picked">Projects</span><span class="btn pri">Open</span></div><small>label 5.09:1 · ΔE00 40.3</small></div>
     <div class="lead"><b>B 28% tint</b><span>label accent_text</span></div>
-    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint28">Authenticate</span></div><small>label 4.79:1 · ΔE00 6.1: dark's active tint, a pressed selected item</small></div>
-    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 5.31:1 · ΔE00 6.8: dark's active tint</small></div>
-    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 4.64:1 · ΔE00 9.4</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint28">Authenticate</span></div><small>label 4.79:1 · ΔE00 6.1: dark's active tint, a pressed selected item</small></div>
+    <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 5.31:1 · ΔE00 6.8: dark's active tint</small></div>
+    <div class="demo md" data-mode="light" data-col="GTK light, on a"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 4.64:1 · ΔE00 9.4</small></div>
     <div class="lead"><b>C 36% tint</b><span>label accent_text</span></div>
-    <div class="demo sh"><div><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small>label 3.89:1, below 4.5 · ΔE00 11.3</small></div>
-    <div class="demo md" data-mode="dark"><div><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small>label 4.24:1, below 4.5 · ΔE00 12.1</small></div>
-    <div class="demo md" data-mode="light"><div><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small>label 4.08:1, below 4.5 · ΔE00 13.2</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div role="img" aria-label="Wired selected, and Authenticate as a 36% tint: its label below 4.5:1"><span class="tg sel"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small><span class="fail">label 3.89:1, below 4.5</span> · ΔE00 11.3</small></div>
+    <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.24:1, below 4.5</span> · ΔE00 12.1</small></div>
+    <div class="demo md" data-mode="light" data-col="GTK light, on a"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.08:1, below 4.5</span> · ΔE00 13.2</small></div>
   </div>
 
-  <h2>Light: ink on paper</h2>
+  </section>
+
+  <section id="light" aria-labelledby="light-h">
+  <h2 id="light-h">Light: ink on paper</h2>
   <p class="note">Dark is the wireframe glowing on ink; light is the same room as a technical drawing, with no more cyan. The window stands on the desk with a ring in the ink's hue, the sidebar is a shelf below it, every line is the muted ink at an alpha, the headerbars' rules run as one line, and the selected place is a white sheet with its label in bold and only its icon in the accent. Drawn light whatever the mode.</p>
   <div data-mode="light" style="background:none">
-    <div class="desktop sim" aria-label="Settings in light mode">
+    <div class="desktop sim" role="figure" aria-label="Settings in light mode">
       <div class="topbar">
         <div class="left"><img src="logos/construct-activities.svg" alt="Activities"></div>
         <div class="right"><span class="clock">Oct 3&nbsp;&nbsp;5:56 PM</span><span class="icons"><svg class="i"><use href="#i-net"/></svg><svg class="i"><use href="#i-vol"/></svg><svg class="i"><use href="#i-power"/></svg></span></div>
@@ -565,7 +716,7 @@
           <div class="pop"><div>Identify Displays</div><div class="h">Night Light…</div><hr><div>Help</div></div>
           <div class="body">
             <div class="group">
-              <h4>Display</h4>
+              <div class="h4">Display</div>
               <p>The built-in panel, 2880 × 1800</p>
               <div class="list">
                 <div><span class="tx">Scale<small>Text and windows</small></span><span class="val">150%</span></div>
@@ -574,7 +725,7 @@
               </div>
             </div>
             <div class="group">
-              <h4>Night Light</h4>
+              <div class="h4">Night Light</div>
               <div class="list">
                 <div><span class="tx">Night Light<small>Sunset to sunrise</small></span><span class="switch off"></span></div>
               </div>
@@ -589,9 +740,9 @@
       </div>
     </div>
     <div class="lines sim">
-      <div><b>GNOME's line</b>: black at 12%, no hue<div class="sample" style="box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-boot) 12%,transparent)"></div></div>
-      <div><b>CONSTRUCT's line</b>: the muted ink at 30%<div class="sample" style="box-shadow:0 0 0 1px var(--line-border)"></div></div>
-      <div><b>Divider and ring</b>: 20% inside a list, 40% around a window<div class="sample" style="box-shadow:0 0 0 1px var(--line-ring),inset 0 -28px 0 -27px var(--line-divider)"></div></div>
+      <div><b>GNOME's line</b>: black at 12%, no hue<div class="sample" style="box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-boot) 12%,transparent),inset 0 -28px 0 -27px color-mix(in srgb,var(--brand-boot) 12%,transparent)"><span>Scale</span><span>Refresh Rate</span></div></div>
+      <div><b>CONSTRUCT's line</b>: the muted ink at 30%<div class="sample" style="box-shadow:0 0 0 1px var(--line-border),inset 0 -28px 0 -27px var(--line-border)"><span>Scale</span><span>Refresh Rate</span></div></div>
+      <div><b>Divider and ring</b>: 20% inside a list, 40% around a window<div class="sample" style="box-shadow:0 0 0 1px var(--line-ring),inset 0 -28px 0 -27px var(--line-divider)"><span>Scale</span><span>Refresh Rate</span></div></div>
     </div>
   </div>
   <div class="types" aria-label="Type, libadwaita's sizes in Adwaita Sans">
@@ -604,7 +755,10 @@
     <span style="font-size:11pt;font-variant-numeric:tabular-nums">12:05 · 3.1 GB<small>numeric</small></span>
   </div>
 
-  <h2>Elevation</h2>
+  </section>
+
+  <section id="elevation" aria-labelledby="elevation-h">
+  <h2 id="elevation-h">Elevation</h2>
   <p class="note">Each level one step lighter on the ink scale; in dark the 1px ring makes the edge, since black shadows do not show on ink. In light the desk is the ground, the window and the sidebar step up from it with their lines, and the shadow is only depth.</p>
   <div class="strip sim" style="background:var(--brand-boot)">
     <div class="lvl" style="background:var(--brand-boot);border:1px dashed var(--shell-border);color:var(--shell-text)"><b>ground</b><span style="color:var(--shell-muted)">boot · Plymouth, overview, lock</span></div>
@@ -624,41 +778,61 @@
     </div>
   </div>
 
-  <h2>Perception</h2>
-  <p class="note">Every pair task palette holds beyond contrast: CIEDE2000 as drawn and in eight views - an IPS panel, an OLED and an IPS at 30%, the three dichromacies, protan and deutan on IPS - against the floor of its tier. E: surfaces at an edge (3 / 2); R: a 1px line (6 / 4); S1: a state that persists (10 / 6); S2: a step under the pointer (3 / 2); K: hue that carries meaning (20 / 10, tritan 6); P: the primary against a selected item (30 / 24); D: an overlay quieter than a selection. A pair below its tier passes only through the line drawn between it. The worst view is in bold.</p>
-  <div id="perception"></div>
+  </section>
 
-  <h2>Shape</h2>
+  <section id="perception-section" aria-labelledby="perception-section-h">
+  <h2 id="perception-section-h">Perception</h2>
+  <p class="note">Every pair task palette holds beyond contrast: CIEDE2000 as drawn and in eight views - an IPS panel, an OLED and an IPS at 30%, the three dichromacies, protan and deutan on IPS - against the floor of its tier. E: surfaces at an edge (3 / 2); R: a 1px line (6 / 4); S1: a state that persists (10 / 6); S2: a step under the pointer (3 / 2); K: hue that carries meaning (20 / 10, tritan 6); P: the primary against a selected item (30 / 24); D: an overlay quieter than a selection. A pair below its tier passes only through the line drawn between it. The worst view is in bold.</p>
+  <div id="perception" tabindex="0" role="region" aria-label="The perception table"></div>
+
+  </section>
+
+  <section id="shape" aria-labelledby="shape-h">
+  <h2 id="shape-h">Shape</h2>
   <p class="note">libadwaita's steps - control, surface, sheet, pill - and concentric corners: quick settings is its toggles' 22 plus its 18 of padding, 40.</p>
   <div class="shape">
     <div class="r1">control 9</div><div class="r4">pill</div><div class="r2">surface 15</div><div class="r3">sheet 24</div>
     <div class="qsr"><i>22 + 18 = 40</i></div>
   </div>
 
-  <h2>Accent and text, this mode</h2>
-  <div class="sw sim" id="mode-sw"></div>
+  </section>
 
-  <h2>Surfaces (Orchis' scale)</h2>
+  <section id="swatches" aria-labelledby="swatches-h">
+  <h2 id="swatches-h">Accent and text, this mode</h2>
+  <p class="note">Surfaces go by letter, as in Orchis' scale: a to d light, a the brightest, and e to h dark, e the darkest. The notes above name them so: h is a menu, g the bars and views.</p>
+  <div class="sw sim" id="mode-sw"></div>
+  <div class="sw sim" id="status-sw"></div>
+
+  <h3>Surfaces (Orchis' scale)</h3>
   <div class="sw sim" id="neutral-sw"></div>
 
-  <h2>Wallpapers</h2>
+  </section>
+
+  <section id="wallpapers" aria-labelledby="wallpapers-h">
+  <h2 id="wallpapers-h">Wallpapers</h2>
   <p class="note">Each pair is for one thing. The default is the identity: the boot's last frame held still. Quiet and mark are its calm forms, for long sessions: quiet the same drawing at a third of the level and without the glow, mark only the brand mark, low in the corner. Offset is functional: the room moved out of the window area, so windows stand on an empty field. Each of the three fails task wallpaper unless it is calmer than the default of its mode. Light draws the room in the ink's hue on the desk; only the mark keeps the accent.</p>
-  <div class="ident sim">
-    <div class="card"><div class="pair"><img src="wallpapers/construct-dark.png" alt="Default, dark"><img src="wallpapers/construct-light.png" alt="Default, light"></div><div class="c"><b>CONSTRUCT</b>construct-dark.png, construct-light.png: the boot's drawing, the mark at 0.4222 of the height</div></div>
-    <div class="card"><div class="pair"><img src="wallpapers/construct-quiet-dark.png" alt="Quiet, dark"><img src="wallpapers/construct-quiet-light.png" alt="Quiet, light"></div><div class="c"><b>CONSTRUCT Quiet</b>construct-quiet-*.png: the outline at most ΔE00 15 from the ink, the grid 6</div></div>
-    <div class="card"><div class="pair"><img src="wallpapers/construct-offset-dark.png" alt="Offset, dark"><img src="wallpapers/construct-offset-light.png" alt="Offset, light"></div><div class="c"><b>CONSTRUCT Offset</b>construct-offset-*.png: the room at 0.62, low on the right third</div></div>
-    <div class="card"><div class="pair"><img src="wallpapers/construct-mark-dark.png" alt="Mark, dark"><img src="wallpapers/construct-mark-light.png" alt="Mark, light"></div><div class="c"><b>CONSTRUCT Mark</b>construct-mark-*.png: the outline alone, 201px from the corner, clear of a 16:9 or 3:2 crop</div></div>
+  <div class="ident wps sim">
+    <div class="card"><div class="pair"><a href="wallpapers/construct-dark.png"><img src="wallpapers/construct-dark.png" alt="Default, dark"></a><a href="wallpapers/construct-light.png"><img src="wallpapers/construct-light.png" alt="Default, light"></a></div><div class="c"><b>CONSTRUCT</b><a class="link" href="wallpapers/construct-dark.png"><code>construct-dark.png</code></a>, <a class="link" href="wallpapers/construct-light.png"><code>construct-light.png</code></a>: the boot's drawing, the mark at 0.4222 of the height</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-quiet-dark.png"><img src="wallpapers/construct-quiet-dark.png" alt="Quiet, dark"></a><a href="wallpapers/construct-quiet-light.png"><img src="wallpapers/construct-quiet-light.png" alt="Quiet, light"></a></div><div class="c"><b>CONSTRUCT Quiet</b><a class="link" href="wallpapers/construct-quiet-dark.png"><code>construct-quiet-dark.png</code></a>, <a class="link" href="wallpapers/construct-quiet-light.png"><code>construct-quiet-light.png</code></a>: the outline at most ΔE00 15 from the ink, the grid 6</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-offset-dark.png"><img src="wallpapers/construct-offset-dark.png" alt="Offset, dark"></a><a href="wallpapers/construct-offset-light.png"><img src="wallpapers/construct-offset-light.png" alt="Offset, light"></a></div><div class="c"><b>CONSTRUCT Offset</b><a class="link" href="wallpapers/construct-offset-dark.png"><code>construct-offset-dark.png</code></a>, <a class="link" href="wallpapers/construct-offset-light.png"><code>construct-offset-light.png</code></a>: the room at 0.62, low on the right third</div></div>
+    <div class="card"><div class="pair"><a href="wallpapers/construct-mark-dark.png"><img src="wallpapers/construct-mark-dark.png" alt="Mark, dark"></a><a href="wallpapers/construct-mark-light.png"><img src="wallpapers/construct-mark-light.png" alt="Mark, light"></a></div><div class="c"><b>CONSTRUCT Mark</b><a class="link" href="wallpapers/construct-mark-dark.png"><code>construct-mark-dark.png</code></a>, <a class="link" href="wallpapers/construct-mark-light.png"><code>construct-mark-light.png</code></a>: the outline alone, 201px from the corner, clear of a 16:9 or 3:2 crop</div></div>
   </div>
 
-  <h2>Identity</h2>
+  </section>
+
+  <section id="identity" aria-labelledby="identity-h">
+  <h2 id="identity-h">Identity</h2>
   <div class="ident">
     <div class="card"><div class="img" style="background:var(--brand-boot)"><img class="boot" src="plymouth/frame-0011.png" alt="The last boot frame"></div><div class="c"><b>Boot</b>Plymouth's last frame on black, the mark's centre at 42.2% of the height, where the wallpaper draws it</div></div>
-    <div class="card"><div class="img" style="background:var(--shell-chrome)"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b>logos/construct-activities.svg: white, never the accent</div></div>
-    <div class="card"><div class="img" style="background:var(--bg)"><img src="logos/io.github.construct_linux.Installer.svg" alt="Installer icon" style="width:96px"></div><div class="c"><b>Install Construct</b>logos/io.github.construct_linux.Installer.svg, in Tela's geometry</div></div>
+    <div class="card"><div class="img" style="background:var(--shell-chrome)"><img src="logos/construct-activities.svg" alt="Activities icon" style="width:72px"></div><div class="c"><b>Activities button</b><a class="link" href="logos/construct-activities.svg"><code>logos/construct-activities.svg</code></a>: white, never the accent</div></div>
+    <div class="card"><div class="img" style="background:var(--bg)"><img src="logos/io.github.construct_linux.Installer.svg" alt="Installer icon" style="width:96px"></div><div class="c"><b>Install Construct</b><a class="link" href="logos/io.github.construct_linux.Installer.svg"><code>logos/io.github.construct_linux.Installer.svg</code></a>, in Tela's geometry</div></div>
   </div>
 
-  <h2>Where each piece goes</h2>
-  <div class="scroll"><table>
+  </section>
+
+  <section id="where" aria-labelledby="where-h">
+  <h2 id="where-h">Where each piece goes</h2>
+  <div class="scroll" tabindex="0" role="region" aria-label="The repositories and what each takes"><table>
     <tr><th>Repository</th><th>Takes</th><th>From</th></tr>
     <tr><td>Orchis-theme</td><td>accent, its text, text, border and semantic colors per variant, the background scale, tints (rest, hover, active, decoration, track), selection, light's desk, shelf and lines, radii; the shell's levels (bars <code>g</code>, menus <code>h</code>, the ring); Activities icon</td><td><code>palette/construct.scss</code>, <code>logos/construct-activities.svg</code></td></tr>
     <tr><td>Tela-icon-theme</td><td>folder and glyph color; the <code>#549bff</code> software family recolored</td><td><code>palette.toml</code> (<code>icons</code>), recolored in the sources</td></tr>
@@ -670,7 +844,14 @@
     <tr><td>The image</td><td>Plymouth's prompt and the mark's place, the harness's checks, the four wallpaper pairs</td><td><code>palette/construct.json</code>, <code>plymouth/sequence.json</code>, <code>wallpapers/</code></td></tr>
     <tr><td>libadwaita apps</td><td>the nearest fixed accent, for the portal and Settings' swatches</td><td><code>gnome.accent</code> = teal</td></tr>
   </table></div>
+  </section>
+
+  <footer class="page">
+    <p>The artwork - the logo, the boot's frames, the wallpapers, the palette and the tagline - is under CC BY-SA 4.0; the scripts and this page under MIT; Audiowide, Adwaita Sans and Adwaita Mono under the SIL Open Font License 1.1.</p>
+    <p><a class="link" href="https://github.com/Construct-Linux/brand">github.com/Construct-Linux/brand</a></p>
+  </footer>
 </main>
+</div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <!-- The shell's and GTK's symbolic icons, roughly: drawn in currentColor. -->
@@ -722,10 +903,17 @@
   function applyMode() { root.dataset.mode = mode || (light.matches ? "light" : "dark"); swatches(); }
   light.addEventListener("change", applyMode);
 
-  // See as: the drawings, not the controls, go through the filter, so the page stays usable.
+  // See as: the drawings, not the controls, go through the filter, so the page stays usable. A
+  // select, not a segmented control: eight views do not fit a row.
   const simCss = document.head.appendChild(document.createElement("style"));
-  const simSeg = document.getElementById("sim");
-  for (const [k, label] of window.SIMULATIONS || []) simSeg.insertAdjacentHTML("beforeend", `<button data-v="${k}">${label}</button>`);
+  const simSelect = document.getElementById("sim");
+  for (const [k, label] of window.SIMULATIONS || []) simSelect.add(new Option(label, k));
+  function pick(id, value, onChange) {
+    const el = document.getElementById(id);
+    const set = v => { el.value = v; if (el.value !== v) el.value = ""; onChange(el.value); store("construct-" + id, el.value); };
+    el.addEventListener("change", () => set(el.value));
+    set(params.get(id) ?? load("construct-" + id) ?? value);
+  }
 
   // The wallpaper under the desktops: each pair's dark and light file.
   function wallpaper(v) {
@@ -734,9 +922,10 @@
     root.style.setProperty("--wp-light", `url("wallpapers/${file}-light.png")`);
   }
 
+  // By role, each group a row: the accent and text, then status and light's grounds.
   const MODE = [["accent", "Accent"], ["accent-text", "Accent as text"], ["on-accent", "Text on accent"], ["text", "Text"],
-                ["muted", "Muted"], ["border", "Border"], ["success", "Success"], ["warning", "Warning"], ["error", "Error"],
-                ["desk", "Desk"], ["shelf", "Shelf"]];
+                ["muted", "Muted"], ["border", "Border"]];
+  const STATUS = [["success", "Success"], ["warning", "Warning"], ["error", "Error"], ["desk", "Desk"], ["shelf", "Shelf"]];
   const NEUTRAL = "abcdefgh".split("").map(k => ["neutral-" + k, k + (k < "e" ? " (light)" : " (dark)")]);
   function fill(id, rows) {
     const css = getComputedStyle(root);
@@ -745,26 +934,41 @@
       return `<div class="s"><i style="background:${hex}"></i><div>${name}<code>--${v} ${hex}</code></div></div>`;
     }).join("");
   }
-  function swatches() { fill("mode-sw", MODE); fill("neutral-sw", NEUTRAL); }
+  function swatches() { fill("mode-sw", MODE); fill("status-sw", STATUS); fill("neutral-sw", NEUTRAL); }
 
+  // The views as the note names them; a view palette.py adds later shows by its key.
+  const VIEW_NAMES = {ips: "IPS", dim: "OLED 30%", dim_ips: "IPS 30%", protan: "Protan", deutan: "Deutan", tritan: "Tritan",
+                      "protan+ips": "Protan IPS", "deutan+ips": "Deutan IPS"};
   function perceptionTable() {
     const P = window.PERCEPTION;
     if (!P) return;
-    const head = ["Tier", "Pair", "As drawn", ...P.views, "Verdict"];
+    const views = P.views.map(v => VIEW_NAMES[v] || v);
+    const head = ["Tier", "Pair", "As drawn", ...views, "Verdict"];
     const rows = P.pairs.map(r => {
-      const cells = P.views.map(v => `<td class="n${r.views[v] === r.worst ? " w" : ""}">${r.views[v].toFixed(2)}</td>`).join("");
+      const cells = P.views.map((v, i) => `<td class="n${r.views[v] === r.worst ? " w" : ""}" data-label="${views[i]}">${r.views[v].toFixed(2)}</td>`).join("");
       const verdict = r.verdict === "LOW" ? `<span class="low">LOW</span>` : r.verdict === "report" ? "report" : `<span class="ok">${r.verdict}</span>`;
       const ring = r.ring ? `<i style="background:${r.ring}"></i>` : "";
-      return `<tr><td>${r.tier || "-"}</td><td><span class="pair"><i style="background:${r.a}"></i>${ring}<i style="background:${r.b}"></i></span>${r.name}</td>`
-           + `<td class="n">${r.ref.toFixed(2)}</td>${cells}<td title="${r.need || ""}${r.via ? "; " + r.via : ""}">${verdict}</td></tr>`;
+      return `<tr><td>${r.tier || "-"}</td><td><span class="pn"><span class="pair"><i style="background:${r.a}"></i>${ring}<i style="background:${r.b}"></i></span><span>${r.name}</span></span></td>`
+           + `<td class="n" data-label="As drawn">${r.ref.toFixed(2)}</td>${cells}<td data-label="Verdict" title="${r.need || ""}${r.via ? "; " + r.via : ""}">${verdict}</td></tr>`;
     }).join("");
     document.getElementById("perception").innerHTML = `<table><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr>${rows}</table>`;
   }
 
   seg("mode", "", v => { mode = v; applyMode(); });
-  seg("sim", "", v => { simCss.textContent = v ? `.sim { filter: url(#sim-${v}); }` : ""; });
+  pick("sim", "", v => { simCss.textContent = v ? `.sim { filter: url(#sim-${v}); }` : ""; });
   seg("wallpaper", "", wallpaper);
   perceptionTable();
+
+  // The section in view is the sidebar's selected place.
+  const tocLinks = [...document.querySelectorAll(".toc a")];
+  const seen = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      tocLinks.forEach(a => a.setAttribute("aria-current", String(a.getAttribute("href") === "#" + e.target.id)));
+    }
+  }, { rootMargin: "0px 0px -70% 0px" });
+  document.querySelectorAll("main section").forEach(sec => seen.observe(sec));
+
 </script>
 </body>
 </html>

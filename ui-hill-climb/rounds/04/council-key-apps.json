@@ -1,0 +1,54 @@
+{
+ "pairs": {
+  "s01": {
+   "screen": "org.gnome.Nautilus",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s02": {
+   "screen": "org.gnome.Settings",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s03": {
+   "screen": "panel-network",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s04": {
+   "screen": "gtk-dialog",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s05": {
+   "screen": "gtk-dialog-light",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s06": {
+   "screen": "com.mitchellh.ghostty",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s07": {
+   "screen": "org.gnome.SystemMonitor",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s08": {
+   "screen": "installer",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s09": {
+   "screen": "io.github.construct_linux.Construct",
+   "a": "baseline",
+   "b": "candidate"
+  }
+ },
+ "control": {
+  "c10": "org.gnome.Settings",
+  "c11": "gtk-dialog",
+  "c12": "com.mitchellh.ghostty"
+ }
+}

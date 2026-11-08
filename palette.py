@@ -192,6 +192,9 @@ def checks(p):
             # desktop under them is e, often the wallpaper's own color.
             for k, need in (("text", BODY), ("muted", TEXT), ("accent", TEXT), ("success", TEXT), ("warning", TEXT), ("error", TEXT)):
                 yield f"dark {k} on raised (shell menus)", m[k], n["h"], need
+        # Chart series, one set for both modes: a mark on the mode's window.
+        for k, c in p["series"].items():
+            yield f"{mode} series {k} on window", c, n["f" if mode == "dark" else "c"], UI
         # Buttons filled with a semantic color (destructive, success): Orchis puts black or white
         # on them by brightness, as on the accent. Error is never a fill: the destructive red is.
         for k in ("success", "warning", "destructive"):
@@ -209,6 +212,9 @@ def checks(p):
                 yield f"{mode} accent_text on {where}", m["accent_text"], fill, TEXT
                 yield f"{mode} text on {where}", m["text"], fill, TEXT
                 yield f"{mode} muted on {where}", m["muted"], fill, REPORT
+            # A toggle that is on: the stronger tint with text, not accent_text, as its label.
+            for step in ("on", "on_hover"):
+                yield f"{mode} text on {step} tint ({t[step]:.2f}) over {k}", m["text"], mix(m["accent"], n[k], t[step]), TEXT
             # Focus on a selected item: the 2px ring on the strongest tint it can stand on.
             yield f"{mode} focus ring on active tint over {k}", m["accent"], mix(m["accent"], n[k], t["active"]), UI
             # A switch's track when on: the knob, full accent and checked as a mark above, carries
@@ -286,7 +292,8 @@ def shape_problems(shape):
 #       deutans, 8% of men; 6 for tritans, about 0.01%.
 #   P   the primary action against a selected item: the solid fill against the tint, the one
 #       channel that tells them apart.
-TIERS = {"E": (3, 2), "R": (6, 4), "S1": (10, 6), "S2": (3, 2), "K": (20, 10), "P": (30, 24)}
+#   C   two chart series: thin lines that cross, told apart by hue alone, in every view.
+TIERS = {"E": (3, 2), "R": (6, 4), "S1": (10, 6), "S2": (3, 2), "K": (20, 10), "P": (30, 24), "C": (20, 10)}
 K_TRITAN = 6
 # D, a transient overlay (the rubberband, the tile preview): it shows (E's 3 as drawn) and stays
 # quieter than a selected item on the same surface, at most this share of the selected tint's ΔE.
@@ -315,7 +322,7 @@ def perceptual_checks(p):
     # edge there, until a lighter ring for that level exists.
     yield None, "dark border ring on h (level 3 over a menu)", n["h"], d["border"], None
     off = mix(n["a"], n["h"], SHELL_FILL)
-    yield "S1", "dark quick toggle off / on", off, mix(d["accent"], n["h"], td["rest"]), None
+    yield "S1", "dark quick toggle off / on", off, mix(d["accent"], n["h"], td["on"]), None
     for k in "fgh":
         rest, hover, active = (mix(d["accent"], n[k], td[s]) for s in ("rest", "hover", "active"))
         yield "S1", f"dark {k} / selected (rest tint)", n[k], rest, None
@@ -360,6 +367,11 @@ def perceptual_checks(p):
                 yield "K", f"{mode} {x} / {y}", m[x], m[y], None
         yield "K", f"{mode} terminal blue / cyan", a["blue"], m["accent"], None
         yield "K", f"{mode} terminal magenta / blue", a["magenta"], a["blue"], None
+    # Chart series, one set for both modes, against each other.
+    ser = list(p["series"].items())
+    for i, (x, cx) in enumerate(ser):
+        for y, cy in ser[i + 1:]:
+            yield "C", f"series {x} / {y}", cx, cy, None
 
 
 def judge(tier, a, b, ring):
@@ -397,11 +409,11 @@ def perception(p):
 def low_light(p):
     """What 30% backlight in a lit room leaves of the edges and states the scale leans on."""
     n, d, td = p["neutral"], p["dark"], p["tint"]["dark"]
-    off, on = mix(n["a"], n["h"], SHELL_FILL), mix(d["accent"], n["h"], td["rest"])
+    off, on = mix(n["a"], n["h"], SHELL_FILL), mix(d["accent"], n["h"], td["on"])
     yield "dark h on e (a menu off the desktop)", n["h"], n["e"]
     yield "dark border ring on e", d["border"], n["e"]
     yield "dark rest tint over g against g", mix(d["accent"], n["g"], td["rest"]), n["g"]
-    yield "dark quick toggle on / off (why an on toggle draws its icon disc)", on, off
+    yield "dark quick toggle on / off (the on tint, and its icon disc)", on, off
     yield "dark icon disc (accent) on the on toggle", d["accent"], on
 
 
@@ -618,6 +630,7 @@ def css(p):
                        "fill": mix(n["a"], n["h"], SHELL_FILL),
                        "tint": pct(td["rest"]), "tint-hover": pct(td["hover"]), "tint-active": pct(td["active"]),
                        "selection": pct(td["selection"]), "tint-deco": pct(td["decoration"]), "tint-track": pct(td["track"]),
+                       "tint-on": pct(td["on"]), "tint-on-hover": pct(td["on_hover"]),
                        **{k.replace("_", "-"): v for k, v in p["dark"].items()}}.items())
     brand = "\n".join(f"  --{k}: {v};" for k, v in flat({g: p[g] for g in ("brand", "neutral", "icons", "cursor")}).items())
     shape = "\n".join(f"  --{k.replace('_', '-')}: {sh[k]}px;" for k in ("radius_control", "radius_surface", "radius_sheet", "inset"))
@@ -663,6 +676,9 @@ def scss(p):
     for k in ("decoration", "track"):
         for variant, mode in (("light", "dark"), ("dark", "light")):
             lines += [f"$construct-tint-{k}-{variant}: {t[mode][k]:.2f};"]
+    lines += ["", "// A toggle that is on, and its hover: text, not accent_text, on it"]
+    for variant, mode in (("light", "dark"), ("dark", "light")):
+        lines += [f"$construct-tint-on-{variant}: ({t[mode]['on']:.2f}, {t[mode]['on_hover']:.2f});"]
     ln = p["line"]["light"]
     lines += ["", "// The light variant only: the desktop's ground, the sidebar's pane, and its lines -",
               "// $construct-muted-dark at (divider, border, ring)",
@@ -715,6 +731,19 @@ def simulate_js(p):
             f"document.body.insertAdjacentHTML(\"beforeend\", {json.dumps(svg)});\n")
 
 
+def system_monitor(p):
+    """The series as System Monitor's defaults, a dconf keyfile the image installs."""
+    s = p["series"]
+    cpus = ", ".join(f"(uint32 {i}, '{s[k]}')" for i, k in enumerate(("one", "two", "three", "four")))
+    return ("# Generated by palette.py from palette.toml - do not edit.\n"
+            "# System Monitor's series in the palette's series colours, not status hues.\n"
+            "[org/gnome/gnome-system-monitor]\n"
+            f"cpu-colors=[{cpus}]\n"
+            f"mem-color='{s['one']}'\nswap-color='{s['three']}'\n"
+            f"net-in-color='{s['one']}'\nnet-out-color='{s['two']}'\n"
+            f"disk-read-color='{s['one']}'\ndisk-write-color='{s['two']}'\n")
+
+
 if __name__ == "__main__":
     OUT = sys.argv[1] if len(sys.argv) > 1 else "palette"
     p = load()
@@ -730,7 +759,8 @@ if __name__ == "__main__":
     open(f"{OUT}/vscode/package.json", "w").write(vscode_package(p))
     open(f"{OUT}/perception.js", "w").write(perception_js(p))
     open(f"{OUT}/simulate.js", "w").write(simulate_js(p))
+    open(f"{OUT}/system-monitor.dconf", "w").write(system_monitor(p))
     for mode in ("dark", "light"):
         open(f"{OUT}/ghostty/Construct {mode.title()}", "w").write(ghostty(p, mode))
         open(f"{OUT}/vscode/themes/construct-{mode}.json", "w").write(vscode(p, mode))
-    print(f"{OUT}/: construct.css, construct.scss, construct.json, perception.js, simulate.js, ghostty/, vscode/")
+    print(f"{OUT}/: construct.css, construct.scss, construct.json, perception.js, simulate.js, system-monitor.dconf, ghostty/, vscode/")

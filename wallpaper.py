@@ -10,9 +10,11 @@ import palette, room
 # Four pairs, each dark and light. The default, construct-*, is the boot's last frame held still:
 # Plymouth's outro goes back to the grid so GDM takes over on this drawing, so its mark stays where
 # the boot puts it. The other three are quieter, for long sessions, and fail here unless they are
-# calmer than the default of their mode. Dark draws in the accent on ink; light draws the room in
-# the ink's hue (light.muted) on the desk, a technical drawing, with no cyan - except the mark,
-# which is the brand mark and keeps the light accent.
+# calmer than the default of their mode. Each mode draws the room in its accent: dark's cyan on
+# ink, light's darkened cyan (light.accent) on the desk. Light once drew it in the ink's hue, a
+# technical drawing with no cyan; the round-0 council (ui-hill-climb) read that grey on grey as
+# the brand gone from the light desktop, all three reviewers, and a muted room is checked against
+# here.
 # GNOME zooms them to the screen, so they are made once, at 16:10 and 2880x1800, the ThinkPad X9's
 # panel; a 16:9 screen crops 90px from the top and the bottom, a 3:2 one from the sides.
 # construct.xml offers each pair to Settings (gnome-background-properties): the light one with the
@@ -61,18 +63,18 @@ def rgb(h):
 
 
 INK, DESK = PAL["brand"]["ink"], PAL["light"]["desk"]
-DARK, LIGHT, MUTED = PAL["dark"]["accent"], PAL["light"]["accent"], PAL["light"]["muted"]
+DARK, LIGHT = PAL["dark"]["accent"], PAL["light"]["accent"]
 # name -> (scale, place, grid, outline width, {mode: (ground, lines, outline level, grid level, glow)})
 VARIANTS = {
     # The boot's drawing: the dark one glows like the splash; the light one is ink on the desk.
-    "construct": (1, None, True, 3, {"dark": (INK, DARK, 0.55, 0.22, 0.6), "light": (DESK, MUTED, 0.50, 0.15, 0)}),
+    "construct": (1, None, True, 3, {"dark": (INK, DARK, 0.55, 0.22, 0.6), "light": (DESK, LIGHT, 0.75, 0.25, 0)}),
     # The same drawing at a third of the level and without the glow, whose haze is most of the
     # default's busyness (8.5% of the screen against 1.1% for the lines alone). Same camera: it may
     # take over from the boot too.
-    "quiet": (1, None, True, 3, {"dark": (INK, DARK, 0.17, 0.045, 0), "light": (DESK, MUTED, 0.28, 0.11, 0)}),
+    "quiet": (1, None, True, 3, {"dark": (INK, DARK, 0.17, 0.045, 0), "light": (DESK, LIGHT, 0.28, 0.11, 0)}),
     # The room smaller, low on the right third, its tall wall facing the empty two thirds where
     # GNOME opens windows; a step above quiet, or at 0.62 it would vanish.
-    "offset": (0.62, (5 / 6, 0.80), True, 3, {"dark": (INK, DARK, 0.24, 0.08, 0), "light": (DESK, MUTED, 0.34, 0.12, 0)}),
+    "offset": (0.62, (5 / 6, 0.80), True, 3, {"dark": (INK, DARK, 0.24, 0.08, 0), "light": (DESK, LIGHT, 0.34, 0.12, 0)}),
     # Only the brand mark, small, in the corner: 201px from the right and the bottom, 90px of
     # zoom crop (16:9 and 3:2) plus the dock's top and a space step at 150%, (6 + 44 + 24) x 1.5.
     "mark": (0.22, (1 - 201 / W, 1 - 201 / H), False, 2, {"dark": (INK, DARK, 0.45, 0, 0), "light": (DESK, LIGHT, 0.40, 0, 0)}),
@@ -120,8 +122,8 @@ for name, (scale, place, with_grid, width, modes) in VARIANTS.items():
                                 f"at most {QUIET['outline']} and {QUIET['grid']}")
             if de(palette.mix(ink, bg, lg), PAL["neutral"]["h"]) < QUIET["grid_vs_h"]:
                 problems.append(f"quiet-dark: the grid is under ΔE00 {QUIET['grid_vs_h']} from h, a menu's edge would merge")
-        if mode == "light" and ink == LIGHT and name != "mark":
-            problems.append(f"{file}-light: light draws in the ink's hue, not cyan; only the mark is the accent")
+        if mode == "light" and ink != LIGHT:
+            problems.append(f"{file}-light: light draws the room in light.accent, the brand's hue, not {ink}")
     if place is None:
         centre = (lo_[1] + hi_[1]) / 2 / H
         if abs(centre - MARK_CENTER) > 0.002:

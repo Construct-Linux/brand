@@ -77,6 +77,10 @@ selection = 0.25
 decoration = 0.08 # transient overlays only (rubberband, tile preview, a drop target), with a 1px
                   # accent edge; never a resting surface, a pane, a banner or a control
 track = 0.50      # a switch's track when on; the knob is the full accent and carries the state
+on = 0.36         # a shell toggle that is on (quick settings): stronger than selected, its label
+                  # text, not accent_text, so on stands 2.0:1 from off where rest's 1.3 read as one
+                  # state (round 0's council, all three); text keeps 5.06:1 over h
+on_hover = 0.40   # its hover: text 4.54:1 over h, the ceiling
 
 [tint.light]
 rest = 0.10
@@ -85,6 +89,8 @@ active = 0.24     # still 4.57:1 on the active tint
 selection = 0.20
 decoration = 0.05
 track = 0.50
+on = 0.30
+on_hover = 0.36
 
 # The light lines: light.muted at an alpha over whatever surface, so every line keeps the ink's
 # hue (OKLCH h 236, C 0.010-0.015). GNOME's black at 0.12 has no hue (C 0.001), which is most of
@@ -93,6 +99,19 @@ track = 0.50
 divider = 0.20    # separators inside a card or a list
 border = 0.30     # card and list outlines, the headerbar's rule, pane separators, popovers, entries
 ring = 0.40       # a window's outer ring on the desk
+
+# Data series in charts, the same in both modes (an app draws one set): System Monitor's CPUs,
+# memory and swap, network and disk. Status hues - success, warning, error - are for thresholds
+# alone; a first CPU in red read as an alarm (round 0's council, all three reviewers). Each is
+# 3:1 as a mark on dark's window (f) and light's (c), and none is a status colour.
+[series]
+# Four hues apart, not four steps of one: the cool set before (teal, steel, violet, slate) ran
+# together where CPU lines cross, by deuteranopes at 3 (tier C holds them). Each stays 3:1 on both
+# windows and away from success, warning and error.
+one = "#1597A5"    # the accent's hue, darkened to read on light too: the first series
+two = "#8C5E75"    # mauve: the second (sent, written, a second CPU)
+three = "#7252D5"  # violet: the third (swap)
+four = "#798C59"   # olive: the fourth
 
 # libadwaita's steps, so the shell and the apps match; a container takes its child's radius plus
 # its padding (THEMING.md).

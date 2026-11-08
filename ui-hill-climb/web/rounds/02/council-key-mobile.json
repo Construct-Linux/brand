@@ -1,0 +1,63 @@
+{
+ "pairs": {
+  "s01": {
+   "screen": "top.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s02": {
+   "screen": "menus.mobile.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s03": {
+   "screen": "overview.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s04": {
+   "screen": "accent.mobile.dark",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s05": {
+   "screen": "compare.mobile.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s06": {
+   "screen": "light.mobile.light",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s07": {
+   "screen": "elevation.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s08": {
+   "screen": "perception.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s09": {
+   "screen": "wallpapers.mobile.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s10": {
+   "screen": "identity.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s11": {
+   "screen": "top.desktop.light",
+   "a": "candidate",
+   "b": "baseline"
+  }
+ },
+ "control": {
+  "c12": "accent.mobile.light",
+  "c13": "identity.mobile.light"
+ }
+}

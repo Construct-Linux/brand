@@ -1,0 +1,63 @@
+{
+ "pairs": {
+  "s01": {
+   "screen": "top.desktop.dark",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s02": {
+   "screen": "menus.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s03": {
+   "screen": "overview.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s04": {
+   "screen": "accent.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s05": {
+   "screen": "compare.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s06": {
+   "screen": "light.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s07": {
+   "screen": "elevation.desktop.dark",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s08": {
+   "screen": "perception.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s09": {
+   "screen": "swatches.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s10": {
+   "screen": "wallpapers.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s11": {
+   "screen": "identity.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  }
+ },
+ "control": {
+  "c12": "top.desktop.light",
+  "c13": "accent.desktop.light"
+ }
+}

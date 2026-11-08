@@ -1,0 +1,200 @@
+{
+ "source": "preview.html served from the worktree (python3 -m http.server); round 00 is f1a16cc",
+ "viewports": {
+  "desktop": [
+   1440,
+   900
+  ],
+  "mobile": [
+   390,
+   844
+  ]
+ },
+ "themes": [
+  "dark",
+  "light"
+ ],
+ "screens": [
+  {
+   "id": "top",
+   "what": "The header, the controls and the first desktop: the page's first impression",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    }
+   ]
+  },
+  {
+   "id": "menus",
+   "what": "The shell's menus: quick settings, a prompt, the calendar",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"The shell's menus\")); if (!h) throw new Error('no heading The shells menus'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "overview",
+   "what": "The overview drawing and the start of the accent scale",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"The overview\")); if (!h) throw new Error('no heading The overview'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "accent",
+   "what": "The accent's seven levels, shell and GTK side by side",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Accent: one scale\")); if (!h) throw new Error('no heading Accent: one scale'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "compare",
+   "what": "The open comparison of the primary as a fill or a tint",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Open comparison\")); if (!h) throw new Error('no heading Open comparison'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "light",
+   "what": "Light mode: Settings drawn as ink on paper",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Light: ink on paper\")); if (!h) throw new Error('no heading Light: ink on paper'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "elevation",
+   "what": "The elevation levels, dark and light",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Elevation\")); if (!h) throw new Error('no heading Elevation'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "perception",
+   "what": "The perception table: every pair the palette holds",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Perception\")); if (!h) throw new Error('no heading Perception'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "swatches",
+   "what": "Shape and the swatches of this mode and the surfaces",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Accent and text\")); if (!h) throw new Error('no heading Accent and text'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "wallpapers",
+   "what": "The four wallpaper pairs",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Wallpapers\")); if (!h) throw new Error('no heading Wallpapers'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  },
+  {
+   "id": "identity",
+   "what": "Identity pieces and where each piece goes",
+   "path": "/preview.html",
+   "fullPage": false,
+   "steps": [
+    {
+     "wait": 400
+    },
+    {
+     "eval": "(() => { const h = [...document.querySelectorAll('h2')].find(e => e.textContent.trim().startsWith(\"Identity\")); if (!h) throw new Error('no heading Identity'); h.scrollIntoView({block: 'start'}); })()"
+    },
+    {
+     "wait": 300
+    }
+   ]
+  }
+ ]
+}

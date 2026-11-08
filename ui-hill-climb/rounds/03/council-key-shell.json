@@ -1,0 +1,59 @@
+{
+ "pairs": {
+  "s01": {
+   "screen": "desktop",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s02": {
+   "screen": "desktop-light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s03": {
+   "screen": "desktop-scale-150",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s04": {
+   "screen": "shell-overview",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s05": {
+   "screen": "shell-app-grid",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s06": {
+   "screen": "shell-quick-settings",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s07": {
+   "screen": "shell-calendar",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s08": {
+   "screen": "shell-notifications",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s09": {
+   "screen": "shell-lock-screen",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s10": {
+   "screen": "shell-lock-prompt",
+   "a": "baseline",
+   "b": "candidate"
+  }
+ },
+ "control": {
+  "c11": "desktop",
+  "c12": "shell-calendar",
+  "c13": "shell-lock-screen"
+ }
+}

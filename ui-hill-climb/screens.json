@@ -1,0 +1,81 @@
+{
+ "source": "needles at Construct-Linux/needles 81a8d56: the harness's approved captures of os main (cmd/image test -usb), 2880x1800 at 200%",
+ "screens": [
+  {
+   "id": "desktop",
+   "what": "The desktop at rest, dark: wallpaper, top bar, dock"
+  },
+  {
+   "id": "desktop-light",
+   "what": "The desktop at rest, light"
+  },
+  {
+   "id": "desktop-scale-150",
+   "what": "The desktop at 150% scale"
+  },
+  {
+   "id": "shell-overview",
+   "what": "Activities overview with windows"
+  },
+  {
+   "id": "shell-app-grid",
+   "what": "App grid"
+  },
+  {
+   "id": "shell-quick-settings",
+   "what": "Quick settings menu"
+  },
+  {
+   "id": "shell-calendar",
+   "what": "Calendar and notifications drawer"
+  },
+  {
+   "id": "shell-notifications",
+   "what": "Notifications: empty state"
+  },
+  {
+   "id": "shell-lock-screen",
+   "what": "Lock screen"
+  },
+  {
+   "id": "shell-lock-prompt",
+   "what": "Lock screen password prompt"
+  },
+  {
+   "id": "org.gnome.Nautilus",
+   "what": "Files: list of folders"
+  },
+  {
+   "id": "org.gnome.Settings",
+   "what": "Settings: navigation and a page"
+  },
+  {
+   "id": "panel-network",
+   "what": "Settings: Network panel (form)"
+  },
+  {
+   "id": "gtk-dialog",
+   "what": "A GTK dialog, dark"
+  },
+  {
+   "id": "gtk-dialog-light",
+   "what": "A GTK dialog, light"
+  },
+  {
+   "id": "com.mitchellh.ghostty",
+   "what": "Ghostty terminal (dense technical view)"
+  },
+  {
+   "id": "org.gnome.SystemMonitor",
+   "what": "System Monitor (dense table)"
+  },
+  {
+   "id": "installer",
+   "what": "The installer, first impression of the product"
+  },
+  {
+   "id": "io.github.construct_linux.Construct",
+   "what": "The Construct app (the product's own app)"
+  }
+ ]
+}
