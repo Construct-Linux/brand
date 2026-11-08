@@ -18,8 +18,9 @@ arrives in upstream's color until it is recolored. Each fork's README says what 
 | `brand` | the logo's cyan, ink (the wallpaper's) and paper; the boot's black, the ground under all that is not a window or the desktop |
 | `neutral` | the surfaces, a-h, on Orchis' scale: a-d light (a brightest), e-h dark (e darkest) |
 | `dark`, `light` | per mode: accent, the accent standing alone (`accent_text`), text on the accent, text, muted text, border, success, warning, error, the destructive action's fill; light's desk (the desktop's ground) and shelf (the sidebar's pane) |
-| `tint` | per mode, the accent's alpha over a surface: rest, hover, active; selection; decoration (transient overlays); a switch's track |
+| `tint` | per mode, the accent's alpha over a surface: rest, hover, active; selection; decoration (transient overlays); a switch's track; on and its hover (a shell toggle that is on, text as its label) |
 | `line.light` | light's lines: `light.muted` at an alpha, for dividers, borders and the window's ring |
+| `series` | chart series, one set for both modes (System Monitor's CPUs, memory, network, disk): never a status hue; `palette/system-monitor.dconf` |
 | `shape` | libadwaita's radius steps, the spacing grid, the bars' distance from the screen edge |
 | `icons` | Tela's folder body and its glyph |
 | `cursor` | Bibata's fill, outline and the watch |

@@ -50,6 +50,10 @@ $construct-tint-decoration-dark: 0.05;
 $construct-tint-track-light: 0.50;
 $construct-tint-track-dark: 0.50;
 
+// A toggle that is on, and its hover: text, not accent_text, on it
+$construct-tint-on-light: (0.36, 0.40);
+$construct-tint-on-dark: (0.30, 0.36);
+
 // The light variant only: the desktop's ground, the sidebar's pane, and its lines -
 // $construct-muted-dark at (divider, border, ring)
 $construct-desk: #DEE4E8;

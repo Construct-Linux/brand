@@ -52,11 +52,13 @@ def colors(text):
 
 # C7: the accent's alpha is a token. A level of the accent scale (THEMING.md) is an alpha
 # palette.toml names - Orchis' $tint, $tint-hover, $tint-active, $selection-alpha,
-# $tint-decoration, $tint-track - never a number written where it is used, nor a shade
+# $tint-decoration, $tint-track, $tint-on and $tint-on-hover (a shell toggle that is on) - never
+# a number written where it is used, nor a shade
 # lighten() or darken() makes: a number chosen at each place of use is how a scale drifts into
 # twenty alphas no one can tell apart. Exceptions are lint-forks.toml's [fork.<name>.accent], each with its reason.
 ACCENT = r"\$(?:primary|suggested|link)\b"
-TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-decoration", "$tint-track"}
+TOKENS = {"$tint", "$tint-hover", "$tint-active", "$selection-alpha", "$tint-decoration", "$tint-track",
+          "$tint-on", "$tint-on-hover"}
 ALPHA = re.compile(rf"\b(?:rgba|alpha|gtkalpha)\(\s*{ACCENT}\s*,\s*([^)]*)\)")
 COLOR_MIX = re.compile(rf"color-mix\(\s*in\s+[\w-]+\s*,\s*{ACCENT}\s+([^,]+),")
 SHADE = re.compile(rf"\b(?:transparentize|lighten|darken)\(\s*{ACCENT}|(?<![\w-])mix\([^;]*?{ACCENT}")
