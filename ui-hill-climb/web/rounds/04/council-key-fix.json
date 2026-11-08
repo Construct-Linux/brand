@@ -1,0 +1,48 @@
+{
+ "pairs": {
+  "s01": {
+   "screen": "light.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s02": {
+   "screen": "light.desktop.light",
+   "a": "baseline",
+   "b": "candidate"
+  },
+  "s03": {
+   "screen": "light.mobile.light",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s04": {
+   "screen": "top.desktop.light",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s05": {
+   "screen": "top.mobile.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s06": {
+   "screen": "compare.desktop.light",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s07": {
+   "screen": "menus.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  },
+  "s08": {
+   "screen": "swatches.desktop.dark",
+   "a": "candidate",
+   "b": "baseline"
+  }
+ },
+ "control": {
+  "c09": "top.desktop.light",
+  "c10": "accent.desktop.light"
+ }
+}
