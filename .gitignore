@@ -7,3 +7,5 @@ sprite.png
 .task/
 __pycache__/
 *.pyc
+# The design review's before/after page, published as an Artifact, not committed.
+_output/
