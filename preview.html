@@ -33,7 +33,8 @@
   main { min-width: 0; max-width: 1144px; padding: 40px 32px 0; }
   .word { font-family: var(--font-wordmark); letter-spacing: .35em; color: var(--accent-text); display: flex; align-items: center; gap: 12px; text-decoration: none; }
   aside .word { font-size: 17px; padding: 0 8px; }
-  .word img { width: 32px; height: 32px; }
+  .word .mark { width: 32px; height: 32px; flex: none; background: var(--accent-text); mask: url("logos/construct.svg") center / contain no-repeat; }
+  aside .tagline { margin: -12px 0 0; padding: 0 8px; color: var(--muted); font-size: 13px; line-height: 1.45; }
   .toc { display: flex; flex-direction: column; gap: 2px; }
   .toc a { display: block; padding: 6px 10px; border-radius: var(--radius-control); color: var(--text); text-decoration: none; font-size: 14px; }
   .toc a:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
@@ -54,8 +55,6 @@
   .hero { padding-bottom: 8px; }
   .hero h1 { font-size: 40px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; margin: 0 0 16px; }
   .hero .lead { font-size: 17px; line-height: 1.55; color: var(--text); margin: 0 0 16px; max-width: 78ch; }
-  .hero .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 48px; }
-  .hero .tagline { color: var(--muted); margin: 0; font-size: 15px; }
   .hero .links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; font-size: 15px; }
   #desktop { padding-top: 28px; }
   section { padding: 56px 0 8px; scroll-margin-top: 8px; }
@@ -68,8 +67,8 @@
   code { font-family: var(--font-mono); font-size: .9em; }
   .lv .num { display: inline-block; min-width: 1.6em; font-variant-numeric: tabular-nums; color: var(--muted); }
   .cmp small { font-size: 13px; font-variant-numeric: tabular-nums; }
-  .cmp .demo small.fail { color: var(--error); }
-  .cmp .demo.sh small.fail { color: var(--shell-error); }
+  .cmp .demo .fail { color: var(--error); }
+  .cmp .demo.sh .fail { color: var(--shell-error); }
   .ident.wps { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
   .wps .pair a { display: block; }
   .ident .card div.c :not(a) > code { color: var(--text); }
@@ -296,7 +295,7 @@
   @media (max-width: 640px) { .lv, .cmp { grid-template-columns: 1fr; } }
 
   /* ---------- light: ink on paper ---------- */
-  .settings { left: 7%; top: 10%; width: 72%; max-height: 76%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
+  .settings { left: 7%; top: 7.5%; width: 72%; display: grid; grid-template-columns: 30% 1fr; flex-direction: row; }
   .settings .pane { background: var(--shelf); box-shadow: inset -1px 0 var(--line-border); display: flex; flex-direction: column; min-width: 0; }
   /* Both headerbars one height, so their rules run as one line across the window. */
   .hb { height: 3em; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 -1px var(--line-border); flex: none; line-height: 1.2; position: relative; }
@@ -307,7 +306,7 @@
   .nav { padding: .5em; display: flex; flex-direction: column; gap: .15em; }
   .nav .cap { font-size: .82em; font-weight: 700; color: var(--muted); padding: .9em .6em .3em; }
   .page { background: var(--bg); display: flex; flex-direction: column; min-width: 0; position: relative; }
-  .page .body { padding: 1.6em 2em; display: flex; flex-direction: column; gap: 1.6em; width: 100%; max-width: 40em; margin: 0 auto; overflow: hidden; }
+  .page .body { padding: 1.4em 2em; display: flex; flex-direction: column; gap: 1.3em; width: 100%; max-width: 40em; margin: 0 auto; overflow: hidden; }
   .group .h4 { margin: 0; font-size: 1em; font-weight: 700; }
   .group > p { margin: .2em 0 0; color: var(--muted); font-size: .82em; }
   .list { margin-top: .8em; background: var(--view); border-radius: 12px; box-shadow: 0 0 0 1px var(--line-border); overflow: hidden; }
@@ -324,7 +323,9 @@
   .pop hr { border: 0; height: 1px; background: var(--line-divider); margin: .3em .4em; }
   .lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
   .lines > div { background: var(--bg); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 13px; box-shadow: 0 0 0 1px var(--line-border); }
-  .lines .sample { height: 56px; border-radius: 10px; margin: 10px 0 6px; background: var(--neutral-a); }
+  /* A boxed list of two rows, so each line is seen doing its job: the edge and the divider. */
+  .lines .sample { height: 56px; border-radius: 10px; margin: 10px 0 6px; background: var(--neutral-a); display: grid; grid-template-rows: 1fr 1fr; }
+  .lines .sample span { display: flex; align-items: center; padding: 0 12px; }
   .types { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 28px; padding: 16px 20px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-border); margin-top: 12px; }
   .types span { white-space: nowrap; }
   .types small { color: var(--muted); font-size: 9pt; font-weight: 400; margin-left: .4em; }
@@ -420,7 +421,6 @@
     .sw, #neutral-sw { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .qs .toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .tg { min-width: 0; padding-right: .6em; }
-    .hero .sub { flex-direction: column; align-items: flex-start; }
     .ident.wps { grid-template-columns: 1fr; }
     .ident:not(.wps) .card .img { aspect-ratio: 2 / 1; }
     #status-sw .s:nth-child(4) { grid-column: auto; }
@@ -429,7 +429,8 @@
 <body>
 <div class="layout">
 <aside class="side-nav">
-  <a class="word" href="#top" aria-label="CONSTRUCT, to the top"><img src="logos/construct.svg" alt="">CONSTRUCT</a>
+  <a class="word" href="#top" aria-label="CONSTRUCT, to the top"><span class="mark" aria-hidden="true"></span>CONSTRUCT</a>
+  <p class="tagline">the workspace.<br>the image, verified.</p>
   <div class="controls">
     <div><span class="cap-label" id="mode-label">Mode</span>
       <div class="seg" role="group" aria-labelledby="mode-label" id="mode">
@@ -463,8 +464,7 @@
   <header class="hero">
     <h1>The desktop, drawn with its palette</h1>
     <p class="lead">CONSTRUCT is a Linux desktop for developers built on Wolfi: a read-only, verified base image with A/B updates and automatic rollback, and GNOME on top. This page draws it with its palette, in dark and light, and shows the rules every colour follows.</p>
-    <div class="sub"><p class="tagline">the workspace.<br>the image, verified.</p>
-    <p class="links"><a class="link" href="https://github.com/Construct-Linux/brand">Source and assets</a><a class="link" href="https://github.com/Construct-Linux/brand/blob/main/THEMING.md">The theming rules</a></p></div>
+    <p class="links"><a class="link" href="https://github.com/Construct-Linux/brand">Source and assets</a><a class="link" href="https://github.com/Construct-Linux/brand/blob/main/THEMING.md">The theming rules</a></p>
   </header>
 
   <section id="desktop" aria-label="The desktop">
@@ -679,9 +679,9 @@
     <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 5.31:1 · ΔE00 6.8: dark's active tint</small></div>
     <div class="demo md" data-mode="light" data-col="GTK light, on a"><div><span class="rowx picked">Projects</span><span class="btn tint28">Open</span></div><small>label 4.64:1 · ΔE00 9.4</small></div>
     <div class="lead"><b>C 36% tint</b><span>label accent_text</span></div>
-    <div class="demo sh" data-col="Shell, on h (both modes)"><div role="img" aria-label="Wired on, and Authenticate as a 36% tint: its label below 4.5:1"><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small class="fail">label 3.89:1, below 4.5 · ΔE00 11.3</small></div>
-    <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small class="fail">label 4.24:1, below 4.5 · ΔE00 12.1</small></div>
-    <div class="demo md" data-mode="light" data-col="GTK light, on a"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small class="fail">label 4.08:1, below 4.5 · ΔE00 13.2</small></div>
+    <div class="demo sh" data-col="Shell, on h (both modes)"><div role="img" aria-label="Wired on, and Authenticate as a 36% tint: its label below 4.5:1"><span class="tg on"><span class="ic"><svg class="i"><use href="#i-net"/></svg></span>Wired</span><span class="btn tint36">Authenticate</span></div><small><span class="fail">label 3.89:1, below 4.5</span> · ΔE00 11.3</small></div>
+    <div class="demo md" data-mode="dark" data-col="GTK dark, on g"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.24:1, below 4.5</span> · ΔE00 12.1</small></div>
+    <div class="demo md" data-mode="light" data-col="GTK light, on a"><div role="img" aria-label="Projects selected, and Open as a 36% tint: its label below 4.5:1"><span class="rowx picked">Projects</span><span class="btn tint36">Open</span></div><small><span class="fail">label 4.08:1, below 4.5</span> · ΔE00 13.2</small></div>
   </div>
 
   </section>
@@ -737,9 +737,9 @@
       </div>
     </div>
     <div class="lines sim">
-      <div><b>GNOME's line</b>: black at 12%, no hue<div class="sample" style="box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-boot) 12%,transparent),inset 0 -28px 0 -27px color-mix(in srgb,var(--brand-boot) 12%,transparent)"></div></div>
-      <div><b>CONSTRUCT's line</b>: the muted ink at 30%<div class="sample" style="box-shadow:0 0 0 1px var(--line-border),inset 0 -28px 0 -27px var(--line-border)"></div></div>
-      <div><b>Divider and ring</b>: 20% inside a list, 40% around a window<div class="sample" style="box-shadow:0 0 0 1px var(--line-ring),inset 0 -28px 0 -27px var(--line-divider)"></div></div>
+      <div><b>GNOME's line</b>: black at 12%, no hue<div class="sample" style="box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-boot) 12%,transparent),inset 0 -28px 0 -27px color-mix(in srgb,var(--brand-boot) 12%,transparent)"><span>Scale</span><span>Refresh Rate</span></div></div>
+      <div><b>CONSTRUCT's line</b>: the muted ink at 30%<div class="sample" style="box-shadow:0 0 0 1px var(--line-border),inset 0 -28px 0 -27px var(--line-border)"><span>Scale</span><span>Refresh Rate</span></div></div>
+      <div><b>Divider and ring</b>: 20% inside a list, 40% around a window<div class="sample" style="box-shadow:0 0 0 1px var(--line-ring),inset 0 -28px 0 -27px var(--line-divider)"><span>Scale</span><span>Refresh Rate</span></div></div>
     </div>
   </div>
   <div class="types" aria-label="Type, libadwaita's sizes in Adwaita Sans">
